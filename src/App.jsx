@@ -10,6 +10,7 @@ import Dashboard from '@/pages/Dashboard';
 import Incidents from '@/pages/Incidents';
 import Communications from '@/pages/Communications';
 import Evidence from '@/pages/Evidence';
+import EvidenceScanner from '@/pages/EvidenceScanner';
 import RICSAssessment from '@/pages/RICSAssessment';
 import LegalAnalysis from '@/pages/LegalAnalysis';
 
@@ -44,6 +45,7 @@ const AuthenticatedApp = () => {
       <Route path="/incidents" element={<Incidents />} />
       <Route path="/communications" element={<Communications />} />
       <Route path="/evidence" element={<Evidence />} />
+      <Route path="/scanner" element={<EvidenceScanner />} />
       <Route path="/assessment" element={<RICSAssessment />} />
       <Route path="/legal-analysis" element={<LegalAnalysis />} />
       <Route path="*" element={<PageNotFound />} />
