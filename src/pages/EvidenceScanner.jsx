@@ -39,12 +39,6 @@ export default function EvidenceScanner() {
 
     for (const file of files) {
       try {
-        // Validate PDF file size (10MB max)
-        if (file.type === 'application/pdf' && file.size > 10 * 1024 * 1024) {
-          newItems.push({ file: file.name, status: 'error', error: 'PDF file size must be under 10MB' });
-          continue;
-        }
-
         // Upload file
         const uploadRes = await base44.integrations.Core.UploadFile({ file });
         const fileUrl = uploadRes.file_url;
