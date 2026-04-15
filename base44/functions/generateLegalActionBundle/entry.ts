@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
     const bundle = {
       generatedDate: new Date().toISOString(),
       parties: {
-        claimant: 'Sean Powell',
+        claimant: 'William Bradley',
         defendant: 'Malcolm Belcher (RICS Surveyor)',
         relatedParties: ricsAssessment.map(r => r.surveyor_name) || []
       },
