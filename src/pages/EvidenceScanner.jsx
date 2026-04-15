@@ -40,93 +40,47 @@ export default function EvidenceScanner() {
 
     for (const file of files) {
       try {
-        // Upload file
+        // Upload file (no size restrictions)
         const uploadRes = await base44.integrations.Core.UploadFile({ file });
         const fileUrl = uploadRes.file_url;
 
-        // Validate upload and check for duplicates
-        let validationRes;
-        try {
-          validationRes = await base44.functions.invoke('validateFileUpload', {
-            fileName: file.name,
-            fileSize: file.size,
-            fileUrl
+        // Check for duplicates
+        const allEvidence = await base44.entities.Evidence.list();
+        if (allEvidence.some(e => e.file_url === fileUrl)) {
+          newItems.push({ 
+            file: file.name, 
+            status: 'error', 
+            error: 'This document has already been uploaded' 
           });
-        } catch (validationErr) {
-          newItems.push({ file: file.name, status: 'error', error: `Validation failed: ${validationErr.message}` });
           continue;
         }
 
-        if (!validationRes.data.valid) {
-          newItems.push({ file: file.name, status: 'error', error: validationRes.data.error });
-          continue;
-        }
-        // Extract and analyze content
-        const extractRes = await base44.integrations.Core.ExtractDataFromUploadedFile({
-          file_url: fileUrl,
-          json_schema: {
-            type: 'object',
-            properties: {
-              title: { type: 'string', description: 'Document title' },
-              description: { type: 'string', description: 'Full extracted content summary' },
-              evidence_type: {
-                type: 'string',
-                enum: ['document', 'communication', 'report', 'valuation', 'contract', 'witness_statement', 'photograph', 'recording_transcript', 'other'],
-                description: 'Evidence type'
-              },
-              relevance: {
-                type: 'string',
-                enum: ['rics_violation', 'legal_violation', 'pattern', 'credibility', 'context', 'other'],
-                description: 'Relevance category'
-              },
-              key_findings: { type: 'array', items: { type: 'string' }, description: 'Critical findings' },
-              date: { type: 'string', description: 'Date mentioned in document' }
-            },
-            required: ['title', 'description', 'evidence_type']
-          }
-        });
+        // Generate title from filename
+        const title = file.name.replace(/\.[^/.]+$/, '');
 
-        if (extractRes.status === 'error') {
-          newItems.push({ file: file.name, status: 'error', error: extractRes.details });
-          continue;
-        }
-
-        const data = extractRes.output;
-
-        // Intelligent incident linking via LLM
-        let linkedIncident = null;
-        if (incidents.length > 0) {
-          const incidentSummaries = incidents.map(i => `[${i.id}] ${i.title}: ${i.description}`).join('\n\n');
-          const linkRes = await base44.integrations.Core.InvokeLLM({
-            prompt: `Given this extracted document content, which of these incidents does it relate to? Return just the incident ID if there's a clear match, or "none" if not related.\n\nDocument: ${data.description}\n\nIncidents:\n${incidentSummaries}`,
-          });
-
-          const matchedId = incidents.find(i => linkRes.includes(i.id))?.id;
-          linkedIncident = matchedId || null;
-        }
-
-        // Create Evidence record
+        // Create Evidence record with basic metadata
         const evidenceData = {
-          date_collected: data.date || new Date().toISOString().split('T')[0],
-          title: data.title || file.name,
-          description: data.description,
-          evidence_type: data.evidence_type || 'document',
+          date_collected: new Date().toISOString().split('T')[0],
+          title: title,
+          description: `Uploaded: ${file.name}`,
+          evidence_type: 'document',
           file_url: fileUrl,
-          relevance: data.relevance || 'other',
+          relevance: 'context',
           strength: 'moderate',
-          notes: data.key_findings?.join('\n') || '',
-          related_incidents: linkedIncident ? [linkedIncident] : []
+          notes: ''
         };
 
         newItems.push({
           file: file.name,
           status: 'success',
-          data: evidenceData,
-          linkedIncident,
-          linkedTitle: incidents.find(i => i.id === linkedIncident)?.title
+          data: evidenceData
         });
       } catch (err) {
-        newItems.push({ file: file.name, status: 'error', error: err.message });
+        newItems.push({ 
+          file: file.name, 
+          status: 'error', 
+          error: err.message || 'Upload failed' 
+        });
       }
     }
 
@@ -157,9 +111,6 @@ export default function EvidenceScanner() {
 
   const handleClear = () => {
     setScannedItems([]);
-    // Force state reset
-    localStorage.removeItem('evidenceScannerState');
-    window.location.reload();
   };
 
   return (
@@ -167,7 +118,7 @@ export default function EvidenceScanner() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Evidence Scanner</h1>
-          <p className="text-slate-600">Scan printed documents and automatically extract evidence, categorize, and link to relevant incidents</p>
+          <p className="text-slate-600">Upload documents and evidence files without size restrictions</p>
         </div>
 
         {/* Drop Zone */}
@@ -185,19 +136,18 @@ export default function EvidenceScanner() {
               {scanning ? (
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-                  <p className="text-sm text-slate-600">Scanning and extracting evidence...</p>
+                  <p className="text-sm text-slate-600">Uploading documents...</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-4">
                   <Upload className="w-10 h-10 text-slate-400" />
                   <div>
-                    <p className="font-medium text-slate-900">Drop scanned documents here</p>
-                    <p className="text-sm text-slate-600">PDF, images, or document files</p>
+                    <p className="font-medium text-slate-900">Drop documents here</p>
+                    <p className="text-sm text-slate-600">Any file type, unlimited size</p>
                   </div>
                   <input
                     type="file"
                     onChange={handleChange}
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.tiff"
                     multiple
                     disabled={scanning}
                     className="absolute inset-0 opacity-0 cursor-pointer"
@@ -206,7 +156,7 @@ export default function EvidenceScanner() {
                     Browse Files
                   </Button>
                   <p className="text-xs text-slate-500">
-                    Supports batch uploads • AI extracts content • Auto-links to incidents
+                    Batch uploads • No file size limits • Duplicate detection
                   </p>
                 </div>
               )}
@@ -218,7 +168,7 @@ export default function EvidenceScanner() {
         {scannedItems.length > 0 && (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
-              <CardTitle>Scan Results ({scannedItems.length})</CardTitle>
+              <CardTitle>Upload Results ({scannedItems.length})</CardTitle>
               <div className="flex gap-2">
                 {scannedItems.some(i => i.status === 'success') && (
                   <Button size="sm" onClick={handleSaveAll} className="bg-green-600 hover:bg-green-700">
@@ -239,18 +189,10 @@ export default function EvidenceScanner() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <CheckCircle2 className="w-4 h-4 text-green-600" />
-                            <p className="font-medium text-slate-900">{item.data.title}</p>
+                            <p className="font-medium text-slate-900">{item.file}</p>
                           </div>
-                          <p className="text-sm text-slate-600 mb-2">{item.data.description.substring(0, 150)}...</p>
                           <div className="flex flex-wrap gap-2">
-                            <Badge variant="secondary">{item.data.evidence_type.replace(/_/g, ' ')}</Badge>
-                            <Badge variant="outline">{item.data.relevance.replace(/_/g, ' ')}</Badge>
-                            {item.linkedIncident && (
-                              <Badge className="bg-blue-100 text-blue-800">
-                                <LinkIcon className="w-3 h-3 mr-1" />
-                                {item.linkedTitle?.substring(0, 30)}...
-                              </Badge>
-                            )}
+                            <Badge variant="secondary">document</Badge>
                           </div>
                         </div>
                         <Button variant="ghost" size="icon" onClick={() => setScannedItems(scannedItems.filter((_, i) => i !== idx))}>
