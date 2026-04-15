@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import DocumentDropZone from '../components/DocumentDropZone';
 
 const strengthColors = {
   weak: 'bg-slate-100 text-slate-800',
@@ -202,8 +203,10 @@ export default function Evidence() {
           </Dialog>
         </div>
 
-        <div className="space-y-4">
-          {evidence.length === 0 ? (
+        <DocumentDropZone onEvidenceCreated={() => queryClient.invalidateQueries({ queryKey: ['evidence'] })} />
+
+        <div className="space-y-4 mt-8">
+           {evidence.length === 0 ? (
             <Card className="text-center py-12">
               <p className="text-slate-500">No evidence added yet. Start organizing your supporting documents.</p>
             </Card>
