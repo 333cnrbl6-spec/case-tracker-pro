@@ -45,11 +45,17 @@ export default function EvidenceScanner() {
         const fileUrl = uploadRes.file_url;
 
         // Validate upload and check for duplicates
-        const validationRes = await base44.functions.invoke('validateFileUpload', {
-          fileName: file.name,
-          fileSize: file.size,
-          fileUrl
-        });
+        let validationRes;
+        try {
+          validationRes = await base44.functions.invoke('validateFileUpload', {
+            fileName: file.name,
+            fileSize: file.size,
+            fileUrl
+          });
+        } catch (validationErr) {
+          newItems.push({ file: file.name, status: 'error', error: `Validation failed: ${validationErr.message}` });
+          continue;
+        }
 
         if (!validationRes.data.valid) {
           newItems.push({ file: file.name, status: 'error', error: validationRes.data.error });
@@ -151,10 +157,9 @@ export default function EvidenceScanner() {
 
   const handleClear = () => {
     setScannedItems([]);
-  };
-
-  const handleRetry = () => {
-    setScannedItems(scannedItems.filter(i => i.status === 'success'));
+    // Force state reset
+    localStorage.removeItem('evidenceScannerState');
+    window.location.reload();
   };
 
   return (
