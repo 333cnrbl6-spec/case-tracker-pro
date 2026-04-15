@@ -23,8 +23,8 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
     const file = files[0];
     if (!file) return;
 
-    // Validate file size (10MB max for PDFs, 20MB for others)
-    const maxSize = file.type === 'application/pdf' ? 10 * 1024 * 1024 : 20 * 1024 * 1024;
+    // Validate file size (50MB max for PDFs, 100MB for others)
+    const maxSize = file.type === 'application/pdf' ? 50 * 1024 * 1024 : 100 * 1024 * 1024;
     if (file.size > maxSize) {
       const maxMB = maxSize / (1024 * 1024);
       setError(`${file.name} exceeds ${maxMB}MB limit`);
@@ -173,7 +173,7 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
         </div>
 
         <p className="text-xs text-slate-500 mt-4">
-          Supports: PDF (max 10MB), Word, Text, Images (max 20MB). AI extracts key data and auto-categorizes evidence.
+          Supports: PDF (max 50MB), Word, Text, Images (max 100MB). AI extracts key data and auto-categorizes evidence.
         </p>
       </CardContent>
     </Card>
