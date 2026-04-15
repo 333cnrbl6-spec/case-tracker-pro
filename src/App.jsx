@@ -13,6 +13,7 @@ import Evidence from '@/pages/Evidence';
 import EvidenceScanner from '@/pages/EvidenceScanner';
 import RICSAssessment from '@/pages/RICSAssessment';
 import LegalAnalysis from '@/pages/LegalAnalysis';
+import LegalActionBundle from '@/pages/LegalActionBundle';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
       <Route path="/scanner" element={<EvidenceScanner />} />
       <Route path="/assessment" element={<RICSAssessment />} />
       <Route path="/legal-analysis" element={<LegalAnalysis />} />
+      <Route path="/action-bundle" element={<LegalActionBundle />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

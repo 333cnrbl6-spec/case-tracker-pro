@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -146,6 +146,21 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">Identify potential legal violations and grounds for action</p>
                 <Button className="bg-amber-600 hover:bg-amber-700 w-full">Analyze Legal Issues</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/action-bundle" className="block">
+            <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileCheck className="w-5 h-5 text-purple-600" />
+                  <span className="text-lg">Action Bundle</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Complete case summary & legal strategy ready for counsel</p>
+                <Button className="bg-purple-600 hover:bg-purple-700 w-full">View Bundle</Button>
               </CardContent>
             </Card>
           </Link>
