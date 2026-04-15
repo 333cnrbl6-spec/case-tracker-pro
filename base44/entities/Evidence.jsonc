@@ -1,0 +1,76 @@
+{
+  "name": "Evidence",
+  "type": "object",
+  "properties": {
+    "date_collected": {
+      "type": "string",
+      "format": "date",
+      "description": "Date evidence was documented"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of evidence"
+    },
+    "description": {
+      "type": "string",
+      "description": "What this evidence shows"
+    },
+    "evidence_type": {
+      "type": "string",
+      "enum": [
+        "document",
+        "communication",
+        "report",
+        "valuation",
+        "contract",
+        "witness_statement",
+        "photograph",
+        "recording_transcript",
+        "other"
+      ],
+      "description": "Type of evidence"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Link to actual evidence file"
+    },
+    "relevance": {
+      "type": "string",
+      "enum": [
+        "rics_violation",
+        "legal_violation",
+        "pattern",
+        "credibility",
+        "context",
+        "other"
+      ],
+      "description": "Why this matters"
+    },
+    "related_incidents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related incidents"
+    },
+    "strength": {
+      "type": "string",
+      "enum": [
+        "weak",
+        "moderate",
+        "strong",
+        "critical"
+      ],
+      "description": "How compelling this evidence is"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional context or analysis"
+    }
+  },
+  "required": [
+    "date_collected",
+    "title",
+    "evidence_type"
+  ]
+}

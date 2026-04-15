@@ -1,0 +1,85 @@
+{
+  "name": "Incident",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the incident"
+    },
+    "title": {
+      "type": "string",
+      "description": "Brief title of the incident"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed account of what happened"
+    },
+    "incident_type": {
+      "type": "string",
+      "enum": [
+        "communication",
+        "professional_conduct",
+        "document_issue",
+        "gatekeeping",
+        "information_control",
+        "harassment",
+        "other"
+      ],
+      "description": "Category of incident"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Severity assessment"
+    },
+    "witnesses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Names of witnesses"
+    },
+    "evidence_notes": {
+      "type": "string",
+      "description": "Evidence supporting this incident"
+    },
+    "rics_violations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Relevant RICS code violations"
+    },
+    "legal_issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Potential legal violations identified"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "reviewed",
+        "assessed",
+        "escalated"
+      ],
+      "default": "open",
+      "description": "Current status"
+    }
+  },
+  "required": [
+    "date",
+    "title",
+    "description",
+    "incident_type"
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "name": "RICSSurveyorProfile",
+  "type": "object",
+  "properties": {
+    "surveyor_name": {
+      "type": "string",
+      "description": "Name of the surveyor"
+    },
+    "rics_registration_number": {
+      "type": "string",
+      "description": "RICS registration number"
+    },
+    "specialism": {
+      "type": "string",
+      "description": "Area of specialization"
+    },
+    "qualifications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Relevant qualifications"
+    },
+    "disciplinary_history": {
+      "type": "string",
+      "description": "Any known disciplinary actions"
+    },
+    "scope_of_work": {
+      "type": "string",
+      "description": "What they were hired to do"
+    },
+    "years_in_profession": {
+      "type": "number",
+      "description": "Years as qualified surveyor"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional background"
+    }
+  },
+  "required": [
+    "surveyor_name"
+  ]
+}

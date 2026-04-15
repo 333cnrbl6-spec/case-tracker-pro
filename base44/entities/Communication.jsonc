@@ -1,0 +1,83 @@
+{
+  "name": "Communication",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of communication"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "email",
+        "letter",
+        "phone_call",
+        "in_person",
+        "message",
+        "other"
+      ],
+      "description": "Type of communication"
+    },
+    "from": {
+      "type": "string",
+      "description": "Who initiated the communication"
+    },
+    "to": {
+      "type": "string",
+      "description": "Recipient"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Subject or topic"
+    },
+    "content": {
+      "type": "string",
+      "description": "Full text of communication"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of attached document (email/letter scan)"
+    },
+    "tone": {
+      "type": "string",
+      "enum": [
+        "neutral",
+        "professional",
+        "dismissive",
+        "aggressive",
+        "threatening",
+        "unprofessional"
+      ],
+      "description": "Assessment of tone"
+    },
+    "concerning_elements": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Specific problematic phrases or behaviors"
+    },
+    "witnesses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Who else was copied/present"
+    },
+    "related_incidents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related incidents"
+    }
+  },
+  "required": [
+    "date",
+    "type",
+    "from",
+    "to",
+    "subject"
+  ]
+}
