@@ -35,6 +35,7 @@ export default function EvidenceScanner() {
 
   const processFiles = async (files) => {
     setScanning(true);
+    setScannedItems([]);
     const newItems = [];
 
     for (const file of files) {
@@ -152,6 +153,10 @@ export default function EvidenceScanner() {
     setScannedItems([]);
   };
 
+  const handleRetry = () => {
+    setScannedItems(scannedItems.filter(i => i.status === 'success'));
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-4xl mx-auto">
@@ -255,7 +260,14 @@ export default function EvidenceScanner() {
                         <p className="font-medium text-slate-900">{item.file}</p>
                         <p className="text-xs text-red-600">{item.error}</p>
                       </div>
-                      <Button variant="ghost" size="icon" onClick={() => setScannedItems(scannedItems.filter((_, i) => i !== idx))}>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => {
+                          const filtered = scannedItems.filter((_, i) => i !== idx);
+                          setScannedItems(filtered);
+                        }}
+                      >
                         <Trash2 className="w-4 h-4 text-slate-400" />
                       </Button>
                     </div>
