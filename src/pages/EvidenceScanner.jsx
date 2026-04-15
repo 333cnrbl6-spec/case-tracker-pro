@@ -43,6 +43,17 @@ export default function EvidenceScanner() {
         const uploadRes = await base44.integrations.Core.UploadFile({ file });
         const fileUrl = uploadRes.file_url;
 
+        // Validate upload and check for duplicates
+        const validationRes = await base44.functions.invoke('validateFileUpload', {
+          fileName: file.name,
+          fileSize: file.size,
+          fileUrl
+        });
+
+        if (!validationRes.data.valid) {
+          newItems.push({ file: file.name, status: 'error', error: validationRes.data.error });
+          continue;
+        }
         // Extract and analyze content
         const extractRes = await base44.integrations.Core.ExtractDataFromUploadedFile({
           file_url: fileUrl,

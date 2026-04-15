@@ -23,13 +23,7 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
     const file = files[0];
     if (!file) return;
 
-    // Validate file size (500MB max for PDFs, 1GB for others)
-    const maxSize = file.type === 'application/pdf' ? 500 * 1024 * 1024 : 1024 * 1024 * 1024;
-    if (file.size > maxSize) {
-      const maxMB = maxSize / (1024 * 1024);
-      setError(`${file.name} exceeds ${maxMB}MB limit`);
-      return;
-    }
+    // No file size restrictions - unlimited uploads
 
     setUploading(true);
     setError(null);
@@ -39,6 +33,18 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
       // Upload file
       const uploadRes = await base44.integrations.Core.UploadFile({ file });
       const fileUrl = uploadRes.file_url;
+
+      // Validate upload and check for duplicates
+      const validationRes = await base44.functions.invoke('validateFileUpload', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileUrl
+      });
+
+      if (!validationRes.data.valid) {
+        setError(validationRes.data.error);
+        return;
+      }
 
       // Extract data from document
       const extractRes = await base44.integrations.Core.ExtractDataFromUploadedFile({
@@ -173,7 +179,7 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
         </div>
 
         <p className="text-xs text-slate-500 mt-4">
-          Supports: PDF (max 500MB), Word, Text, Images (max 1GB). AI extracts key data and auto-categorizes evidence.
+          Supports: PDF, Word, Text, Images (unlimited size). AI extracts key data and auto-categorizes evidence. Duplicates detected automatically.
         </p>
       </CardContent>
     </Card>
