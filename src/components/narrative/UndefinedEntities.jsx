@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertCircle, CheckCircle2, UserCircle, Building2, MapPin, HelpCircle, Pencil, Save, X, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 // Detected mentions from evidence that may need confirmation
 const DETECTED_PARTIES = [
@@ -125,7 +126,10 @@ export default function UndefinedEntities() {
 
   const saveMutation = useMutation({
     mutationFn: (party) => base44.entities.CaseParty.create(party),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['caseParties'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['caseParties'] });
+      toast.success('Party details saved');
+    },
   });
 
   const updateMutation = useMutation({
@@ -133,6 +137,7 @@ export default function UndefinedEntities() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['caseParties'] });
       setEditingIdx(null);
+      toast.success('Party details updated');
     },
   });
 
