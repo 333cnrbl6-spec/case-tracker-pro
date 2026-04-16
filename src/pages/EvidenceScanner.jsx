@@ -33,6 +33,20 @@ export default function EvidenceScanner() {
     setIsDragActive(e.type === 'dragenter' || e.type === 'dragover');
   };
 
+  const uploadFile = async (file) => {
+    // Use backend function for large files (PDFs, docs over 4MB)
+    const LARGE_FILE_THRESHOLD = 4 * 1024 * 1024; // 4MB
+    if (file.size > LARGE_FILE_THRESHOLD || file.type === 'application/pdf') {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await base44.functions.invoke('uploadLargeFile', formData);
+      return response.data.file_url;
+    } else {
+      const uploadRes = await base44.integrations.Core.UploadFile({ file });
+      return uploadRes.file_url;
+    }
+  };
+
   const processFiles = async (files) => {
     setScanning(true);
     setScannedItems([]);
@@ -40,9 +54,9 @@ export default function EvidenceScanner() {
 
     for (const file of files) {
       try {
-        // Upload file (no size restrictions)
-        const uploadRes = await base44.integrations.Core.UploadFile({ file });
-        const fileUrl = uploadRes.file_url;
+        // Upload file - PDFs and large files go via backend (no size limit)
+        const fileUrl = await uploadFile(file);
+        if (!fileUrl) throw new Error('Upload returned no URL');
 
         // Check for duplicates
         const allEvidence = await base44.entities.Evidence.list();
@@ -149,6 +163,7 @@ export default function EvidenceScanner() {
                     type="file"
                     onChange={handleChange}
                     multiple
+                    accept="*/*"
                     disabled={scanning}
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
