@@ -55,30 +55,36 @@ export default function ChronologicalNarrative({ incidents, communications, evid
   const timeline = [];
 
   incidents.forEach(inc => {
-    timeline.push({
-      date: inc.data.date,
-      type: 'incident',
-      sortDate: new Date(inc.data.date),
-      item: inc
-    });
+    if (inc?.data?.date) {
+      timeline.push({
+        date: inc.data.date,
+        type: 'incident',
+        sortDate: new Date(inc.data.date),
+        item: inc
+      });
+    }
   });
 
   communications.forEach(comm => {
-    timeline.push({
-      date: comm.data.date,
-      type: 'communication',
-      sortDate: new Date(comm.data.date),
-      item: comm
-    });
+    if (comm?.data?.date) {
+      timeline.push({
+        date: comm.data.date,
+        type: 'communication',
+        sortDate: new Date(comm.data.date),
+        item: comm
+      });
+    }
   });
 
   evidence.forEach(ev => {
-    timeline.push({
-      date: ev.data.date_collected,
-      type: 'evidence',
-      sortDate: new Date(ev.data.date_collected),
-      item: ev
-    });
+    if (ev?.data?.date_collected) {
+      timeline.push({
+        date: ev.data.date_collected,
+        type: 'evidence',
+        sortDate: new Date(ev.data.date_collected),
+        item: ev
+      });
+    }
   });
 
   // Sort chronologically
