@@ -188,7 +188,7 @@ export default function UndefinedEntities() {
                 confirmed ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'
               } ${justSavedIdx === idx ? 'ring-2 ring-green-400 shadow-lg' : ''}`}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className={`flex items-start justify-between gap-3 transition-opacity duration-500 ${justSavedIdx === idx ? 'opacity-0' : 'opacity-100'}`}>
                 <div className="flex items-start gap-3 flex-1">
                   <PartyIcon type={party.party_type} />
                   <div className="flex-1">
