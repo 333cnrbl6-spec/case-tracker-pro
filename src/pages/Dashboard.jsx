@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 
 export default function Dashboard() {
   const { data: incidents = [] } = useQuery({
@@ -76,6 +77,10 @@ export default function Dashboard() {
               <p className="text-xs text-slate-500 mt-1">Documents & communications</p>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mb-8">
+          <CaseSummaryWidget />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
