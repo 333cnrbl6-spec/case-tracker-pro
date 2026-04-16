@@ -118,6 +118,7 @@ export default function UndefinedEntities() {
   const queryClient = useQueryClient();
   const [editingIdx, setEditingIdx] = useState(null);
   const [editNotes, setEditNotes] = useState('');
+  const [justSavedIdx, setJustSavedIdx] = useState(null);
 
   const { data: savedParties = [] } = useQuery({
     queryKey: ['caseParties'],
@@ -126,16 +127,21 @@ export default function UndefinedEntities() {
 
   const saveMutation = useMutation({
     mutationFn: (party) => base44.entities.CaseParty.create(party),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['caseParties'] });
+      setJustSavedIdx(DETECTED_PARTIES.findIndex(p => p.name === variables.name));
+      setTimeout(() => setJustSavedIdx(null), 2000);
       toast.success('Party details saved');
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.CaseParty.update(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['caseParties'] });
+      const idx = DETECTED_PARTIES.findIndex(p => p.name === variables.data.name);
+      setJustSavedIdx(idx);
+      setTimeout(() => setJustSavedIdx(null), 2000);
       setEditingIdx(null);
       toast.success('Party details updated');
     },
@@ -178,9 +184,9 @@ export default function UndefinedEntities() {
           return (
             <div 
               key={idx} 
-              className={`border rounded-lg p-4 transition-colors ${
+              className={`border rounded-lg p-4 transition-all duration-300 ${
                 confirmed ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'
-              }`}
+              } ${justSavedIdx === idx ? 'ring-2 ring-green-400 shadow-lg' : ''}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1">
