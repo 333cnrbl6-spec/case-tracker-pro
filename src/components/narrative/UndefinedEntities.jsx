@@ -196,12 +196,16 @@ export default function UndefinedEntities() {
           const confirmed = isConfirmed(party.name);
           const saved = getSaved(party.name);
 
+          if (justSavedIdx === idx) {
+            return null;
+          }
+
           return (
             <div 
               key={idx} 
               className={`border rounded-lg p-4 transition-all duration-300 ${
                 confirmed ? 'bg-green-50 border-green-200' : 'bg-white border-slate-200'
-              } ${justSavedIdx === idx ? 'ring-2 ring-green-400 shadow-lg' : ''}`}
+              }`}
             >
               <div className={`flex items-start justify-between gap-3 transition-opacity duration-500 ${justSavedIdx === idx ? 'opacity-0' : 'opacity-100'}`}>
                 <div className="flex items-start gap-3 flex-1">
