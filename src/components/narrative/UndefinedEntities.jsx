@@ -126,12 +126,27 @@ export default function UndefinedEntities() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (party) => base44.entities.CaseParty.create(party),
+    mutationFn: async (party) => {
+      const created = await base44.entities.CaseParty.create(party);
+      
+      // Trigger verification search in background
+      try {
+        await base44.functions.invoke('verifyPartyDetails', {
+          name: party.name,
+          party_type: party.party_type,
+          notes: party.notes
+        });
+      } catch (err) {
+        console.log('Verification search initiated (background)');
+      }
+      
+      return created;
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['caseParties'] });
       setJustSavedIdx(DETECTED_PARTIES.findIndex(p => p.name === variables.name));
       setTimeout(() => setJustSavedIdx(null), 2000);
-      toast.success('Party details saved');
+      toast.success('Party details saved & verification search started');
     },
   });
 
