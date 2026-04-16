@@ -137,6 +137,13 @@ export default function EvidenceScanner() {
                 isDragActive ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 bg-slate-50'
               }`}
             >
+              <input
+                id="file-input"
+                type="file"
+                onChange={handleChange}
+                multiple
+                className="hidden"
+              />
               {scanning ? (
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
@@ -149,15 +156,7 @@ export default function EvidenceScanner() {
                     <p className="font-medium text-slate-900">Drop documents here</p>
                     <p className="text-sm text-slate-600">Any file type, unlimited size</p>
                   </div>
-                  <input
-                    type="file"
-                    onChange={handleChange}
-                    multiple
-                    accept="*/*"
-                    disabled={scanning}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
-                  />
-                  <Button variant="outline" size="sm" disabled={scanning}>
+                  <Button variant="outline" size="sm" onClick={() => document.getElementById('file-input').click()}>
                     Browse Files
                   </Button>
                   <p className="text-xs text-slate-500">
