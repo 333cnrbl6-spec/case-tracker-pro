@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertCircle, CheckCircle2, UserCircle, Building2, MapPin, HelpCircle, Pencil, Save, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, UserCircle, Building2, MapPin, HelpCircle, Pencil, Save, X, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -224,17 +224,31 @@ export default function UndefinedEntities() {
                           className="text-sm"
                         />
                         <div className="flex gap-2">
-                          <Button size="sm" onClick={() => {
+                          <Button 
+                           size="sm" 
+                           onClick={() => {
                             const existing = getSaved(party.name);
                             if (existing) {
                               updateMutation.mutate({ id: existing.id, data: { ...existing.data, notes: editNotes, confirmed: true } });
                             } else {
                               saveMutation.mutate({ ...party, confirmed: true, notes: editNotes });
                             }
-                          }}>
-                            <Save className="w-3 h-3 mr-1" /> Save & Confirm
+                          }}
+                           disabled={saveMutation.isPending || updateMutation.isPending}
+                          >
+                            {saveMutation.isPending || updateMutation.isPending ? (
+                              <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                            ) : (
+                              <Save className="w-3 h-3 mr-1" />
+                            )}
+                            Save & Confirm
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => setEditingIdx(null)}>
+                          <Button 
+                           size="sm" 
+                           variant="outline" 
+                           onClick={() => setEditingIdx(null)}
+                           disabled={saveMutation.isPending || updateMutation.isPending}
+                          >
                             <X className="w-3 h-3 mr-1" /> Cancel
                           </Button>
                         </div>
