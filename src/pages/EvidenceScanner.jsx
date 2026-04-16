@@ -23,7 +23,6 @@ export default function EvidenceScanner() {
     mutationFn: (data) => base44.entities.Evidence.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['evidence'] });
-      toast({ title: 'Evidence saved', description: 'Document added to case.' });
     },
   });
 
@@ -111,6 +110,7 @@ export default function EvidenceScanner() {
       await createEvidenceMutation.mutateAsync(item.data);
     }
     setScannedItems([]);
+    toast({ title: `${successItems.length} document${successItems.length > 1 ? 's' : ''} saved`, description: 'Added to case evidence.' });
   };
 
   const handleClear = () => {
