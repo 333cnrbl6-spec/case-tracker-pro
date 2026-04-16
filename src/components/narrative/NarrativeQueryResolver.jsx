@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight, ChevronLeft, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Save, AlertCircle, CheckCircle2, Loader2, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -55,6 +55,7 @@ export default function NarrativeQueryResolver({ evidence = [], incidents = [], 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState({});
   const [answerText, setAnswerText] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
   const queryClient = useQueryClient();
 
   const current = NARRATIVE_QUERIES[currentIdx];
@@ -97,6 +98,8 @@ export default function NarrativeQueryResolver({ evidence = [], incidents = [], 
         if (currentIdx < NARRATIVE_QUERIES.length - 1) {
           setCurrentIdx(currentIdx + 1);
           setAnswerText(answers[NARRATIVE_QUERIES[currentIdx + 1].id] || '');
+        } else {
+          setIsComplete(true);
         }
       }, 500);
     },
@@ -143,6 +146,19 @@ export default function NarrativeQueryResolver({ evidence = [], incidents = [], 
       </CardHeader>
 
       <CardContent className="space-y-6">
+        {isComplete && (
+          <div className="bg-green-50 border border-green-300 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-green-900 mb-1">Narrative Query Resolution Complete</h4>
+                <p className="text-sm text-green-800">All {NARRATIVE_QUERIES.length} queries have been answered and the case narrative is ready for final export and submission.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!isComplete && (
         {/* Supporting Evidence Section */}
         {(relevantEvidence.length > 0 || relatedIncidentRecords.length > 0) && (
           <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
@@ -181,50 +197,72 @@ export default function NarrativeQueryResolver({ evidence = [], incidents = [], 
           </div>
         )}
 
-        {/* Answer Input */}
-        <div>
-          <label className="block text-sm font-semibold mb-2 text-slate-900">Your response:</label>
-          <Textarea
-            placeholder={current.placeholder}
-            value={answerText}
-            onChange={(e) => setAnswerText(e.target.value)}
-            className="min-h-32"
-          />
-          <p className="text-xs text-slate-500 mt-1">Provide your analysis, decision on fact, or required information.</p>
-        </div>
+        {!isComplete ? (
+          <>
+            {/* Answer Input */}
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-slate-900">Your response:</label>
+              <Textarea
+                placeholder={current.placeholder}
+                value={answerText}
+                onChange={(e) => setAnswerText(e.target.value)}
+                className="min-h-32"
+              />
+              <p className="text-xs text-slate-500 mt-1">Provide your analysis, decision on fact, or required information.</p>
+            </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between gap-3">
-          <Button
-            variant="outline"
-            onClick={handlePrev}
-            disabled={currentIdx === 0}
-          >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-          </Button>
+            {/* Navigation */}
+            <div className="flex items-center justify-between gap-3">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                disabled={currentIdx === 0}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+              </Button>
 
-          <div className="flex gap-2">
-            <Button
-              onClick={handleSave}
-              disabled={!answerText.trim() || saveMutation.isPending}
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSave}
+                  disabled={!answerText.trim() || saveMutation.isPending}
+                >
+                  {saveMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4 mr-1" />
+                  )}
+                  Save Answer
+                </Button>
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={handleNext}
+                disabled={currentIdx === NARRATIVE_QUERIES.length - 1}
+              >
+                Next <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-green-50 border border-green-300 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-green-900 mb-1">Narrative Query Resolution Complete</h4>
+                  <p className="text-sm text-green-800">All {NARRATIVE_QUERIES.length} queries have been answered and the case narrative is ready for final export and submission.</p>
+                </div>
+              </div>
+            </div>
+            <Button 
+              className="w-full" 
+              onClick={() => window.print()}
             >
-              {saveMutation.isPending ? (
-                <Loader2 className="w-4 h-4 mr-1 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4 mr-1" />
-              )}
-              Save Answer
+              <Download className="w-4 h-4 mr-2" /> Export Final Narrative
             </Button>
           </div>
-
-          <Button
-            variant="outline"
-            onClick={handleNext}
-            disabled={currentIdx === NARRATIVE_QUERIES.length - 1}
-          >
-            Next <ChevronRight className="w-4 h-4 ml-1" />
-          </Button>
-        </div>
+        )}
 
         {/* Progress indicator */}
         <div className="flex gap-1 mt-4">
