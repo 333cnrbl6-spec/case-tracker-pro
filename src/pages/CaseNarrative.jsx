@@ -8,6 +8,7 @@ import NarrativeHeader from '@/components/narrative/NarrativeHeader';
 import ChronologicalNarrative from '@/components/narrative/ChronologicalNarrative';
 import DamageCharts from '@/components/narrative/DamageCharts';
 import UndefinedEntities from '@/components/narrative/UndefinedEntities';
+import NarrativeQueryResolver from '@/components/narrative/NarrativeQueryResolver';
 
 export default function CaseNarrative() {
   const { data: incidents = [], isLoading: loadingInc } = useQuery({
@@ -70,6 +71,12 @@ export default function CaseNarrative() {
         />
 
         <DamageCharts />
+
+        <NarrativeQueryResolver 
+          evidence={evidence}
+          incidents={incidents}
+          communications={communications}
+        />
 
         <UndefinedEntities />
 
