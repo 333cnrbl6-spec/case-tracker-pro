@@ -1,0 +1,62 @@
+{
+  "name": "CaseParty",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the person, company, or location"
+    },
+    "party_type": {
+      "type": "string",
+      "enum": [
+        "person",
+        "company",
+        "location",
+        "property",
+        "organisation",
+        "other"
+      ],
+      "description": "Type of party"
+    },
+    "role_in_case": {
+      "type": "string",
+      "description": "Their role or relationship to the case"
+    },
+    "confirmed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether details have been confirmed by the user"
+    },
+    "contact_details": {
+      "type": "string",
+      "description": "Contact information if known"
+    },
+    "address": {
+      "type": "string",
+      "description": "Address if applicable"
+    },
+    "relationship_to": {
+      "type": "string",
+      "description": "Who they are connected to in the case"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional context or gaps to fill"
+    },
+    "first_mentioned_in": {
+      "type": "string",
+      "description": "Where this party first appears in evidence"
+    },
+    "information_gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "What information is missing or unconfirmed"
+    }
+  },
+  "required": [
+    "name",
+    "party_type"
+  ]
+}

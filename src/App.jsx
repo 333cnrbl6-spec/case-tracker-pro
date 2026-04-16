@@ -13,6 +13,7 @@ import Evidence from '@/pages/Evidence';
 import EvidenceScanner from '@/pages/EvidenceScanner';
 import RICSAssessment from '@/pages/RICSAssessment';
 import LegalAnalysis from '@/pages/LegalAnalysis';
+import CaseNarrative from '@/pages/CaseNarrative';
 import LegalActionBundle from '@/pages/LegalActionBundle';
 
 const AuthenticatedApp = () => {
@@ -49,6 +50,7 @@ const AuthenticatedApp = () => {
       <Route path="/scanner" element={<EvidenceScanner />} />
       <Route path="/assessment" element={<RICSAssessment />} />
       <Route path="/legal-analysis" element={<LegalAnalysis />} />
+      <Route path="/case-narrative" element={<CaseNarrative />} />
       <Route path="/action-bundle" element={<LegalActionBundle />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
