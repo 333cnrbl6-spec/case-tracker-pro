@@ -34,17 +34,8 @@ export default function EvidenceScanner() {
   };
 
   const uploadFile = async (file) => {
-    // Use backend function for large files (PDFs, docs over 4MB)
-    const LARGE_FILE_THRESHOLD = 4 * 1024 * 1024; // 4MB
-    if (file.size > LARGE_FILE_THRESHOLD || file.type === 'application/pdf') {
-      const formData = new FormData();
-      formData.append('file', file);
-      const response = await base44.functions.invoke('uploadLargeFile', formData);
-      return response.data.file_url;
-    } else {
-      const uploadRes = await base44.integrations.Core.UploadFile({ file });
-      return uploadRes.file_url;
-    }
+    const uploadRes = await base44.integrations.Core.UploadFile({ file });
+    return uploadRes.file_url;
   };
 
   const processFiles = async (files) => {
@@ -56,7 +47,6 @@ export default function EvidenceScanner() {
       try {
         // Upload file - PDFs and large files go via backend (no size limit)
         const fileUrl = await uploadFile(file);
-        if (!fileUrl) throw new Error('Upload returned no URL');
 
         // Check for duplicates
         const allEvidence = await base44.entities.Evidence.list();
