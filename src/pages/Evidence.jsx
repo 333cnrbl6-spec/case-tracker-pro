@@ -16,6 +16,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import DocumentDropZone from '../components/DocumentDropZone';
+import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestions';
+import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
 
 const strengthColors = {
   weak: 'bg-slate-100 text-slate-800',
@@ -41,6 +43,16 @@ export default function Evidence() {
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list('-date_collected'),
+  });
+
+  const { data: incidents = [] } = useQuery({
+    queryKey: ['incidents'],
+    queryFn: () => base44.entities.Incident.list(),
+  });
+
+  const { data: rules = [] } = useQuery({
+    queryKey: ['rics-rules'],
+    queryFn: () => base44.entities.RICSRule.list(),
   });
 
   const createMutation = useMutation({
@@ -250,6 +262,21 @@ export default function Evidence() {
                       {item.notes}
                     </div>
                   )}
+
+                  <div className="space-y-3 pt-2 border-t border-slate-200">
+                    <EvidenceIncidentSuggestions
+                      evidence={item}
+                      incidents={incidents}
+                      onLinkCreated={(incidentId) => {
+                        // Link has been created
+                      }}
+                    />
+
+                    <EvidenceRuleCorrelations
+                      evidence={item}
+                      rules={rules}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             ))
