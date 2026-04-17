@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import RuleRecommendations from '@/components/RuleRecommendations';
 import IncidentRulesPanel from '@/components/IncidentRulesPanel';
+import IncidentAIAssistant from '@/components/IncidentAIAssistant';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -130,6 +131,20 @@ export default function Incidents() {
                <DialogTitle>{editingId ? 'Edit Incident' : 'Log New Incident'}</DialogTitle>
              </DialogHeader>
              <form onSubmit={handleSubmit} className="space-y-4">
+               {formData.description && (
+                 <IncidentAIAssistant
+                   description={formData.description}
+                   onApplySuggestions={(suggestions) => {
+                     setFormData(prev => ({
+                       ...prev,
+                       incident_type: suggestions.incident_type || prev.incident_type,
+                       severity: suggestions.severity || prev.severity,
+                       rics_violations: suggestions.rics_violations || prev.rics_violations
+                     }));
+                     setLinkedRules(suggestions.rics_violations || linkedRules);
+                   }}
+                 />
+               )}
                {formData.title && formData.description && (
                  <RuleRecommendations
                    incident={formData}
