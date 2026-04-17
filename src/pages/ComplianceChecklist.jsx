@@ -13,6 +13,7 @@ export default function ComplianceChecklist() {
   const [selectedIncidents, setSelectedIncidents] = useState([]);
   const [checklist, setChecklist] = useState(null);
   const [checklistItems, setChecklistItems] = useState({});
+  const [autoPopulated, setAutoPopulated] = useState(false);
 
   const { data: rules = [] } = useQuery({
     queryKey: ['rics-rules'],
@@ -23,6 +24,25 @@ export default function ComplianceChecklist() {
     queryKey: ['incidents'],
     queryFn: () => base44.entities.Incident.list(),
   });
+
+  // Auto-populate rules from incidents with linked rules
+  const handleAutoPopulateRules = () => {
+    const linkedRuleIds = new Set();
+    incidents.forEach(incident => {
+      if (incident.data.rics_violations && Array.isArray(incident.data.rics_violations)) {
+        incident.data.rics_violations.forEach(ruleNum => {
+          const rule = rules.find(r => r.data.rule_number === ruleNum);
+          if (rule) {
+            linkedRuleIds.add(rule.id);
+          }
+        });
+      }
+    });
+    if (linkedRuleIds.size > 0) {
+      setSelectedRules(Array.from(linkedRuleIds));
+      setAutoPopulated(true);
+    }
+  };
 
   const generateChecklist = useMutation({
     mutationFn: async () => {
@@ -279,11 +299,21 @@ export default function ComplianceChecklist() {
           </Card>
 
           {/* Incidents Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Select Incidents ({selectedIncidents.length})</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-base">Select Incidents ({selectedIncidents.length})</CardTitle>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleAutoPopulateRules}
+                    className="text-xs"
+                  >
+                    Auto-populate rules
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-2 max-h-96 overflow-y-auto">
               {incidents.length === 0 ? (
                 <p className="text-sm text-slate-500">No incidents logged</p>
               ) : (

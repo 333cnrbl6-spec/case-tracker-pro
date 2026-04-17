@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, Plus, Edit2, Trash2 } from 'lucide-react';
+import { AlertTriangle, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import RuleRecommendations from '@/components/RuleRecommendations';
+import IncidentRulesPanel from '@/components/IncidentRulesPanel';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -26,6 +28,7 @@ const severityColors = {
 export default function Incidents() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [linkedRules, setLinkedRules] = useState([]);
   const [formData, setFormData] = useState({
     date: '',
     title: '',
@@ -42,6 +45,11 @@ export default function Incidents() {
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
     queryFn: () => base44.entities.Incident.list('-date'),
+  });
+
+  const { data: evidence = [] } = useQuery({
+    queryKey: ['evidence'],
+    queryFn: () => base44.entities.Evidence.list(),
   });
 
   const createMutation = useMutation({
@@ -82,15 +90,27 @@ export default function Incidents() {
       legal_issues: [],
     });
     setEditingId(null);
+    setLinkedRules([]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const dataToSave = {
+      ...formData,
+      rics_violations: linkedRules.length > 0 ? linkedRules : formData.rics_violations
+    };
     if (editingId) {
-      updateMutation.mutate(formData);
+      updateMutation.mutate(dataToSave);
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(dataToSave);
     }
+  };
+
+  const handleEditIncident = (incident) => {
+    setEditingId(incident.id);
+    setFormData(incident);
+    setLinkedRules(incident.rics_violations || []);
+    setOpen(true);
   };
 
   return (
@@ -105,11 +125,21 @@ export default function Incidents() {
                 Log New Incident
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>{editingId ? 'Edit Incident' : 'Log New Incident'}</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+             <DialogHeader>
+               <DialogTitle>{editingId ? 'Edit Incident' : 'Log New Incident'}</DialogTitle>
+             </DialogHeader>
+             <form onSubmit={handleSubmit} className="space-y-4">
+               {formData.title && formData.description && (
+                 <RuleRecommendations
+                   incident={formData}
+                   evidence={evidence.filter(e => 
+                     formData.evidence_notes?.includes(e.data.title)
+                   ).map(e => e.data)}
+                   linkedRules={linkedRules}
+                   onLinkedRulesChange={setLinkedRules}
+                 />
+               )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-sm font-medium">Date</label>
@@ -176,14 +206,21 @@ export default function Incidents() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Evidence Notes</label>
-                  <Textarea
-                    value={formData.evidence_notes}
-                    onChange={(e) => setFormData({ ...formData, evidence_notes: e.target.value })}
-                    placeholder="What evidence supports this incident?"
-                    className="min-h-24"
+                   <label className="text-sm font-medium">Evidence Notes</label>
+                   <Textarea
+                     value={formData.evidence_notes}
+                     onChange={(e) => setFormData({ ...formData, evidence_notes: e.target.value })}
+                     placeholder="What evidence supports this incident?"
+                     className="min-h-24"
+                   />
+                 </div>
+
+                {linkedRules.length > 0 && (
+                  <IncidentRulesPanel
+                    linkedRules={linkedRules}
+                    onUnlink={(ruleNumber) => setLinkedRules(linkedRules.filter(r => r !== ruleNumber))}
                   />
-                </div>
+                )}
 
                 <div className="flex gap-3 justify-end">
                   <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
@@ -218,13 +255,9 @@ export default function Incidents() {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => {
-                        setEditingId(incident.id);
-                        setFormData(incident);
-                        setOpen(true);
-                      }}>
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
+                       <Button variant="ghost" size="icon" onClick={() => handleEditIncident(incident)}>
+                         <Edit2 className="w-4 h-4" />
+                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(incident.id)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
