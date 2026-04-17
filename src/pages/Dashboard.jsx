@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
+import SystemAlertsPanel from '@/components/SystemAlertsPanel';
 
 export default function Dashboard() {
   const { data: incidents = [] } = useQuery({
@@ -79,7 +80,11 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-8 space-y-8">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 mb-4">System Alerts</h2>
+            <SystemAlertsPanel />
+          </div>
           <CaseSummaryWidget />
         </div>
 

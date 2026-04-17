@@ -1,0 +1,82 @@
+{
+  "name": "SystemAlert",
+  "type": "object",
+  "properties": {
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "rule_pattern",
+        "overdue_tasks",
+        "high_severity_cluster"
+      ],
+      "description": "Type of alert triggered"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "warning",
+        "critical"
+      ],
+      "description": "Alert severity level"
+    },
+    "title": {
+      "type": "string",
+      "description": "Brief alert title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the detected pattern"
+    },
+    "rule_number": {
+      "type": "string",
+      "description": "RICS rule number if alert is rule-related"
+    },
+    "incident_count": {
+      "type": "number",
+      "description": "Number of related incidents"
+    },
+    "overdue_task_count": {
+      "type": "number",
+      "description": "Number of overdue tasks"
+    },
+    "related_incidents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related incidents"
+    },
+    "related_tasks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related overdue tasks"
+    },
+    "detection_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When this pattern was detected"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "resolved",
+        "acknowledged"
+      ],
+      "default": "active",
+      "description": "Alert status"
+    },
+    "recommended_action": {
+      "type": "string",
+      "description": "Suggested remediation or investigation steps"
+    }
+  },
+  "required": [
+    "alert_type",
+    "severity",
+    "title",
+    "description"
+  ]
+}
