@@ -268,6 +268,18 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/analytics" className="block">
+            <Card className="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="text-lg">Risk Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Visualize incident impact, breach severity scoring, and financial risk exposure</p>
+                <Button className="bg-violet-600 hover:bg-violet-700 w-full">View Analytics</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>
