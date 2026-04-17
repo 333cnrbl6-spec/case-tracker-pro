@@ -244,6 +244,30 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/rics-rules" className="block">
+            <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="text-lg">RICS Rules Library</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Searchable reference of RICS conduct rules and compliance requirements</p>
+                <Button className="bg-cyan-600 hover:bg-cyan-700 w-full">Browse Rules</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/compliance-checklist" className="block">
+            <Card className="bg-gradient-to-br from-lime-50 to-green-50 border-lime-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="text-lg">Compliance Checklist</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Generate AI-powered compliance checklists for selected rules</p>
+                <Button className="bg-lime-600 hover:bg-lime-700 w-full">Generate Checklist</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>

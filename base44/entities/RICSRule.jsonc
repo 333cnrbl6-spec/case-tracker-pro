@@ -1,0 +1,70 @@
+{
+  "name": "RICSRule",
+  "type": "object",
+  "properties": {
+    "rule_number": {
+      "type": "string",
+      "description": "RICS rule identifier (e.g., PS-1.1, PS-1.2)"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Professional Standards",
+        "Competence",
+        "Honesty and Integrity",
+        "Conflicts of Interest",
+        "Client Relations",
+        "Complaints Handling",
+        "Documentation",
+        "Conduct & Behaviour"
+      ],
+      "description": "Rule category"
+    },
+    "title": {
+      "type": "string",
+      "description": "Short title of the rule"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full text of the rule requirement"
+    },
+    "guidance": {
+      "type": "string",
+      "description": "Additional guidance and interpretation"
+    },
+    "compliance_points": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key compliance checkpoints"
+    },
+    "severity_if_breached": {
+      "type": "string",
+      "enum": [
+        "minor",
+        "moderate",
+        "serious",
+        "critical"
+      ],
+      "description": "Severity of breach if violated"
+    },
+    "related_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of related rules"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional context or updates"
+    }
+  },
+  "required": [
+    "rule_number",
+    "category",
+    "title",
+    "description"
+  ]
+}

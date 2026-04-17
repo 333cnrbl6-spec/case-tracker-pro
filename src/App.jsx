@@ -21,6 +21,8 @@ import RICSBreachNotification from '@/pages/RICSBreachNotification';
 import RICSCommunicationMapper from '@/pages/RICSCommunicationMapper';
 import SolicitorBriefGenerator from '@/pages/SolicitorBriefGenerator';
 import RICSDocumentGenerator from '@/pages/RICSDocumentGenerator';
+import RICSRulesLibrary from '@/pages/RICSRulesLibrary';
+import ComplianceChecklist from '@/pages/ComplianceChecklist';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -64,6 +66,8 @@ const AuthenticatedApp = () => {
       <Route path="/communication-mapper" element={<RICSCommunicationMapper />} />
       <Route path="/solicitor-brief" element={<SolicitorBriefGenerator />} />
       <Route path="/rics-documents" element={<RICSDocumentGenerator />} />
+      <Route path="/rics-rules" element={<RICSRulesLibrary />} />
+      <Route path="/compliance-checklist" element={<ComplianceChecklist />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
