@@ -18,6 +18,7 @@ import {
 import DocumentDropZone from '../components/DocumentDropZone';
 import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestions';
 import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
+import EvidenceSummary from '../components/EvidenceSummary';
 
 const strengthColors = {
   weak: 'bg-slate-100 text-slate-800',
@@ -264,6 +265,8 @@ export default function Evidence() {
                   )}
 
                   <div className="space-y-3 pt-2 border-t border-slate-200">
+                    <EvidenceSummary evidence={item} />
+
                     <EvidenceIncidentSuggestions
                       evidence={item}
                       incidents={incidents}
