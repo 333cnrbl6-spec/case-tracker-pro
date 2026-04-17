@@ -16,6 +16,7 @@ import LegalAnalysis from '@/pages/LegalAnalysis';
 import CaseNarrative from '@/pages/CaseNarrative';
 import LegalActionBundle from '@/pages/LegalActionBundle';
 import BundleProcessor from '@/pages/BundleProcessor';
+import LegalNextSteps from '@/pages/LegalNextSteps';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -54,6 +55,7 @@ const AuthenticatedApp = () => {
       <Route path="/case-narrative" element={<CaseNarrative />} />
       <Route path="/action-bundle" element={<LegalActionBundle />} />
       <Route path="/bundle-processor" element={<BundleProcessor />} />
+      <Route path="/next-steps" element={<LegalNextSteps />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

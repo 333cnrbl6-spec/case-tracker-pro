@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 
@@ -169,7 +169,22 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
-        </div>
+
+          <Link to="/next-steps" className="block lg:col-span-2">
+            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-lg">Legal Action — Next Steps</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Prioritized action plan with document templates for RICS complaint & solicitor brief</p>
+                <Button className="bg-green-600 hover:bg-green-700 w-full">View Action Plan</Button>
+              </CardContent>
+            </Card>
+          </Link>
+          </div>
       </div>
     </div>
   );
