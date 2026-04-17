@@ -170,7 +170,7 @@ export default function Dashboard() {
             </Card>
           </Link>
 
-          <Link to="/next-steps" className="block lg:col-span-2">
+          <Link to="/next-steps" className="block">
             <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -181,6 +181,21 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">Prioritized action plan with document templates for RICS complaint & solicitor brief</p>
                 <Button className="bg-green-600 hover:bg-green-700 w-full">View Action Plan</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/rics-breach-notification" className="block">
+            <Card className="bg-gradient-to-br from-red-50 to-pink-50 border-red-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                  <span className="text-lg">RICS Breach Notification</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Multi-select incidents to generate formal RICS regulatory breach PDF report</p>
+                <Button className="bg-red-600 hover:bg-red-700 w-full">Generate Report</Button>
               </CardContent>
             </Card>
           </Link>
