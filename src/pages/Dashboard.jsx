@@ -292,6 +292,18 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/incident-tasks" className="block">
+            <Card className="bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="text-lg">Task Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Track follow-up actions, assign to team members, and monitor deadline reminders</p>
+                <Button className="bg-teal-600 hover:bg-teal-700 w-full">Manage Tasks</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>

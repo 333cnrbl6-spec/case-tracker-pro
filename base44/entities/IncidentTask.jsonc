@@ -1,0 +1,70 @@
+{
+  "name": "IncidentTask",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "ID of the related incident"
+    },
+    "title": {
+      "type": "string",
+      "description": "Task title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed task description"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "under_investigation",
+        "evidence_review",
+        "resolution",
+        "completed",
+        "blocked"
+      ],
+      "default": "not_started",
+      "description": "Current task status"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Email of team member responsible"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Task deadline"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Task priority level"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal notes or progress updates"
+    },
+    "completion_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date task was completed"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether deadline reminder has been sent"
+    }
+  },
+  "required": [
+    "incident_id",
+    "title",
+    "status"
+  ]
+}

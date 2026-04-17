@@ -25,6 +25,7 @@ import RICSRulesLibrary from '@/pages/RICSRulesLibrary';
 import ComplianceChecklist from '@/pages/ComplianceChecklist';
 import AnalyticsDashboard from '@/pages/AnalyticsDashboard';
 import EvidenceValidator from '@/pages/EvidenceValidator';
+import IncidentTaskManager from '@/pages/IncidentTaskManager';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -72,6 +73,7 @@ const AuthenticatedApp = () => {
       <Route path="/compliance-checklist" element={<ComplianceChecklist />} />
       <Route path="/analytics" element={<AnalyticsDashboard />} />
       <Route path="/evidence-validator" element={<EvidenceValidator />} />
+      <Route path="/incident-tasks" element={<IncidentTaskManager />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
