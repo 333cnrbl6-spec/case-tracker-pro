@@ -19,6 +19,7 @@ import BundleProcessor from '@/pages/BundleProcessor';
 import LegalNextSteps from '@/pages/LegalNextSteps';
 import RICSBreachNotification from '@/pages/RICSBreachNotification';
 import RICSCommunicationMapper from '@/pages/RICSCommunicationMapper';
+import SolicitorBriefGenerator from '@/pages/SolicitorBriefGenerator';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -60,6 +61,7 @@ const AuthenticatedApp = () => {
       <Route path="/next-steps" element={<LegalNextSteps />} />
       <Route path="/rics-breach-notification" element={<RICSBreachNotification />} />
       <Route path="/communication-mapper" element={<RICSCommunicationMapper />} />
+      <Route path="/solicitor-brief" element={<SolicitorBriefGenerator />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
