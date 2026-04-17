@@ -280,6 +280,18 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/evidence-validator" className="block">
+            <Card className="bg-gradient-to-br from-rose-50 to-pink-50 border-rose-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="text-lg">Evidence Validator</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">AI-powered validation: RICS compliance gaps, timeline verification, and discrepancy detection</p>
+                <Button className="bg-rose-600 hover:bg-rose-700 w-full">Validate Evidence</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>
