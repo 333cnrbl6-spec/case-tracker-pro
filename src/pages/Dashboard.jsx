@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 
@@ -158,9 +158,24 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/rics-documents" className="block">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FileText className="w-5 h-5 text-emerald-600" />
+                  RICS Documents
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-600 mb-4">AI-assisted drafting of complaint letters, responses & disclosures</p>
+                <Button variant="outline" className="w-full">Generate Documents</Button>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Link to="/assessment" className="block">
             <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardHeader>
