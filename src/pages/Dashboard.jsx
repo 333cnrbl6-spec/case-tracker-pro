@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 
@@ -110,6 +110,21 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-600 mb-4">Track emails, letters, and other communications</p>
                 <Button variant="outline" className="w-full">View Communications</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/communication-mapper" className="block">
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Link2 className="w-5 h-5 text-purple-600" />
+                  Communication Mapper
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-600 mb-4">Auto-map communications to RICS violations & flag discrepancies</p>
+                <Button variant="outline" className="w-full">Open Mapper</Button>
               </CardContent>
             </Card>
           </Link>
