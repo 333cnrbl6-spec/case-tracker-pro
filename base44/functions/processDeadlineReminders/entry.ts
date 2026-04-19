@@ -63,6 +63,18 @@ Deno.serve(async (req) => {
                     reminder_sent: true
                 });
 
+                // Send email reminder to fee earner
+                try {
+                    await base44.integrations.Core.SendEmail({
+                        to: task.assigned_to,
+                        subject: `Task Deadline Reminder: ${task.title}`,
+                        body: `This is a reminder that your task is due in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}.\n\nTask: ${task.title}\nDeadline: ${task.deadline}\nPriority: ${task.priority}\n\nPlease ensure you complete this task by the deadline.`,
+                        from_name: 'Compliance System'
+                    });
+                } catch (emailError) {
+                    console.error('Failed to send reminder email:', emailError);
+                }
+
                 // Log reminder sent
                 await logAuditEvent(base44, {
                     event_type: 'reminder_sent',
@@ -93,6 +105,18 @@ Deno.serve(async (req) => {
                     status: 'blocked',
                     notes: `ESCALATED: Overdue by ${Math.abs(daysUntil)} days - awaiting resolution`
                 });
+
+                // Send escalation email to fee earner
+                try {
+                    await base44.integrations.Core.SendEmail({
+                        to: task.assigned_to,
+                        subject: `⚠️ OVERDUE TASK ESCALATION: ${task.title}`,
+                        body: `Your task is now OVERDUE by ${Math.abs(daysUntil)} day${Math.abs(daysUntil) !== 1 ? 's' : ''}.\n\nTask: ${task.title}\nOriginal Deadline: ${task.deadline}\nDays Overdue: ${Math.abs(daysUntil)}\nPriority: ${task.priority}\n\nImmediate action is required. Please complete this task urgently or contact management if there are blockers.`,
+                        from_name: 'Compliance System'
+                    });
+                } catch (emailError) {
+                    console.error('Failed to send escalation email:', emailError);
+                }
 
                 // Log task escalation
                 await logAuditEvent(base44, {

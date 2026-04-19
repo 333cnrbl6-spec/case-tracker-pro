@@ -94,6 +94,18 @@ Deno.serve(async (req) => {
                 deadline: deadline.toISOString().split('T')[0]
             });
 
+            // Send email notification to fee earner
+            try {
+                await base44.integrations.Core.SendEmail({
+                    to: caseData.assigned_fee_earner,
+                    subject: `NEW ${risk_level.toUpperCase()} RISK TASK: ${caseData.case_ref}`,
+                    body: `A new ${risk_level} risk remediation task has been assigned to you.\n\nCase: ${caseData.case_ref}\nTask: ${taskTitle}\nPriority: ${action.priority || 'high'}\nDeadline: ${deadline.toISOString().split('T')[0]}\n\nAction: ${action.action}\n\nPlease review and implement this remediation action urgently.`,
+                    from_name: 'Compliance System'
+                });
+            } catch (emailError) {
+                console.error('Failed to send task assignment email:', emailError);
+            }
+
             // Log task creation
             await logAuditEvent(base44, {
                 event_type: 'task_created',
@@ -129,6 +141,18 @@ Deno.serve(async (req) => {
                 risk_score: riskRecord.overall_risk_score,
                 escalated_at: new Date().toISOString()
             });
+
+            // Send escalation email to management
+            try {
+                await base44.integrations.Core.SendEmail({
+                    to: 'management@firm.local',
+                    subject: `🚨 CRITICAL RISK ESCALATION: ${caseData.case_ref}`,
+                    body: `A CRITICAL compliance risk has been detected and requires immediate management review.\n\nCase: ${caseData.case_ref}\nRisk Score: ${riskRecord.overall_risk_score}/100\nConfidence: ${riskRecord.confidence_score}%\nFee Earner: ${caseData.assigned_fee_earner}\n\nImmediate review and approval of remediation actions required.\n\nPlease log in to the compliance system to review recommended actions and approve the remediation strategy.`,
+                    from_name: 'Compliance System'
+                });
+            } catch (emailError) {
+                console.error('Failed to send escalation email:', emailError);
+            }
 
             // Log escalation
             await logAuditEvent(base44, {
