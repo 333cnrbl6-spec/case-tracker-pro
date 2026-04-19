@@ -5,13 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { AlertTriangle, Briefcase, TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
+import { daysUntil } from '@/lib/dateUtils';
 
 const COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#0ea5e9', '#8b5cf6'];
-
-function daysUntil(dateStr) {
-  if (!dateStr) return null;
-  return Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24));
-}
 
 export default function PracticeAnalytics() {
   const { data: cases = [] } = useQuery({

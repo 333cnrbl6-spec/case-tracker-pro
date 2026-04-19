@@ -8,6 +8,7 @@ import { Loader2, Sparkles, Download, ArrowLeft, CheckCircle, AlertTriangle, Sca
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import PDFExportPanel from '@/components/PDFExportPanel';
+import { daysUntil } from '@/lib/dateUtils';
 
 export default function CaseNarrativeBuilder() {
   const params = new URLSearchParams(window.location.search);
@@ -106,7 +107,7 @@ export default function CaseNarrativeBuilder() {
                 <div><p className="text-slate-500">Opponent</p><p className="font-semibold">{legalCase.opponent_name || '—'}</p></div>
                 <div>
                   <p className="text-slate-500 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5 text-red-500" /> Limitation Date</p>
-                  <p className={`font-bold ${legalCase.limitation_date && new Date(legalCase.limitation_date) - new Date() < 30 * 86400000 ? 'text-red-600' : 'text-slate-900'}`}>
+                  <p className={`font-bold ${legalCase.limitation_date && daysUntil(legalCase.limitation_date) <= 30 ? 'text-red-600' : 'text-slate-900'}`}>
                     {legalCase.limitation_date ? new Date(legalCase.limitation_date).toLocaleDateString('en-GB') : '⚠️ Not set'}
                   </p>
                 </div>

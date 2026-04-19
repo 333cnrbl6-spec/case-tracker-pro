@@ -114,19 +114,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Clear old active alerts and create fresh ones
+    // Clear old active alerts and create fresh ones — both in parallel
     const existingActive = await base44.asServiceRole.entities.ComplianceAlert.filter({ status: 'active' });
-    for (const a of existingActive) {
-      await base44.asServiceRole.entities.ComplianceAlert.delete(a.id);
-    }
 
-    const created = [];
-    for (const alert of newAlerts) {
-      const created_alert = await base44.asServiceRole.entities.ComplianceAlert.create(alert);
-      created.push(created_alert);
-    }
+    await Promise.all(existingActive.map(a => base44.asServiceRole.entities.ComplianceAlert.delete(a.id)));
+    await Promise.all(newAlerts.map(alert => base44.asServiceRole.entities.ComplianceAlert.create(alert)));
 
-    return Response.json({ success: true, alerts_created: created.length, alerts: newAlerts });
+    return Response.json({ success: true, alerts_created: newAlerts.length });
   } catch (error) {
     console.error('checkComplianceAlerts error:', error);
     return Response.json({ error: error.message }, { status: 500 });

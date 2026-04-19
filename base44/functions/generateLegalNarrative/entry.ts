@@ -9,12 +9,13 @@ Deno.serve(async (req) => {
     const { case_id } = await req.json();
     if (!case_id) return Response.json({ error: 'case_id required' }, { status: 400 });
 
-    // Fetch case data in parallel
+    // Fetch case data in parallel — incidents/comms/evidence are global for now
+    // (no case_id FK on those entities yet)
     const [caseRecords, incidents, communications, evidence] = await Promise.all([
       base44.entities.LegalCase.filter({ id: case_id }),
-      base44.entities.Incident.list('-date'),
-      base44.entities.Communication.list('-date'),
-      base44.entities.Evidence.list('-date_collected')
+      base44.entities.Incident.list('-date', 50),
+      base44.entities.Communication.list('-date', 30),
+      base44.entities.Evidence.list('-date_collected', 30)
     ]);
 
     const legalCase = caseRecords[0];

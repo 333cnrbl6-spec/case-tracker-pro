@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,27 +8,19 @@ import { Loader2, RefreshCw, AlertCircle, CheckCircle2, Calendar, Users } from '
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function CaseSummaryWidget() {
-  const [summary, setsummary] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(false);
 
-  const generateSummary = async () => {
-    setLoading(true);
-    setError(null);
-    try {
+  const { data: summary, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['case-summary'],
+    queryFn: async () => {
       const response = await base44.functions.invoke('generateCaseSummary', {});
-      setsummary(response.data);
-    } catch (err) {
-      setError(err.message || 'Failed to generate summary');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000, // cache for 5 minutes — avoids re-calling LLM on every remount
+    retry: 1,
+  });
 
-  useEffect(() => {
-    generateSummary();
-  }, []);
+  const generateSummary = () => refetch();
 
   if (loading && !summary) {
     return (
@@ -44,7 +37,7 @@ export default function CaseSummaryWidget() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>{error?.message || 'Failed to generate summary'}</AlertDescription>
       </Alert>
     );
   }

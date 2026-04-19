@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertTriangle, Plus, Search, Filter, Calendar, User, Briefcase, Clock, ChevronRight } from 'lucide-react';
+import { AlertTriangle, Plus, Search, Calendar, User, Briefcase, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { daysUntil } from '@/lib/dateUtils';
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-800',
@@ -32,11 +33,6 @@ const CASE_TYPE_LABELS = {
   other: 'Other'
 };
 
-function daysUntil(dateStr) {
-  if (!dateStr) return null;
-  const diff = new Date(dateStr) - new Date();
-  return Math.ceil(diff / (1000 * 60 * 60 * 24));
-}
 
 function LimitationBadge({ date }) {
   if (!date) return null;

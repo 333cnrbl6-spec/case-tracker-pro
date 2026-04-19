@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, ArrowRight, Building2, Scale, Bell, Sparkles } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,9 +33,9 @@ export default function OnboardingWizard() {
   // Skip if already onboarded
   useEffect(() => {
     if (existingProfiles.length > 0 && existingProfiles[0].onboarding_complete) {
-      navigate('/case-manager');
+      navigate('/case-manager', { replace: true });
     }
-  }, [existingProfiles]);
+  }, [existingProfiles, navigate]);
 
   const saveProfileMutation = useMutation({
     mutationFn: async () => {
@@ -169,15 +170,18 @@ export default function OnboardingWizard() {
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">Case Type</label>
-                  <select className="w-full border border-slate-200 rounded-md px-3 py-2 text-sm" value={firstCase.case_type} onChange={e => setFirstCase({ ...firstCase, case_type: e.target.value })}>
-                    <option value="personal_injury">Personal Injury</option>
-                    <option value="employment">Employment</option>
-                    <option value="property_dispute">Property Dispute</option>
-                    <option value="professional_negligence">Professional Negligence</option>
-                    <option value="insurance_claim">Insurance Claim</option>
-                    <option value="rics_complaint">RICS Complaint</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <Select value={firstCase.case_type} onValueChange={v => setFirstCase({ ...firstCase, case_type: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="personal_injury">Personal Injury</SelectItem>
+                      <SelectItem value="employment">Employment</SelectItem>
+                      <SelectItem value="property_dispute">Property Dispute</SelectItem>
+                      <SelectItem value="professional_negligence">Professional Negligence</SelectItem>
+                      <SelectItem value="insurance_claim">Insurance Claim</SelectItem>
+                      <SelectItem value="rics_complaint">RICS Complaint</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className="text-sm font-medium mb-1 block">Client Name</label>
