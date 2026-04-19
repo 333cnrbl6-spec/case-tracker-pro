@@ -1,0 +1,17 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "Lead Investigator",
+        "Legal Counsel",
+        "General Auditor",
+        "admin"
+      ],
+      "default": "General Auditor",
+      "description": "User role for RICS investigations"
+    }
+  }
+}

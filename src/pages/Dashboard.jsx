@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3 } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
@@ -460,6 +460,20 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">Real-time compliance metrics, RICS violation trends, and investigation deadline adherence</p>
                 <Button className="bg-indigo-600 hover:bg-indigo-700 w-full">View Metrics</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/permissions" className="block">
+            <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Lock className="w-5 h-5 text-slate-700" /> Permissions Manager
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Manage role-based access control: Lead Investigator, Legal Counsel, and General Auditor</p>
+                <Button className="bg-slate-700 hover:bg-slate-800 w-full">Manage Roles</Button>
               </CardContent>
             </Card>
           </Link>
