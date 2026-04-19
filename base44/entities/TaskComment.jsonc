@@ -1,0 +1,60 @@
+{
+  "name": "TaskComment",
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "ID of the related IncidentTask"
+    },
+    "content": {
+      "type": "string",
+      "description": "Comment text content"
+    },
+    "author_email": {
+      "type": "string",
+      "description": "Email of the user who posted the comment"
+    },
+    "author_name": {
+      "type": "string",
+      "description": "Display name of the commenter"
+    },
+    "comment_type": {
+      "type": "string",
+      "enum": [
+        "update",
+        "discussion",
+        "resolution",
+        "escalation"
+      ],
+      "default": "update",
+      "description": "Type of comment for filtering/highlighting"
+    },
+    "mentions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails of mentioned team members"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Optional file attachments"
+    }
+  },
+  "required": [
+    "task_id",
+    "content",
+    "author_email"
+  ]
+}

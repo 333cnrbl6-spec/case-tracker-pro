@@ -11,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Trash2, Clock, User, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Trash2, Clock, User, AlertTriangle, CheckCircle2, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import TaskCommentThread from '@/components/TaskCommentThread';
 
 const STATUS_COLORS = {
   not_started: 'bg-slate-100 text-slate-800',
@@ -32,6 +33,7 @@ const PRIORITY_COLORS = {
 
 export default function TaskCard({ task, onDelete, users }) {
   const queryClient = useQueryClient();
+  const [showComments, setShowComments] = useState(false);
   const taskData = task.data;
   const isOverdue = taskData.deadline && new Date(taskData.deadline) < new Date() && 
     !['completed', 'blocked'].includes(taskData.status);
@@ -125,8 +127,24 @@ export default function TaskCard({ task, onDelete, users }) {
               <p className="text-sm text-slate-700">{taskData.notes}</p>
             </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+
+          <Button
+           variant="outline"
+           size="sm"
+           onClick={() => setShowComments(!showComments)}
+           className="gap-2 w-full"
+          >
+           <MessageCircle className="w-4 h-4" />
+           {showComments ? 'Hide' : 'Show'} Discussion
+          </Button>
+
+          {showComments && (
+           <div className="border-t pt-4 mt-4">
+             <TaskCommentThread taskId={task.id} taskAssignedTo={taskData.assigned_to} />
+           </div>
+          )}
+          </div>
+          </CardContent>
+          </Card>
+          );
+          }
