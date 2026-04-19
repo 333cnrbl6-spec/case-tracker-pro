@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
@@ -446,6 +446,20 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">Generate formal PDF incident reports with all tasks, communications, and evidence for RICS investigations</p>
                 <Button className="bg-orange-600 hover:bg-orange-700 w-full">Generate Report</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/compliance-dashboard" className="block">
+            <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <BarChart3 className="w-5 h-5 text-indigo-600" /> Compliance Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Real-time compliance metrics, RICS violation trends, and investigation deadline adherence</p>
+                <Button className="bg-indigo-600 hover:bg-indigo-700 w-full">View Metrics</Button>
               </CardContent>
             </Card>
           </Link>
