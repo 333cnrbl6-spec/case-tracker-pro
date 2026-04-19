@@ -31,6 +31,7 @@ import CaseNarrativeBuilder from '@/pages/CaseNarrativeBuilder';
 import ComplianceAlerts from '@/pages/ComplianceAlerts';
 import PracticeAnalytics from '@/pages/PracticeAnalytics';
 import OnboardingWizard from '@/pages/OnboardingWizard';
+import ComplianceDashboard from '@/pages/ComplianceDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -84,6 +85,7 @@ const AuthenticatedApp = () => {
       <Route path="/compliance-alerts" element={<ComplianceAlerts />} />
       <Route path="/practice-analytics" element={<PracticeAnalytics />} />
       <Route path="/onboarding" element={<OnboardingWizard />} />
+      <Route path="/compliance-dashboard" element={<ComplianceDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
@@ -348,6 +348,20 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">KPIs, fee earner workload, case age distribution, settlements & limitation date tracker</p>
                 <Button className="bg-slate-700 hover:bg-slate-800 w-full">View Analytics</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/compliance-dashboard" className="block">
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Shield className="w-5 h-5 text-blue-600" /> Centralized Compliance Dashboard
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Real-time compliance monitoring across all portfolio apps with limitation tracking, safety certificates & regulatory alerts</p>
+                <Button className="bg-blue-600 hover:bg-blue-700 w-full">Open Dashboard</Button>
               </CardContent>
             </Card>
           </Link>
