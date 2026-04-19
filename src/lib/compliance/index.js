@@ -16,7 +16,7 @@
 import SpeciesExplorerCompliance from './SpeciesExplorerCompliance.js';
 import PremisoCompliance from './PremisoCompliance.js';
 import CharityHubCompliance from './CharityHubCompliance.js';
-import CaseNarrativeCompliance from './complianceStandards.js';
+import CaseNarrativeCompliance from '../complianceStandards.js';
 
 // =============================================================================
 // UNIVERSAL COMPLIANCE PATTERNS
