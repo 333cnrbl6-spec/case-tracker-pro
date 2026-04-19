@@ -365,6 +365,20 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/compliance-reports" className="block">
+            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <FileText className="w-5 h-5 text-emerald-600" /> Compliance Report Generator
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Auto-generate branded PDF reports: RICS breaches, limitation dates, Gift Aid, Gas Safety with real-time data</p>
+                <Button className="bg-emerald-600 hover:bg-emerald-700 w-full">Generate Reports</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>
