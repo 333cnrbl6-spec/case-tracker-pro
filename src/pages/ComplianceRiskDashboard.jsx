@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import RiskVisualization from '@/components/RiskVisualization';
+import RiskWorkflowManager from '@/components/RiskWorkflowManager';
 
 const riskLevelColors = {
     low: 'bg-green-100 text-green-800 border-green-300',
@@ -288,6 +289,15 @@ export default function ComplianceRiskDashboard() {
                                 <CardContent>
                                     {latestRisk ? (
                                         <div className="space-y-4">
+                                            <RiskWorkflowManager 
+                                                risk={latestRisk} 
+                                                caseData={caseItem}
+                                                onWorkflowTriggered={() => {
+                                                    queryClient.invalidateQueries({ queryKey: ['incidentTasks'] });
+                                                }}
+                                            />
+                                            <div className="border-t border-slate-200 pt-4"></div>
+
                                             <div className="flex items-center gap-4">
                                                 <div className="flex-1">
                                                     <div className="flex justify-between text-sm mb-1">
