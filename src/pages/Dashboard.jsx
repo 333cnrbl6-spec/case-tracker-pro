@@ -421,6 +421,20 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/timeline" className="block">
+            <Card className="bg-gradient-to-br from-cyan-50 to-teal-50 border-cyan-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <FileText className="w-5 h-5 text-cyan-600" /> Event Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Chronological view of all incidents, tasks, and communications with filtering options</p>
+                <Button className="bg-cyan-600 hover:bg-cyan-700 w-full">View Timeline</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>

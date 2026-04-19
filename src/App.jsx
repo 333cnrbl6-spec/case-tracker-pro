@@ -36,6 +36,7 @@ import ComplianceReportGenerator from '@/pages/ComplianceReportGenerator';
 import ComplianceRiskDashboard from '@/pages/ComplianceRiskDashboard';
 import AuditLog from '@/pages/AuditLog';
 import FeeEarnerAnalytics from '@/pages/FeeEarnerAnalytics';
+import EventTimeline from '@/pages/EventTimeline';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
       <Route path="/risk-dashboard" element={<ComplianceRiskDashboard />} />
       <Route path="/audit-log" element={<AuditLog />} />
       <Route path="/fee-earner-analytics" element={<FeeEarnerAnalytics />} />
+      <Route path="/timeline" element={<EventTimeline />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
