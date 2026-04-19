@@ -34,6 +34,7 @@ import OnboardingWizard from '@/pages/OnboardingWizard';
 import ComplianceDashboard from '@/pages/ComplianceDashboard';
 import ComplianceReportGenerator from '@/pages/ComplianceReportGenerator';
 import ComplianceRiskDashboard from '@/pages/ComplianceRiskDashboard';
+import AuditLog from '@/pages/AuditLog';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -90,6 +91,7 @@ const AuthenticatedApp = () => {
       <Route path="/compliance-dashboard" element={<ComplianceDashboard />} />
       <Route path="/compliance-reports" element={<ComplianceReportGenerator />} />
       <Route path="/risk-dashboard" element={<ComplianceRiskDashboard />} />
+      <Route path="/audit-log" element={<AuditLog />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

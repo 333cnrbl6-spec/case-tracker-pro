@@ -1,0 +1,84 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "workflow_triggered",
+        "task_created",
+        "task_escalated",
+        "reminder_sent",
+        "workflow_completed",
+        "risk_assessment_created",
+        "escalation_sent"
+      ],
+      "description": "Type of audit event"
+    },
+    "action": {
+      "type": "string",
+      "description": "Detailed description of the action taken"
+    },
+    "triggered_by": {
+      "type": "string",
+      "description": "Email of user who triggered the action (or 'system' for automated actions)"
+    },
+    "case_id": {
+      "type": "string",
+      "description": "Related case ID if applicable"
+    },
+    "case_ref": {
+      "type": "string",
+      "description": "Case reference for quick display"
+    },
+    "risk_id": {
+      "type": "string",
+      "description": "Related risk assessment ID if applicable"
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Related task ID if applicable"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "User the action was assigned to or affected"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "description": "Severity level of the action"
+    },
+    "details": {
+      "type": "string",
+      "description": "JSON string with additional details for compliance reporting"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failure",
+        "pending"
+      ],
+      "default": "success",
+      "description": "Status of the action"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if action failed"
+    },
+    "timestamp": {
+      "type": "string",
+      "description": "ISO timestamp of when the event occurred"
+    }
+  },
+  "required": [
+    "event_type",
+    "action",
+    "triggered_by"
+  ]
+}

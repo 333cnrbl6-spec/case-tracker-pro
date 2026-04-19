@@ -393,6 +393,20 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/audit-log" className="block">
+            <Card className="bg-gradient-to-br from-slate-50 to-zinc-50 border-slate-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <FileText className="w-5 h-5 text-slate-700" /> Audit Log
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Track all automated workflow actions, task assignments, reminders, and escalations for compliance reporting</p>
+                <Button className="bg-slate-700 hover:bg-slate-800 w-full">View Audit Log</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>

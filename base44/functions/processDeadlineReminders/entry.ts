@@ -1,5 +1,27 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+const logAuditEvent = async (base44, event) => {
+  try {
+    await base44.entities.AuditLog.create({
+      event_type: event.event_type,
+      action: event.action,
+      triggered_by: event.triggered_by || 'system',
+      case_id: event.case_id,
+      case_ref: event.case_ref,
+      risk_id: event.risk_id,
+      task_id: event.task_id,
+      assigned_to: event.assigned_to,
+      severity: event.severity || 'medium',
+      details: typeof event.details === 'string' ? event.details : JSON.stringify(event.details || {}),
+      status: event.status || 'success',
+      error_message: event.error_message,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Failed to log audit event:', error);
+  }
+};
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -40,6 +62,17 @@ Deno.serve(async (req) => {
                 await base44.entities.IncidentTask.update(task.id, {
                     reminder_sent: true
                 });
+
+                // Log reminder sent
+                await logAuditEvent(base44, {
+                    event_type: 'reminder_sent',
+                    action: `Deadline reminder sent: "${task.title}" due in ${daysUntil} days`,
+                    triggered_by: 'system',
+                    task_id: task.id,
+                    assigned_to: task.assigned_to,
+                    severity: task.priority,
+                    details: { days_until: daysUntil, deadline: task.deadline }
+                });
             }
 
             // Escalate overdue critical/high priority tasks
@@ -59,6 +92,17 @@ Deno.serve(async (req) => {
                 await base44.entities.IncidentTask.update(task.id, {
                     status: 'blocked',
                     notes: `ESCALATED: Overdue by ${Math.abs(daysUntil)} days - awaiting resolution`
+                });
+
+                // Log task escalation
+                await logAuditEvent(base44, {
+                    event_type: 'task_escalated',
+                    action: `Task escalated: "${task.title}" is ${Math.abs(daysUntil)} days overdue`,
+                    triggered_by: 'system',
+                    task_id: task.id,
+                    assigned_to: task.assigned_to,
+                    severity: task.priority,
+                    details: { days_overdue: Math.abs(daysUntil), deadline: task.deadline }
                 });
             }
         }

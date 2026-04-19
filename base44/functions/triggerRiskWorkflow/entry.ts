@@ -1,5 +1,27 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+const logAuditEvent = async (base44, event) => {
+  try {
+    await base44.entities.AuditLog.create({
+      event_type: event.event_type,
+      action: event.action,
+      triggered_by: event.triggered_by || 'system',
+      case_id: event.case_id,
+      case_ref: event.case_ref,
+      risk_id: event.risk_id,
+      task_id: event.task_id,
+      assigned_to: event.assigned_to,
+      severity: event.severity || 'medium',
+      details: typeof event.details === 'string' ? event.details : JSON.stringify(event.details || {}),
+      status: event.status || 'success',
+      error_message: event.error_message,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Failed to log audit event:', error);
+  }
+};
+
 Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
@@ -9,6 +31,7 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const userId = user.email;
         const { risk_id, case_id, risk_level, predicted_failures, recommended_actions } = await req.json();
 
         // Fetch case and risk details
@@ -18,6 +41,18 @@ Deno.serve(async (req) => {
         if (!caseData) {
             return Response.json({ error: 'Case not found' }, { status: 404 });
         }
+
+        // Log workflow trigger
+        await logAuditEvent(base44, {
+            event_type: 'workflow_triggered',
+            action: `Risk workflow triggered for case ${caseData.case_ref} (${risk_level} risk)`,
+            triggered_by: userId,
+            case_id: case_id,
+            case_ref: caseData.case_ref,
+            risk_id: risk_id,
+            severity: risk_level,
+            details: { risk_score: riskRecord.overall_risk_score }
+        });
 
         const tasksCreated = [];
         const escalations = [];
@@ -58,6 +93,20 @@ Deno.serve(async (req) => {
                 assigned_to: caseData.assigned_fee_earner,
                 deadline: deadline.toISOString().split('T')[0]
             });
+
+            // Log task creation
+            await logAuditEvent(base44, {
+                event_type: 'task_created',
+                action: `Task created: "${taskTitle}"`,
+                triggered_by: 'system',
+                case_id: case_id,
+                case_ref: caseData.case_ref,
+                risk_id: risk_id,
+                task_id: task.id,
+                assigned_to: caseData.assigned_fee_earner,
+                severity: risk_level,
+                details: { deadline: deadline.toISOString().split('T')[0] }
+            });
         }
 
         // Escalation to management for critical risks
@@ -79,6 +128,20 @@ Deno.serve(async (req) => {
                 risk_level,
                 risk_score: riskRecord.overall_risk_score,
                 escalated_at: new Date().toISOString()
+            });
+
+            // Log escalation
+            await logAuditEvent(base44, {
+                event_type: 'escalation_sent',
+                action: `Management escalation triggered for critical risk: ${caseData.case_ref}`,
+                triggered_by: 'system',
+                case_id: case_id,
+                case_ref: caseData.case_ref,
+                risk_id: risk_id,
+                task_id: escalationTask.id,
+                assigned_to: 'management@firm.local',
+                severity: 'critical',
+                details: { risk_score: riskRecord.overall_risk_score }
             });
         }
 
