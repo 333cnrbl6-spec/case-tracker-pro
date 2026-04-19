@@ -1,0 +1,75 @@
+{
+  "name": "ComplianceAlert",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related case ID"
+    },
+    "case_ref": {
+      "type": "string",
+      "description": "Case reference for quick display"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Client name for quick display"
+    },
+    "alert_type": {
+      "type": "string",
+      "enum": [
+        "limitation_date",
+        "client_care_letter",
+        "no_client_contact",
+        "court_deadline",
+        "settlement_authority"
+      ],
+      "description": "Type of compliance alert"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "warning",
+        "urgent",
+        "critical"
+      ],
+      "description": "Alert severity"
+    },
+    "days_until": {
+      "type": "number",
+      "description": "Days until the deadline (negative = overdue)"
+    },
+    "deadline_date": {
+      "type": "string",
+      "format": "date",
+      "description": "The actual deadline date"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable alert message"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "acknowledged",
+        "resolved"
+      ],
+      "default": "active"
+    },
+    "acknowledged_by": {
+      "type": "string",
+      "description": "User who acknowledged the alert"
+    },
+    "acknowledged_at": {
+      "type": "string",
+      "description": "When alert was acknowledged"
+    }
+  },
+  "required": [
+    "case_id",
+    "alert_type",
+    "severity",
+    "message"
+  ]
+}

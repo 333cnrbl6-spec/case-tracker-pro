@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
@@ -306,6 +306,48 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">Track follow-up actions, assign to team members, and monitor deadline reminders</p>
                 <Button className="bg-teal-600 hover:bg-teal-700 w-full">Manage Tasks</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/case-manager" className="block">
+            <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Scale className="w-5 h-5 text-indigo-600" /> Case Manager
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Manage UK legal cases with limitation date tracking, smart search & AI narrative builder</p>
+                <Button className="bg-indigo-600 hover:bg-indigo-700 w-full">Open Case Manager</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/compliance-alerts" className="block">
+            <Card className="bg-gradient-to-br from-red-50 to-orange-50 border-red-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Bell className="w-5 h-5 text-red-600" /> Compliance Alerts
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Limitation date alerts, client care letter reminders, court deadlines & settlement authority</p>
+                <Button className="bg-red-600 hover:bg-red-700 w-full">View Alerts</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/practice-analytics" className="block">
+            <Card className="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <BarChart2 className="w-5 h-5 text-slate-700" /> Practice Analytics
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">KPIs, fee earner workload, case age distribution, settlements & limitation date tracker</p>
+                <Button className="bg-slate-700 hover:bg-slate-800 w-full">View Analytics</Button>
               </CardContent>
             </Card>
           </Link>

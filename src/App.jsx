@@ -26,6 +26,11 @@ import ComplianceChecklist from '@/pages/ComplianceChecklist';
 import AnalyticsDashboard from '@/pages/AnalyticsDashboard';
 import EvidenceValidator from '@/pages/EvidenceValidator';
 import IncidentTaskManager from '@/pages/IncidentTaskManager';
+import CaseManager from '@/pages/CaseManager';
+import CaseNarrativeBuilder from '@/pages/CaseNarrativeBuilder';
+import ComplianceAlerts from '@/pages/ComplianceAlerts';
+import PracticeAnalytics from '@/pages/PracticeAnalytics';
+import OnboardingWizard from '@/pages/OnboardingWizard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,6 +79,11 @@ const AuthenticatedApp = () => {
       <Route path="/analytics" element={<AnalyticsDashboard />} />
       <Route path="/evidence-validator" element={<EvidenceValidator />} />
       <Route path="/incident-tasks" element={<IncidentTaskManager />} />
+      <Route path="/case-manager" element={<CaseManager />} />
+      <Route path="/case-narrative-builder" element={<CaseNarrativeBuilder />} />
+      <Route path="/compliance-alerts" element={<ComplianceAlerts />} />
+      <Route path="/practice-analytics" element={<PracticeAnalytics />} />
+      <Route path="/onboarding" element={<OnboardingWizard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

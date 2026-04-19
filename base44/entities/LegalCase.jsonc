@@ -1,0 +1,122 @@
+{
+  "name": "LegalCase",
+  "type": "object",
+  "properties": {
+    "case_ref": {
+      "type": "string",
+      "description": "Unique case reference number"
+    },
+    "case_type": {
+      "type": "string",
+      "enum": [
+        "personal_injury",
+        "employment",
+        "property_dispute",
+        "professional_negligence",
+        "insurance_claim",
+        "contractual_dispute",
+        "rics_complaint",
+        "other"
+      ],
+      "description": "Type of legal case"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "under_review",
+        "settled",
+        "closed",
+        "on_hold",
+        "litigation"
+      ],
+      "default": "active",
+      "description": "Current case status"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Name of the client"
+    },
+    "client_email": {
+      "type": "string",
+      "description": "Client email address"
+    },
+    "opponent_name": {
+      "type": "string",
+      "description": "Name of the opposing party"
+    },
+    "assigned_fee_earner": {
+      "type": "string",
+      "description": "Solicitor/fee earner handling the case"
+    },
+    "incident_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the incident giving rise to claim"
+    },
+    "limitation_date": {
+      "type": "string",
+      "format": "date",
+      "description": "CRITICAL: Limitation date \u2014 legal claim expires after this date"
+    },
+    "client_care_letter_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether client care letter has been sent"
+    },
+    "client_care_letter_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date client care letter was sent"
+    },
+    "last_client_contact": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last client contact"
+    },
+    "estimated_value": {
+      "type": "number",
+      "description": "Estimated case value in GBP"
+    },
+    "settlement_value": {
+      "type": "number",
+      "description": "Actual settlement value if settled"
+    },
+    "settlement_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date case was settled"
+    },
+    "facts": {
+      "type": "string",
+      "description": "Summary of key facts"
+    },
+    "instructions": {
+      "type": "string",
+      "description": "Client instructions and case objectives"
+    },
+    "court_deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Next court deadline if applicable"
+    },
+    "settlement_authority_obtained": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether settlement authority has been obtained from client"
+    },
+    "ai_narrative": {
+      "type": "string",
+      "description": "AI-generated structured legal narrative (JSON)"
+    },
+    "narrative_generated_at": {
+      "type": "string",
+      "description": "When AI narrative was last generated"
+    }
+  },
+  "required": [
+    "case_ref",
+    "case_type",
+    "client_name"
+  ]
+}

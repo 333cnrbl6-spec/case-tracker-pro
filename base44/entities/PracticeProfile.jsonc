@@ -1,0 +1,74 @@
+{
+  "name": "PracticeProfile",
+  "type": "object",
+  "properties": {
+    "firm_name": {
+      "type": "string",
+      "description": "Law firm name"
+    },
+    "sra_number": {
+      "type": "string",
+      "description": "SRA registration number"
+    },
+    "practice_areas": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Areas of law practiced"
+    },
+    "address": {
+      "type": "string",
+      "description": "Firm address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "email": {
+      "type": "string",
+      "description": "Firm email address"
+    },
+    "limitation_alert_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "description": "Days before limitation date to send alerts (e.g. [30, 14, 7, 3, 1])",
+      "default": [
+        30,
+        14,
+        7,
+        3,
+        1
+      ]
+    },
+    "client_contact_reminder_days": {
+      "type": "number",
+      "default": 30,
+      "description": "Alert if no client contact for this many days"
+    },
+    "client_care_letter_days": {
+      "type": "number",
+      "default": 14,
+      "description": "Alert if client care letter not sent within this many days"
+    },
+    "subscription_tier": {
+      "type": "string",
+      "enum": [
+        "starter",
+        "professional",
+        "enterprise"
+      ],
+      "default": "starter",
+      "description": "Current subscription tier"
+    },
+    "onboarding_complete": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "firm_name"
+  ]
+}
