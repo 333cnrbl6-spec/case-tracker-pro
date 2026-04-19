@@ -15,9 +15,12 @@ import {
     Loader2, 
     RefreshCw,
     AlertCircle,
-    Target
+    Target,
+    Filter,
+    X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import RiskVisualization from '@/components/RiskVisualization';
 
 const riskLevelColors = {
     low: 'bg-green-100 text-green-800 border-green-300',
@@ -36,6 +39,8 @@ const riskLevelIcons = {
 export default function ComplianceRiskDashboard() {
     const queryClient = useQueryClient();
     const [selectedCase, setSelectedCase] = useState(null);
+    const [filterCaseType, setFilterCaseType] = useState(null);
+    const [filterFeeEarner, setFilterFeeEarner] = useState(null);
 
     const { data: cases = [] } = useQuery({
         queryKey: ['legalCases'],
@@ -73,8 +78,27 @@ export default function ComplianceRiskDashboard() {
         return caseRisks.sort((a, b) => new Date(b.assessment_date) - new Date(a.assessment_date))[0];
     };
 
-    const criticalRisks = risks.filter(r => r.risk_level === 'critical');
-    const highRisks = risks.filter(r => r.risk_level === 'high');
+    // Filter logic
+    const filteredCases = cases.filter(c => {
+        if (filterCaseType && c.case_type !== filterCaseType) return false;
+        if (filterFeeEarner && c.assigned_fee_earner !== filterFeeEarner) return false;
+        return true;
+    });
+
+    const filteredRisks = risks.filter(r => {
+        const caseItem = cases.find(c => c.id === r.case_id);
+        if (!caseItem) return false;
+        if (filterCaseType && caseItem.case_type !== filterCaseType) return false;
+        if (filterFeeEarner && caseItem.assigned_fee_earner !== filterFeeEarner) return false;
+        return true;
+    });
+
+    const criticalRisks = filteredRisks.filter(r => r.risk_level === 'critical');
+    const highRisks = filteredRisks.filter(r => r.risk_level === 'high');
+
+    // Get unique values for filters
+    const caseTypes = [...new Set(cases.map(c => c.case_type))];
+    const feeEarners = [...new Set(cases.map(c => c.assigned_fee_earner).filter(Boolean))];
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
@@ -114,6 +138,59 @@ export default function ComplianceRiskDashboard() {
                         </AlertDescription>
                     </Alert>
                 )}
+
+                {/* Filters */}
+                <Card className="mb-6 bg-slate-50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <Filter className="w-4 h-4" />
+                            Filter by Case Type or Fee Earner
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-wrap gap-2">
+                            {caseTypes.map(type => (
+                                <Button
+                                    key={type}
+                                    variant={filterCaseType === type ? 'default' : 'outline'}
+                                    size="sm"
+                                    onClick={() => setFilterCaseType(filterCaseType === type ? null : type)}
+                                >
+                                    {type}
+                                    {filterCaseType === type && <X className="w-3 h-3 ml-1" />}
+                                </Button>
+                            ))}
+                            <div className="border-l border-slate-300 mx-2"></div>
+                            {feeEarners.map(earner => (
+                                <Button
+                                    key={earner}
+                                    variant={filterFeeEarner === earner ? 'default' : 'outline'}
+                                    size="sm"
+                                    onClick={() => setFilterFeeEarner(filterFeeEarner === earner ? null : earner)}
+                                >
+                                    {earner}
+                                    {filterFeeEarner === earner && <X className="w-3 h-3 ml-1" />}
+                                </Button>
+                            ))}
+                            {(filterCaseType || filterFeeEarner) && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                        setFilterCaseType(null);
+                                        setFilterFeeEarner(null);
+                                    }}
+                                    className="text-red-600 hover:text-red-700"
+                                >
+                                    Clear Filters
+                                </Button>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Visualizations */}
+                <RiskVisualization risks={filteredRisks} cases={filteredCases} title="Portfolio Risk Visualization" />
 
                 {/* Risk Overview */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -160,9 +237,9 @@ export default function ComplianceRiskDashboard() {
 
                 {/* Cases List */}
                 <div className="grid grid-cols-1 gap-6">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-4">Case Risk Assessments</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-4">Case Risk Assessments ({filteredCases.length})</h2>
                     
-                    {cases.map((caseItem) => {
+                    {filteredCases.map((caseItem) => {
                         const latestRisk = getLatestRisk(caseItem.id);
                         const RiskIcon = latestRisk ? riskLevelIcons[latestRisk.risk_level] : Clock;
                         
