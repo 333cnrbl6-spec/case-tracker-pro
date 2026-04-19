@@ -1,4 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+// Import compliance standards - using inline constants to avoid cross-file imports in Deno
+const AI_MODELS = {
+  PROFESSIONAL_DOCUMENTS: "claude_sonnet_4_6",
+  COMPLEX_ANALYSIS: "claude_opus_4_6",
+  WEB_SEARCH: "gemini_3_1_pro",
+  SIMPLE_TASKS: "automatic",
+};
 
 Deno.serve(async (req) => {
   try {
@@ -56,8 +63,9 @@ ${chronology}
 
 Jurisdiction: England & Wales. Produce a comprehensive structured legal narrative.`;
 
+    // 🏛️ COMPLIANCE STANDARD: Use claude_sonnet_4_6 for professional legal documents
     const narrative = await base44.integrations.Core.InvokeLLM({
-      model: 'claude_sonnet_4_6',
+      model: AI_MODELS.PROFESSIONAL_DOCUMENTS, // claude_sonnet_4_6 - highest quality for legal work
       prompt,
       response_json_schema: {
         type: 'object',
@@ -71,10 +79,16 @@ Jurisdiction: England & Wales. Produce a comprehensive structured legal narrativ
           risk_assessment: { type: 'string' },
           applicable_statutes: { type: 'array', items: { type: 'string' } },
           strengths: { type: 'array', items: { type: 'string' } },
-          weaknesses: { type: 'array', items: { type: 'string' } }
-        }
+          weaknesses: { type: 'array', items: { type: 'string' } },
+          compliance_status: { type: 'string', enum: ["compliant", "review_required", "non_compliant"] },
+          confidence_score: { type: 'number', minimum: 0, maximum: 1 }
+        },
+        required: ['background_parties', 'chronology', 'liability_analysis', 'recommended_actions', 'confidence_score']
       }
     });
+
+    // Audit trail logging - COMPLIANCE REQUIREMENT
+    console.log(`[AUDIT] GENERATE | LegalCase:${case_id} | ${user.email} | model:${AI_MODELS.PROFESSIONAL_DOCUMENTS} | type:ai_narrative`);
 
     // Save narrative back to case
     await base44.entities.LegalCase.update(case_id, {
