@@ -8,10 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertTriangle, Plus, Search, Calendar, User, Briefcase, ChevronRight } from 'lucide-react';
+import { AlertTriangle, Plus, Search, Calendar, User, Briefcase, ChevronRight, GitCommitHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
+import CaseTimeline from '@/components/CaseTimeline';
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-800',
@@ -61,6 +62,7 @@ export default function CaseManager() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterFeeEarner, setFilterFeeEarner] = useState('all');
   const [filterLimitationDays, setFilterLimitationDays] = useState('all');
+  const [view, setView] = useState('list'); // 'list' | 'timeline'
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
@@ -138,6 +140,20 @@ export default function CaseManager() {
             <p className="text-slate-500 mt-1">{cases.length} cases {criticalLimitation > 0 && <span className="text-red-600 font-semibold">· {criticalLimitation} limitation dates within 30 days</span>}</p>
           </div>
           <div className="flex gap-3">
+            <div className="flex border border-slate-200 rounded-md overflow-hidden">
+              <button
+                onClick={() => setView('list')}
+                className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${view === 'list' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+              >
+                <Briefcase className="w-4 h-4" /> Cases
+              </button>
+              <button
+                onClick={() => setView('timeline')}
+                className={`px-3 py-1.5 text-sm flex items-center gap-1.5 transition-colors ${view === 'timeline' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+              >
+                <GitCommitHorizontal className="w-4 h-4" /> Timeline
+              </button>
+            </div>
             <Link to="/practice-analytics">
               <Button variant="outline">Analytics</Button>
             </Link>
@@ -250,8 +266,19 @@ export default function CaseManager() {
           </div>
         </div>
 
+        {/* Timeline view */}
+        {view === 'timeline' && (
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+              <GitCommitHorizontal className="w-5 h-5 text-indigo-500" /> Case Timeline
+              <span className="text-xs font-normal text-slate-400 ml-1">— drag to reorder · click to edit</span>
+            </h2>
+            <CaseTimeline />
+          </Card>
+        )}
+
         {/* Filters */}
-        <Card className="mb-6">
+        {view === 'list' && <Card className="mb-6">
           <CardContent className="pt-4">
             <div className="flex flex-wrap gap-3 items-center">
               <div className="relative flex-1 min-w-48">
@@ -298,17 +325,17 @@ export default function CaseManager() {
               </Select>
             </div>
           </CardContent>
-        </Card>
+        </Card>}
 
         {/* Cases List */}
-        {isLoading ? (
+        {view === 'list' && isLoading ? (
           <div className="text-center py-12 text-slate-500">Loading cases...</div>
-        ) : filtered.length === 0 ? (
+        ) : view === 'list' && filtered.length === 0 ? (
           <Card className="text-center py-16">
             <p className="text-slate-400 text-lg">No cases found</p>
             <p className="text-slate-400 text-sm mt-1">Try adjusting filters or create a new case</p>
           </Card>
-        ) : (
+        ) : view === 'list' ? (
           <div className="space-y-3">
             {filtered.map(c => (
               <Card key={c.id} className="hover:shadow-md transition-shadow">
@@ -343,7 +370,7 @@ export default function CaseManager() {
               </Card>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
