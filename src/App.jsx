@@ -40,6 +40,7 @@ import EventTimeline from '@/pages/EventTimeline';
 import IncidentReporter from '@/pages/IncidentReporter';
 import InvestigationCompliance from '@/pages/InvestigationCompliance';
 import PermissionsManager from '@/pages/PermissionsManager';
+import Pricing from '@/pages/Pricing';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -102,6 +103,7 @@ const AuthenticatedApp = () => {
       <Route path="/incident-reporter" element={<IncidentReporter />} />
       <Route path="/compliance-dashboard" element={<InvestigationCompliance />} />
       <Route path="/permissions" element={<PermissionsManager />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
