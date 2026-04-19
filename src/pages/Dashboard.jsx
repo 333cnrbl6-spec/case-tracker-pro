@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp } from 'lucide-react';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
@@ -432,6 +432,20 @@ export default function Dashboard() {
               <CardContent>
                 <p className="text-sm text-slate-700 mb-4">Chronological view of all incidents, tasks, and communications with filtering options</p>
                 <Button className="bg-cyan-600 hover:bg-cyan-700 w-full">View Timeline</Button>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link to="/incident-reporter" className="block">
+            <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Download className="w-5 h-5 text-orange-600" /> Incident Reporter
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Generate formal PDF incident reports with all tasks, communications, and evidence for RICS investigations</p>
+                <Button className="bg-orange-600 hover:bg-orange-700 w-full">Generate Report</Button>
               </CardContent>
             </Card>
           </Link>
