@@ -379,6 +379,20 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link to="/risk-dashboard" className="block">
+            <Card className="bg-gradient-to-br from-red-50 to-rose-50 border-red-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Shield className="w-5 h-5 text-red-600" /> AI Risk Assessment
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-700 mb-4">Predictive compliance failure analysis: AI-driven risk scoring, failure prediction & urgent action recommendations</p>
+                <Button className="bg-red-600 hover:bg-red-700 w-full">View Risk Dashboard</Button>
+              </CardContent>
+            </Card>
+          </Link>
           </div>
       </div>
     </div>

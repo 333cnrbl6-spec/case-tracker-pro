@@ -1,0 +1,83 @@
+{
+  "name": "ComplianceRisk",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related case ID (or 'portfolio' for portfolio-wide analysis)"
+    },
+    "assessment_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of risk assessment"
+    },
+    "overall_risk_score": {
+      "type": "number",
+      "description": "Overall risk score 0-100"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "description": "Overall risk level classification"
+    },
+    "risk_categories": {
+      "type": "string",
+      "description": "JSON string of risk category scores (limitation_date_risk, documentation_risk, etc.)"
+    },
+    "predicted_failures": {
+      "type": "string",
+      "description": "JSON array of predicted compliance failures with probability and timeframe"
+    },
+    "risk_factors": {
+      "type": "string",
+      "description": "JSON array of identified risk factors with impact assessment"
+    },
+    "recommended_actions": {
+      "type": "string",
+      "description": "JSON array of recommended remediation actions with priority and deadlines"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "AI confidence in assessment 0-100"
+    },
+    "analyzed_by": {
+      "type": "string",
+      "description": "Email of user who triggered analysis"
+    },
+    "acknowledged": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether risk assessment has been acknowledged"
+    },
+    "acknowledged_by": {
+      "type": "string",
+      "description": "User who acknowledged the risk"
+    },
+    "acknowledged_at": {
+      "type": "string",
+      "description": "When risk was acknowledged"
+    },
+    "mitigation_status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "mitigated",
+        "monitoring"
+      ],
+      "default": "not_started",
+      "description": "Status of risk mitigation efforts"
+    }
+  },
+  "required": [
+    "case_id",
+    "assessment_date",
+    "overall_risk_score",
+    "risk_level"
+  ]
+}
