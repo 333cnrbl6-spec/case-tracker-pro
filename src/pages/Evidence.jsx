@@ -21,6 +21,7 @@ import AnnotationPanel from '../components/AnnotationPanel';
 import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestions';
 import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
 import EvidenceSummary from '../components/EvidenceSummary';
+import OCRContradictionModule from '../components/OCRContradictionModule';
 
 const strengthColors = {
   weak: 'bg-slate-100 text-slate-800',
@@ -219,6 +220,10 @@ export default function Evidence() {
         </div>
 
         <DocumentDropZone onEvidenceCreated={() => queryClient.invalidateQueries({ queryKey: ['evidence'] })} />
+
+        <div className="mt-6">
+          <OCRContradictionModule />
+        </div>
 
         {evidence.length > 0 && (
           <div className="mt-6">
