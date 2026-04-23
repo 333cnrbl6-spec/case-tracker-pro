@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,8 +8,15 @@ import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCi
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
+import BreachFrequencyChart from '@/components/dashboard/BreachFrequencyChart';
+import IncidentTypeChart from '@/components/dashboard/IncidentTypeChart';
+import ResolutionTimeChart from '@/components/dashboard/ResolutionTimeChart';
+import DrillDownPanel from '@/components/dashboard/DrillDownPanel';
+import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export default function Dashboard() {
+  const [drillDown, setDrillDown] = useState(null); // { incidents, label }
+
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
     queryFn: () => base44.entities.Incident.list(),
@@ -30,7 +37,23 @@ export default function Dashboard() {
   const riicsViolations = incidents.filter(i => i.rics_violations?.length > 0).length;
   const legalIssues = incidents.filter(i => i.legal_issues?.length > 0).length;
 
+  const handleMonthDrillDown = (monthLabel) => {
+    // Find incidents whose date-formatted month matches the label
+    const filtered = incidents.filter(inc => {
+      try { return format(new Date(inc.date), 'MMM yy') === monthLabel; } catch { return false; }
+    });
+    setDrillDown({ incidents: filtered, label: monthLabel });
+  };
+
+  const handleTypeDrillDown = (monthLabel, type) => {
+    const filtered = type
+      ? incidents.filter(i => i.incident_type === type)
+      : incidents;
+    setDrillDown({ incidents: filtered, label: type || 'All' });
+  };
+
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
@@ -78,6 +101,18 @@ export default function Dashboard() {
               <p className="text-xs text-slate-500 mt-1">Documents & communications</p>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Compliance Metric Charts */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Compliance Metrics</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+            <div className="lg:col-span-2">
+              <BreachFrequencyChart incidents={incidents} onDrillDown={handleMonthDrillDown} />
+            </div>
+            <IncidentTypeChart incidents={incidents} onDrillDown={handleTypeDrillDown} />
+          </div>
+          <ResolutionTimeChart incidents={incidents} />
         </div>
 
         <div className="mb-8 space-y-8">
@@ -480,5 +515,14 @@ export default function Dashboard() {
           </div>
       </div>
     </div>
+
+    {drillDown && (
+      <DrillDownPanel
+        incidents={drillDown.incidents}
+        label={drillDown.label}
+        onClose={() => setDrillDown(null)}
+      />
+    )}
+    </>
   );
 }
