@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import DocumentDropZone from '../components/DocumentDropZone';
+import AnnotationPanel from '../components/AnnotationPanel';
 import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestions';
 import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
 import EvidenceSummary from '../components/EvidenceSummary';
@@ -263,6 +264,13 @@ export default function Evidence() {
                       {item.notes}
                     </div>
                   )}
+                  <AnnotationPanel
+                    entityName="Evidence"
+                    recordId={item.id}
+                    field="annotations"
+                    value={item.annotations || ''}
+                    queryKey={['evidence']}
+                  />
 
                   <div className="space-y-3 pt-2 border-t border-slate-200">
                     <EvidenceSummary evidence={item} />

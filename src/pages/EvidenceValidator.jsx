@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AlertCircle, CheckCircle2, AlertTriangle, Loader2, FileCheck, Clock, Link2, FileText, MessageSquare, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import AnnotationPanel from '@/components/AnnotationPanel';
 import { toast } from 'sonner';
 
 const TYPE_META = {
@@ -53,6 +54,7 @@ function LinkedItemDetail({ item, onClose }) {
           {r.strength && <p><strong>Strength:</strong> {r.strength}</p>}
           {r.description && <p className="text-slate-600">{r.description}</p>}
           {r.notes && <p className="italic text-slate-500">{r.notes}</p>}
+          <AnnotationPanel entityName="Evidence" recordId={r.id} field="annotations" value={r.annotations || ''} queryKey={['evidence']} />
         </div>
       )}
       {item.type === 'communication' && (
@@ -72,6 +74,7 @@ function LinkedItemDetail({ item, onClose }) {
               </ul>
             </div>
           )}
+          <AnnotationPanel entityName="Communication" recordId={r.id} field="annotations" value={r.annotations || ''} queryKey={['communications']} />
         </div>
       )}
       {item.type === 'incident' && (

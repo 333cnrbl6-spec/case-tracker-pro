@@ -71,6 +71,10 @@
         "type": "string"
       },
       "description": "IDs of related incidents"
+    },
+    "annotations": {
+      "type": "string",
+      "description": "User-added notes and annotations for this communication"
     }
   },
   "required": [

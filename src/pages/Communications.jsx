@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Plus, Trash2, ExternalLink } from 'lucide-react';
+import AnnotationPanel from '../components/AnnotationPanel';
 import {
   Dialog,
   DialogContent,
@@ -225,6 +226,13 @@ export default function Communications() {
                   <div className="bg-slate-50 p-4 rounded text-sm text-slate-700 max-h-48 overflow-y-auto">
                     {comm.content}
                   </div>
+                  <AnnotationPanel
+                    entityName="Communication"
+                    recordId={comm.id}
+                    field="annotations"
+                    value={comm.annotations || ''}
+                    queryKey={['communications']}
+                  />
                 </CardContent>
               </Card>
             ))
