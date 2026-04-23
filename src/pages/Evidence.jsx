@@ -338,7 +338,16 @@ ${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} â€
                     queryKey={['evidence']}
                   />
 
-                  <div className="space-y-3 pt-2 border-t border-slate-200">
+                  <div
+                    className="space-y-3 pt-2 border-t border-slate-200 cursor-grab active:cursor-grabbing bg-slate-50 rounded p-2"
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.effectAllowed = 'copy';
+                      e.dataTransfer.setData('evidenceId', item.id);
+                      e.dataTransfer.setData('evidenceTitle', item.title);
+                    }}
+                  >
+                    <p className="text-xs text-slate-500 mb-1">ðŸ’¡ Drag to timeline to link</p>
                     <EvidenceSummary evidence={item} />
 
                     <EvidenceIncidentSuggestions

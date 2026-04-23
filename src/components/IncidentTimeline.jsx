@@ -1,11 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   AlertTriangle, FileText, MessageSquare, CheckCircle2,
-  ArrowUpRight, Clock, ChevronDown, ChevronUp, Calendar,
+  ArrowUpRight, Clock, ChevronDown, ChevronUp, Calendar, Zap, Loader2,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
+import { base44 } from '@/api/base44Client';
+import { useQueryClient } from '@tanstack/react-query';
 
 /* ─── Config ─────────────────────────────────────────────── */
 const ENTRY_TYPES = {
@@ -33,17 +35,43 @@ function formatDate(str) {
   return d ? format(d, 'd MMM yyyy') : str;
 }
 
-/* ─── Single timeline entry ─────────────────────────────── */
-function TimelineEntry({ entry, isLast }) {
+/* ─── Single timeline entry with drag-drop zone ─────────────────────────────── */
+function TimelineEntry({ entry, isLast, onEvidenceDrop, isDropping }) {
   const cfg = ENTRY_TYPES[entry.type] || ENTRY_TYPES.evidence;
   const Icon = cfg.icon;
+  const [dragOver, setDragOver] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const evidenceId = e.dataTransfer.getData('evidenceId');
+    const evidenceTitle = e.dataTransfer.getData('evidenceTitle');
+    if (evidenceId && onEvidenceDrop) {
+      onEvidenceDrop(evidenceId, evidenceTitle, entry.date);
+    }
+  };
 
   return (
-    <div className="flex gap-3 group">
+    <div
+      className={`flex gap-3 group transition-colors ${dragOver ? 'bg-blue-50 rounded-lg px-2 py-1' : ''}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Spine */}
       <div className="flex flex-col items-center">
-        <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 ring-2 ring-white ${cfg.dot}`} />
-        {!isLast && <div className="w-px flex-1 bg-slate-200 mt-1" />}
+        <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 ring-2 ring-white ${cfg.dot} ${dragOver ? 'ring-blue-400' : ''}`} />
+        {!isLast && <div className={`w-px flex-1 mt-1 ${dragOver ? 'bg-blue-400' : 'bg-slate-200'}`} />}
       </div>
 
       {/* Content */}
@@ -72,14 +100,20 @@ function TimelineEntry({ entry, isLast }) {
             ))}
           </div>
         )}
+        {dragOver && (
+          <p className="text-xs text-blue-600 mt-1 italic">Drop evidence here to link</p>
+        )}
       </div>
     </div>
   );
 }
 
 /* ─── Main component ─────────────────────────────────────── */
-export default function IncidentTimeline({ incident, evidence = [], communications = [] }) {
+export default function IncidentTimeline({ incident, evidence = [], communications = [], onRiskUpdate }) {
   const [open, setOpen] = useState(false);
+  const [isRecalculating, setIsRecalculating] = useState(false);
+  const [linkedCount, setLinkedCount] = useState(0);
+  const queryClient = useQueryClient();
 
   const entries = useMemo(() => {
     const list = [];
@@ -146,9 +180,42 @@ export default function IncidentTimeline({ incident, evidence = [], communicatio
   }, [incident, evidence, communications]);
 
   const total = entries.length;
-  // Always show the first entry (incident itself) + rest behind toggle
   const visible = open ? entries : entries.slice(0, 1);
   const hidden  = total - 1;
+
+  const handleEvidenceDrop = async (evidenceId, evidenceTitle, timelineDate) => {
+    setIsRecalculating(true);
+    try {
+      // Link evidence to incident
+      const ev = evidence.find(e => e.id === evidenceId);
+      if (ev) {
+        const relatedIncidents = ev.related_incidents || [];
+        if (!relatedIncidents.includes(incident.id)) {
+          relatedIncidents.push(incident.id);
+          await base44.entities.Evidence.update(evidenceId, {
+            related_incidents: relatedIncidents,
+          });
+        }
+      }
+
+      // Trigger risk recalculation
+      const result = await base44.functions.invoke('recalculateIncidentRisk', {
+        incidentId: incident.id,
+      });
+
+      setLinkedCount(result.data.linkedEvidenceCount);
+      if (onRiskUpdate) {
+        onRiskUpdate(result.data);
+      }
+
+      // Refresh evidence list
+      queryClient.invalidateQueries({ queryKey: ['evidence'] });
+    } catch (error) {
+      console.error('Drop failed:', error);
+    } finally {
+      setIsRecalculating(false);
+    }
+  };
 
   return (
     <div className="border-t border-slate-100 pt-3 mt-1">
@@ -158,6 +225,11 @@ export default function IncidentTimeline({ incident, evidence = [], communicatio
       >
         <Clock className="w-3.5 h-3.5" />
         <span>Case Timeline</span>
+        {linkedCount > 0 && (
+          <span className="text-blue-600 font-semibold text-xs">
+            ({linkedCount} evidence linked)
+          </span>
+        )}
         <span className="ml-auto flex items-center gap-1 text-slate-400">
           {total} event{total !== 1 ? 's' : ''}
           {open ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -167,8 +239,20 @@ export default function IncidentTimeline({ incident, evidence = [], communicatio
       {open && (
         <div className="pl-1">
           {visible.map((entry, i) => (
-            <TimelineEntry key={i} entry={entry} isLast={i === visible.length - 1} />
+            <TimelineEntry
+              key={i}
+              entry={entry}
+              isLast={i === visible.length - 1}
+              onEvidenceDrop={handleEvidenceDrop}
+              isDropping={isRecalculating}
+            />
           ))}
+          {isRecalculating && (
+            <div className="flex items-center gap-2 text-xs text-slate-500 mt-2 px-4 py-1">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              Re-calculating risk score...
+            </div>
+          )}
         </div>
       )}
 
@@ -179,6 +263,15 @@ export default function IncidentTimeline({ incident, evidence = [], communicatio
         >
           + {hidden} more event{hidden !== 1 ? 's' : ''} (evidence, communications, status updates)
         </button>
+      )}
+
+      {open && (
+        <div className="bg-blue-50 border border-blue-200 rounded p-2 mt-3 text-xs text-blue-700">
+          <p className="flex items-center gap-1">
+            <Zap className="w-3 h-3" />
+            Drag evidence files from Evidence page onto timeline points to link and update risk
+          </p>
+        </div>
       )}
     </div>
   );
