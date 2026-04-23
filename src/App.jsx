@@ -49,6 +49,7 @@ import RICSRiskModule from '@/pages/RICSRiskModule';
 import IncidentKanban from '@/pages/IncidentKanban';
 import ReportBuilder from '@/pages/ReportBuilder';
 import WitnessPortal from '@/pages/WitnessPortal';
+import CaseTimeline from '@/pages/CaseTimeline';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -120,6 +121,7 @@ const AuthenticatedApp = () => {
       <Route path="/rics-risk" element={<RICSRiskModule />} />
       <Route path="/incident-kanban" element={<IncidentKanban />} />
       <Route path="/report-builder" element={<ReportBuilder />} />
+      <Route path="/case-timeline/:incidentId" element={<CaseTimeline />} />
       <Route path="/witness/:token" element={<WitnessPortal />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
