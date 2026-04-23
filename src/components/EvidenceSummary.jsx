@@ -11,16 +11,19 @@ export default function EvidenceSummary({ evidence, onSummaryGenerated }) {
   const [summary, setSummary] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Support both plain evidence objects and wrapped { data: {...} } objects
+  const evidenceData = evidence?.data ?? evidence;
+
   const generateSummary = useMutation({
     mutationFn: async () => {
-      if (!evidence.data.file_url) {
+      if (!evidenceData?.file_url) {
         throw new Error('No file available to summarize');
       }
       const result = await base44.functions.invoke('summarizeEvidenceDocument', {
         evidence_id: evidence.id,
-        file_url: evidence.data.file_url,
-        evidence_title: evidence.data.title,
-        evidence_type: evidence.data.evidence_type
+        file_url: evidenceData.file_url,
+        evidence_title: evidenceData.title,
+        evidence_type: evidenceData.evidence_type
       });
       return result.data;
     },
@@ -96,7 +99,7 @@ export default function EvidenceSummary({ evidence, onSummaryGenerated }) {
             size="sm"
             variant={generateSummary.isPending ? 'outline' : 'default'}
             onClick={() => generateSummary.mutate()}
-            disabled={generateSummary.isPending || !evidence.data.file_url}
+            disabled={generateSummary.isPending || !evidenceData?.file_url}
             className="gap-1"
           >
             {generateSummary.isPending ? (
@@ -184,7 +187,7 @@ export default function EvidenceSummary({ evidence, onSummaryGenerated }) {
 
       {!summary && !generateSummary.isPending && (
         <CardContent className="text-sm text-slate-500 py-3">
-          {evidence.data.file_url ? (
+          {evidenceData?.file_url ? (
             'Click "Generate Summary" to analyze this document with AI.'
           ) : (
             'No file available to summarize.'
