@@ -21,6 +21,8 @@ import IncidentAIAssistant from '@/components/IncidentAIAssistant';
 import RiskScoreBadge from '@/components/RiskScoreBadge';
 import { scoreIncident } from '@/lib/riskScoring';
 import RemediationPlan from '@/components/RemediationPlan';
+import AISummaryBanner from '@/components/AISummaryBanner';
+import IncidentAISummary from '@/components/IncidentAISummary';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -54,6 +56,11 @@ export default function Incidents() {
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list(),
+  });
+
+  const { data: communications = [] } = useQuery({
+    queryKey: ['communications'],
+    queryFn: () => base44.entities.Communication.list(),
   });
 
   const createMutation = useMutation({
@@ -249,6 +256,19 @@ export default function Incidents() {
           </Dialog>
         </div>
 
+        {incidents.length > 0 && (
+          <div className="mb-6">
+            <AISummaryBanner
+              title="AI Summary — All Incidents"
+              colorScheme="indigo"
+              prompt={`You are a legal compliance expert. Provide a concise 3–5 bullet point summary of the following incidents for a RICS conduct investigation file. Highlight: overall severity patterns, the most serious breaches, recurring themes across incidents, key RICS violations identified, and the overall strength of the case.
+
+Incidents (most recent first):
+${incidents.map((inc, i) => `${i + 1}. [${inc.severity?.toUpperCase()}] ${inc.date} | ${inc.incident_type?.replace(/_/g, ' ')} | ${inc.title} | ${inc.description?.slice(0, 150)} ${inc.rics_violations?.length ? '| RICS: ' + inc.rics_violations.join(', ') : ''} ${inc.legal_issues?.length ? '| Legal: ' + inc.legal_issues.join(', ') : ''}`).join('\n')}`}
+            />
+          </div>
+        )}
+
         <div className="space-y-4">
           {incidents.length === 0 ? (
             <Card className="text-center py-12">
@@ -287,6 +307,7 @@ export default function Incidents() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-sm text-slate-700">{incident.description}</p>
+                  <IncidentAISummary incident={incident} evidence={evidence} communications={communications} />
                   {incident.evidence_notes && (
                     <div className="bg-slate-50 p-3 rounded text-sm">
                       <p className="font-medium text-slate-700 mb-1">Evidence:</p>
