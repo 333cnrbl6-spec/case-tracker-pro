@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const RICS_STANDARDS = [
   {
@@ -87,6 +89,7 @@ const RICS_STANDARDS = [
 
 export default function RICSAssessment() {
   const [assessments, setAssessments] = useState({});
+  const [generating, setGenerating] = useState(false);
 
   const toggleAssessment = (standardId, indicatorIndex) => {
     const key = `${standardId}-${indicatorIndex}`;
@@ -94,6 +97,34 @@ export default function RICSAssessment() {
       ...prev,
       [key]: !prev[key]
     }));
+  };
+
+  const handleResetAssessment = () => {
+    setAssessments({});
+  };
+
+  const handleGenerateReport = async () => {
+    setGenerating(true);
+    try {
+      const response = await base44.functions.invoke('generateRICSComplaintReport', {
+        assessments,
+        surveyorName: 'Malcolm Belcher'
+      });
+
+      if (response.data.file_url) {
+        const link = document.createElement('a');
+        link.href = response.data.file_url;
+        link.download = 'RICS_Complaint_Report.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast.success('RICS Complaint Report generated successfully');
+      }
+    } catch (error) {
+      toast.error(error.message || 'Failed to generate report');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const getStandardStatus = (standardId) => {
@@ -214,11 +245,22 @@ export default function RICSAssessment() {
 
         {/* Actions */}
         <div className="mt-8 flex gap-4">
-          <Button variant="outline" className="flex-1">
+          <Button variant="outline" className="flex-1" onClick={handleResetAssessment}>
             Reset Assessment
           </Button>
-          <Button className="flex-1 bg-indigo-600 hover:bg-indigo-700">
-            Generate RICS Complaint Report
+          <Button 
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700" 
+            onClick={handleGenerateReport}
+            disabled={generating}
+          >
+            {generating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              'Generate RICS Complaint Report'
+            )}
           </Button>
         </div>
       </div>
