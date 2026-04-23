@@ -1,0 +1,83 @@
+{
+  "name": "Annotation",
+  "type": "object",
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "description": "ID of the related Evidence document"
+    },
+    "page_number": {
+      "type": "number",
+      "description": "Page number in document (for PDFs)"
+    },
+    "highlight_text": {
+      "type": "string",
+      "description": "The highlighted passage text"
+    },
+    "highlight_color": {
+      "type": "string",
+      "enum": [
+        "yellow",
+        "red",
+        "blue",
+        "green",
+        "purple"
+      ],
+      "default": "yellow",
+      "description": "Color of the highlight"
+    },
+    "x": {
+      "type": "number",
+      "description": "X coordinate of highlight start"
+    },
+    "y": {
+      "type": "number",
+      "description": "Y coordinate of highlight start"
+    },
+    "width": {
+      "type": "number",
+      "description": "Width of highlight bounding box"
+    },
+    "height": {
+      "type": "number",
+      "description": "Height of highlight bounding box"
+    },
+    "linked_rics_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked RICS rules"
+    },
+    "linked_incidents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked incidents"
+    },
+    "annotation_note": {
+      "type": "string",
+      "description": "User's interpretation or legal note"
+    },
+    "significance": {
+      "type": "string",
+      "enum": [
+        "supporting",
+        "critical",
+        "contextual"
+      ],
+      "default": "supporting",
+      "description": "How significant this passage is to the case"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Email of user who created annotation"
+    }
+  },
+  "required": [
+    "evidence_id",
+    "highlight_text",
+    "significance"
+  ]
+}

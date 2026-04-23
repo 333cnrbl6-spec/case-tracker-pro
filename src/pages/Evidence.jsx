@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +25,9 @@ import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestio
 import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
 import EvidenceSummary from '../components/EvidenceSummary';
 import OCRContradictionModule from '../components/OCRContradictionModule';
+import DocumentViewer from '@/components/DocumentViewer';
+import AnnotationManager from '@/components/AnnotationManager';
+import StatementOfEvidenceReport from '@/components/StatementOfEvidenceReport';
 
 const strengthColors = {
   weak: 'bg-slate-100 text-slate-800',
@@ -36,6 +39,14 @@ const strengthColors = {
 export default function Evidence() {
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState({ search: '', evidence_type: 'all', strength: 'all', relevance: 'all', date_from: 'all', date_to: 'all' });
+  const [selectedEvidenceId, setSelectedEvidenceId] = useState(null);
+  const [selectedEvidenceIds, setSelectedEvidenceIds] = useState([]);
+  const [viewMode, setViewMode] = useState('grid'); // grid or annotate
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => setUser(null));
+  }, []);
   const [formData, setFormData] = useState({
     date_collected: '',
     title: '',
@@ -104,17 +115,40 @@ export default function Evidence() {
     createMutation.mutate(formData);
   };
 
+  const handleSelectEvidence = (id) => {
+    setSelectedEvidenceIds(prev => 
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const selectedItem = selectedEvidenceId ? evidence.find(e => e.id === selectedEvidenceId) : null;
+
   return (
     <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Evidence & Documents</h1>
-          <div className="flex gap-2">
-            <BatchAutoTagButton />
-            <Button variant="outline" className="gap-2" onClick={() => generateEvidenceReport(filteredEvidence)}>
-              <Download className="w-4 h-4" />
-              Download Report
-            </Button>
+           <div>
+             <h1 className="text-3xl font-bold text-slate-900">Evidence & Documents</h1>
+             {viewMode === 'annotate' && selectedEvidenceIds.length > 0 && (
+               <p className="text-sm text-slate-600 mt-1">{selectedEvidenceIds.length} document(s) selected for annotation</p>
+             )}
+           </div>
+           <div className="flex gap-2">
+             <BatchAutoTagButton />
+             <Button 
+               variant={viewMode === 'annotate' ? 'default' : 'outline'}
+               className="gap-2"
+               onClick={() => {
+                 setViewMode(viewMode === 'annotate' ? 'grid' : 'annotate');
+                 setSelectedEvidenceIds([]);
+               }}
+             >
+               {viewMode === 'annotate' ? '‚úì Annotation Mode' : 'üìù Start Annotation'}
+             </Button>
+             <Button variant="outline" className="gap-2" onClick={() => generateEvidenceReport(filteredEvidence)}>
+               <Download className="w-4 h-4" />
+               Download Report
+             </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-green-600 hover:bg-green-700">
@@ -287,13 +321,56 @@ ${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} ‚Ä
           ]}
         />
 
+        {viewMode === 'annotate' && selectedEvidenceIds.length > 0 ? (
+          <div className="space-y-6">
+            <StatementOfEvidenceReport selectedEvidenceIds={selectedEvidenceIds} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-4">
+                {selectedEvidenceIds.map((id) => {
+                  const item = evidence.find(e => e.id === id);
+                  return item ? (
+                    <div key={id}>
+                      {item.file_url && (
+                        <>
+                          <h3 className="text-lg font-semibold text-slate-900 mb-3">{item.title}</h3>
+                          <DocumentViewer 
+                            fileUrl={item.file_url}
+                            fileType={item.evidence_type === 'document' || item.evidence_type === 'report' ? 'pdf' : 'image'}
+                            onHighlightCreate={async (highlight) => {
+                              await base44.entities.Annotation.create({
+                                evidence_id: id,
+                                ...highlight,
+                                significance: 'supporting',
+                                created_by: user?.email || 'anonymous'
+                              });
+                              queryClient.invalidateQueries({ queryKey: ['annotations', id] });
+                            }}
+                            onHighlightDelete={async (annotationId) => {
+                              await base44.entities.Annotation.delete(annotationId);
+                              queryClient.invalidateQueries({ queryKey: ['annotations', id] });
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
+                  ) : null;
+                })}
+              </div>
+              <div className="space-y-4">
+                {selectedEvidenceIds.map((id) => (
+                  <AnnotationManager key={id} evidenceId={id} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
         <div className="space-y-4">
            {filteredEvidence.length === 0 ? (
-            <Card className="text-center py-12">
-              <p className="text-slate-500">{evidence.length === 0 ? 'No evidence added yet. Start organizing your supporting documents.' : 'No evidence matches the current filters.'}</p>
-            </Card>
-          ) : (
-            filteredEvidence.map((item) => (
+             <Card className="text-center py-12">
+               <p className="text-slate-500">{evidence.length === 0 ? 'No evidence added yet. Start organizing your supporting documents.' : 'No evidence matches the current filters.'}</p>
+             </Card>
+           ) : (
+             filteredEvidence.map((item) => (
               <Card key={item.id}>
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
@@ -369,8 +446,9 @@ ${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} ‚Ä
               </Card>
             ))
           )}
-        </div>
-      </div>
-    </div>
-  );
-}
+          </div>
+          )}
+          </div>
+          </div>
+          );
+          }
