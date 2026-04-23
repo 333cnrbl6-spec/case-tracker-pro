@@ -5,9 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AlertCircle, CheckCircle2, AlertTriangle, Loader2, FileCheck, Clock, Link2, FileText, MessageSquare, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { AlertCircle, CheckCircle2, AlertTriangle, Loader2, FileCheck, Clock, Link2, FileText, MessageSquare, ChevronDown, ChevronUp, ExternalLink, Download } from 'lucide-react';
 import AnnotationPanel from '@/components/AnnotationPanel';
 import { toast } from 'sonner';
+import { exportValidationPDF } from '@/lib/exportValidationPDF';
 
 const TYPE_META = {
   evidence: { label: 'Evidence', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
@@ -231,14 +232,28 @@ export default function EvidenceValidator() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-8">
         <div className="max-w-5xl mx-auto space-y-6">
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start flex-wrap gap-3">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Validation Report</h1>
               <p className="text-slate-600 mt-1">Generated: {new Date().toLocaleDateString()}</p>
             </div>
-            <Button onClick={() => { setValidationReport(null); setActiveLinkedItem(null); setExpandedLinks({}); }} variant="outline">
-              Validate New Set
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => exportValidationPDF({
+                  report: validationReport,
+                  evidenceMap,
+                  commMap,
+                  incidentMap,
+                  resolveLinkedItems,
+                })}
+                className="gap-2 bg-slate-900 hover:bg-slate-800"
+              >
+                <Download className="w-4 h-4" /> Export PDF
+              </Button>
+              <Button onClick={() => { setValidationReport(null); setActiveLinkedItem(null); setExpandedLinks({}); }} variant="outline">
+                Validate New Set
+              </Button>
+            </div>
           </div>
 
           {/* Summary Cards */}
