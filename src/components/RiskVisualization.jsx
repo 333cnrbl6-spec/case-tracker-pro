@@ -80,6 +80,7 @@ export default function RiskVisualization({ risks, cases, title, height = 300 })
                             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                             <YAxis tick={{ fontSize: 12 }} />
+                            <YAxis yAxisId="right" tick={{ fontSize: 12 }} orientation="right" />
                             <Tooltip contentStyle={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }} />
                             <Legend />
                             <Line type="monotone" dataKey="avgScore" stroke="#3b82f6" strokeWidth={2} name="Avg Risk Score" />
