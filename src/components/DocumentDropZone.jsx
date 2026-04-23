@@ -5,11 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Upload, FileText, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+import AutoTagPreview from '@/components/AutoTagPreview';
 
 export default function DocumentDropZone({ onEvidenceCreated }) {
   const [isDragActive, setIsDragActive] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [tagging, setTagging] = useState(false);
   const [extractedData, setExtractedData] = useState(null);
+  const [autoTagData, setAutoTagData] = useState(null);
+  const [taggedFile, setTaggedFile] = useState(null);
   const [error, setError] = useState(null);
   const queryClient = useQueryClient();
 
@@ -77,30 +81,24 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
 
       const data = extractRes.output;
       setExtractedData(data);
+      setTaggedFile({ name: file.name, url: fileUrl });
 
-      // Create Evidence record
-      const evidenceRecord = await base44.entities.Evidence.create({
-        date_collected: new Date().toISOString().split('T')[0],
-        title: data.title || file.name,
-        description: data.description || '',
-        evidence_type: data.evidence_type || 'document',
-        file_url: fileUrl,
-        relevance: data.relevance || 'other',
-        strength: 'moderate',
-        notes: data.key_findings?.join('\n') || ''
-      });
+      // Trigger AI auto-tagging
+      setTagging(true);
+      try {
+        const tagResult = await base44.functions.invoke('aiAutoTagDocument', {
+          fileUrl,
+          fileName: file.name
+        });
 
-      // Refresh evidence list
-      queryClient.invalidateQueries({ queryKey: ['evidence'] });
-      
-      if (onEvidenceCreated) {
-        onEvidenceCreated(evidenceRecord);
+        setAutoTagData(tagResult.data);
+      } catch (tagErr) {
+        console.warn('Auto-tagging failed, continuing with manual tags:', tagErr);
+        // Continue with manual extraction data
+        await createEvidenceRecord(data, fileUrl);
+      } finally {
+        setTagging(false);
       }
-
-      // Reset form after 2s
-      setTimeout(() => {
-        setExtractedData(null);
-      }, 2000);
     } catch (err) {
       setError(err.message || 'Failed to process document');
     } finally {
@@ -121,6 +119,42 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
     }
   };
 
+  const createEvidenceRecord = async (data, fileUrl) => {
+    const evidenceRecord = await base44.entities.Evidence.create({
+      date_collected: new Date().toISOString().split('T')[0],
+      title: data.title || taggedFile.name,
+      description: data.description || '',
+      evidence_type: data.evidence_type || 'document',
+      file_url: fileUrl,
+      relevance: data.relevance || 'other',
+      strength: data.strength || 'moderate',
+      related_incidents: data.related_incidents || [],
+      notes: data.key_findings?.join('\n') || ''
+    });
+
+    queryClient.invalidateQueries({ queryKey: ['evidence'] });
+    if (onEvidenceCreated) {
+      onEvidenceCreated(evidenceRecord);
+    }
+
+    setTimeout(() => {
+      setExtractedData(null);
+      setAutoTagData(null);
+      setTaggedFile(null);
+    }, 1500);
+  };
+
+  const handleAcceptTags = async () => {
+    if (autoTagData && taggedFile) {
+      await createEvidenceRecord(autoTagData, taggedFile.url);
+    }
+  };
+
+  const handleRejectTags = () => {
+    setAutoTagData(null);
+    setTagging(false);
+  };
+
   return (
     <Card className="border-2 border-dashed border-slate-300">
       <CardHeader>
@@ -129,7 +163,16 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
           Smart Document Scanner
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {autoTagData && (
+          <AutoTagPreview 
+            tagData={autoTagData} 
+            onAccept={handleAcceptTags}
+            onReject={handleRejectTags}
+            loading={tagging}
+          />
+        )}
+
         <div
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -176,9 +219,9 @@ export default function DocumentDropZone({ onEvidenceCreated }) {
               </Button>
             </div>
           )}
-        </div>
+          </div>
 
-        <p className="text-xs text-slate-500 mt-4">
+          <p className="text-xs text-slate-500 mt-2">
           Supports: PDF, Word, Text, Images (unlimited size). AI extracts key data and auto-categorizes evidence. Duplicates detected automatically.
         </p>
       </CardContent>
