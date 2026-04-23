@@ -472,10 +472,22 @@ Validation report data:
           {/* Evidence Selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileCheck className="w-4 h-4" />
-                Evidence ({selectedEvidence.length})
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileCheck className="w-4 h-4" />
+                  Evidence ({selectedEvidence.length}/{evidence.length})
+                </CardTitle>
+                {evidence.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedEvidence(selectedEvidence.length === evidence.length ? [] : evidence.map(e => e.id))}
+                    className="text-xs"
+                  >
+                    {selectedEvidence.length === evidence.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-2 max-h-96 overflow-y-auto">
               {evidence.length === 0 ? (
@@ -504,10 +516,22 @@ Validation report data:
           {/* Communications Selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Communications ({selectedCommunications.length})
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  Communications ({selectedCommunications.length}/{communications.length})
+                </CardTitle>
+                {communications.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedCommunications(selectedCommunications.length === communications.length ? [] : communications.map(c => c.id))}
+                    className="text-xs"
+                  >
+                    {selectedCommunications.length === communications.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-2 max-h-96 overflow-y-auto">
               {communications.length === 0 ? (
@@ -534,10 +558,22 @@ Validation report data:
           {/* Incidents Selection */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Incidents ({selectedIncidents.length})
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  Incidents ({selectedIncidents.length}/{incidents.length})
+                </CardTitle>
+                {incidents.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedIncidents(selectedIncidents.length === incidents.length ? [] : incidents.map(i => i.id))}
+                    className="text-xs"
+                  >
+                    {selectedIncidents.length === incidents.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="space-y-2 max-h-96 overflow-y-auto">
               {incidents.length === 0 ? (
