@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Plus, Trash2, ExternalLink } from 'lucide-react';
+import AISummaryBanner from '@/components/AISummaryBanner';
 import {
   Dialog,
   DialogContent,
@@ -218,6 +219,19 @@ export default function Evidence() {
         </div>
 
         <DocumentDropZone onEvidenceCreated={() => queryClient.invalidateQueries({ queryKey: ['evidence'] })} />
+
+        {evidence.length > 0 && (
+          <div className="mt-6">
+            <AISummaryBanner
+              title="AI Summary — Evidence"
+              colorScheme="teal"
+              prompt={`You are a legal compliance expert. Provide a concise 3–5 bullet point summary of the following evidence items collected for a RICS conduct investigation. Highlight: the strongest evidence, any critical patterns or gaps, overall evidence quality, and the most important next steps.
+
+Evidence items:
+${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} — Type: ${e.evidence_type?.replace(/_/g,' ')} | Relevance: ${e.relevance?.replace(/_/g,' ')} | ${e.description || ''} ${e.notes ? '| Notes: ' + e.notes : ''}`).join('\n')}`}
+            />
+          </div>
+        )}
 
         <div className="space-y-4 mt-8">
            {evidence.length === 0 ? (

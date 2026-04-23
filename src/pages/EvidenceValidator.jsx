@@ -9,6 +9,7 @@ import { AlertCircle, CheckCircle2, AlertTriangle, Loader2, FileCheck, Clock, Li
 import AnnotationPanel from '@/components/AnnotationPanel';
 import { toast } from 'sonner';
 import { exportValidationPDF } from '@/lib/exportValidationPDF';
+import AISummaryBanner from '@/components/AISummaryBanner';
 
 const TYPE_META = {
   evidence: { label: 'Evidence', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
@@ -255,6 +256,21 @@ export default function EvidenceValidator() {
               </Button>
             </div>
           </div>
+
+          {/* AI Summary Banner */}
+          <AISummaryBanner
+            title="AI Summary — Validation Report"
+            colorScheme="indigo"
+            prompt={`You are a legal compliance expert. Summarise the following evidence validation report for a RICS conduct investigation. Be concise and actionable — 3 to 5 bullet points covering: overall risk level, the most critical issues, key patterns observed, and the most important recommended next steps.
+
+Validation report data:
+- Total issues: ${validationReport.issues.length}
+- Critical issues: ${validationReport.issues.filter(i => i.severity === 'critical').length}
+- High issues: ${validationReport.issues.filter(i => i.severity === 'high').length}
+- Timeline integrity: ${validationReport.timelineIntegrity ? 'Verified' : 'Issues found'}
+- Communication alignment: ${validationReport.communicationAlignment ? 'Aligned' : 'Discrepancies found'}
+- Issues: ${JSON.stringify(validationReport.issues.map(i => ({ title: i.title, severity: i.severity, type: i.type, description: i.description, recommendation: i.recommendation })))}`}
+          />
 
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

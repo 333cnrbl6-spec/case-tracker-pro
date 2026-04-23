@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Plus, Trash2, ExternalLink } from 'lucide-react';
+import AISummaryBanner from '@/components/AISummaryBanner';
 import AnnotationPanel from '../components/AnnotationPanel';
 import {
   Dialog,
@@ -183,6 +184,19 @@ export default function Communications() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {communications.length > 0 && (
+          <div className="mb-6">
+            <AISummaryBanner
+              title="AI Summary — Communications"
+              colorScheme="purple"
+              prompt={`You are a legal compliance expert. Provide a concise 3–5 bullet point summary of the following communication thread for a RICS conduct investigation. Highlight: key patterns of behaviour, the most concerning communications, tone trends, and any evidence of misconduct or unprofessional conduct.
+
+Communications (most recent first):
+${communications.map((c, i) => `${i + 1}. [${c.tone?.toUpperCase()}] ${c.date} | ${c.type} | From: ${c.from} → To: ${c.to} | Subject: ${c.subject} | ${c.content ? c.content.slice(0, 200) : ''} ${c.concerning_elements?.length ? '| Concerning: ' + c.concerning_elements.join(', ') : ''}`).join('\n')}`}
+            />
+          </div>
+        )}
 
         <div className="space-y-4">
           {communications.length === 0 ? (
