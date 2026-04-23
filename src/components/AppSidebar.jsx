@@ -46,6 +46,7 @@ const NAV_GROUPS = [
       { path: '/case-narrative-builder', icon: Layers, label: 'Narrative Builder' },
       { path: '/solicitor-brief', icon: Gavel, label: 'Solicitor Brief' },
       { path: '/action-bundle', icon: FileBarChart, label: 'Legal Action Bundle' },
+      { path: '/disclosure-bundle', icon: FileBarChart, label: 'Disclosure Bundle' },
       { path: '/next-steps', icon: ChevronRight, label: 'Legal Next Steps' },
       { path: '/rics-breach-notification', icon: Bell, label: 'Breach Notification' },
       { path: '/rics-documents', icon: FileText, label: 'RICS Documents' },
