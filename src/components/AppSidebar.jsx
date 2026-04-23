@@ -159,7 +159,7 @@ export default function AppSidebar({ collapsed, onToggle }) {
       {/* Mobile overlay */}
       {!collapsed && (
         <div
-          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
           onClick={onToggle}
         />
       )}
