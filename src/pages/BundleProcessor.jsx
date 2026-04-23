@@ -19,6 +19,18 @@ export default function BundleProcessor() {
   const [isRunningAll, setIsRunningAll] = useState(false);
   const queryClient = useQueryClient();
 
+  const clearErrors = () => {
+    setFragmentStatuses(prev => {
+      const cleared = { ...prev };
+      Object.keys(cleared).forEach(id => {
+        if (cleared[id].status === 'error') delete cleared[id];
+      });
+      return cleared;
+    });
+  };
+
+  const hasErrors = Object.values(fragmentStatuses).some(s => s.status === 'error');
+
   const { data: evidence = [], isLoading } = useQuery({
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list('-date_collected'),
@@ -127,6 +139,12 @@ export default function BundleProcessor() {
           <>
             <div className="flex justify-between items-center mb-4">
               <p className="text-sm text-slate-600">{pdfFragments.length} fragment{pdfFragments.length > 1 ? 's' : ''} ready to process</p>
+              <div className="flex items-center gap-2">
+              {hasErrors && (
+                <Button variant="outline" onClick={clearErrors} className="text-red-600 border-red-300 hover:bg-red-50">
+                  Clear Errors
+                </Button>
+              )}
               <Button
                 onClick={processAll}
                 disabled={isRunningAll}
@@ -138,6 +156,7 @@ export default function BundleProcessor() {
                   <><Zap className="w-4 h-4 mr-2" />Process All Fragments</>
                 )}
               </Button>
+              </div>
             </div>
 
             <div className="space-y-3">
