@@ -111,9 +111,9 @@ export default function RICSAssessment() {
         surveyorName: 'Malcolm Belcher'
       });
 
-      if (response.data.file_url) {
+      if (response.data.pdf_data) {
         const link = document.createElement('a');
-        link.href = response.data.file_url;
+        link.href = response.data.pdf_data;
         link.download = 'RICS_Complaint_Report.pdf';
         document.body.appendChild(link);
         link.click();

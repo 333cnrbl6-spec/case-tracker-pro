@@ -220,21 +220,11 @@ Deno.serve(async (req) => {
       doc.text(`Page ${i} of ${totalPages}`, 105, 285, { align: 'center' });
     }
 
-    // Generate PDF
-    const pdfBuffer = doc.output('arraybuffer');
-    const uint8Array = new Uint8Array(pdfBuffer);
-    const blob = new Blob([uint8Array], { type: 'application/pdf' });
-
-    // Upload to file storage
-    const formData = new FormData();
-    formData.append('file', blob, `${bundleName.replace(/\s+/g, '_')}.pdf`);
-
-    const uploadRes = await base44.integrations.Core.UploadFile({
-      file: blob,
-    });
+    // Generate PDF as data URL
+    const pdfDataUrl = doc.output('dataurlstring');
 
     return Response.json({
-      file_url: uploadRes.file_url,
+      pdf_data: pdfDataUrl,
       bundle_name: bundleName,
       total_items: evidence.length + incidents.length,
       total_pages: totalPages,

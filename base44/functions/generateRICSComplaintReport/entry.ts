@@ -238,17 +238,13 @@ Deno.serve(async (req) => {
       doc.text(`Page ${i} of ${totalPages}`, 105, 285, { align: 'center' });
     }
 
-    // Upload PDF
-    const pdfBuffer = doc.output('arraybuffer');
-    const uint8Array = new Uint8Array(pdfBuffer);
-    const blob = new Blob([uint8Array], { type: 'application/pdf' });
-
-    const uploadRes = await base44.integrations.Core.UploadFile({
-      file: blob,
-    });
-
+    // Create data URL string and encode for upload
+    const pdfDataUrl = doc.output('dataurlstring');
+    
+    // For now, return the data URL directly as PDF content
+    // Client will handle the download
     return Response.json({
-      file_url: uploadRes.file_url,
+      pdf_data: pdfDataUrl,
       overall_level: overallLevel,
       severe_count: severeCount,
       moderate_count: moderateCount,
