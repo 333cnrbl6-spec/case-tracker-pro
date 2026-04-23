@@ -23,6 +23,7 @@ import { scoreIncident } from '@/lib/riskScoring';
 import RemediationPlan from '@/components/RemediationPlan';
 import AISummaryBanner from '@/components/AISummaryBanner';
 import IncidentAISummary from '@/components/IncidentAISummary';
+import RICSRiskAssessor from '@/components/RICSRiskAssessor';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -254,6 +255,10 @@ export default function Incidents() {
               </form>
             </DialogContent>
           </Dialog>
+        </div>
+
+        <div className="mb-6">
+          <RICSRiskAssessor compact={true} />
         </div>
 
         {incidents.length > 0 && (
