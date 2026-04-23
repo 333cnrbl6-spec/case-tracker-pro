@@ -40,9 +40,9 @@ export default function SolicitorBriefGenerator() {
         incidentIds: selectedIncidents,
         communicationIds: selectedComms,
         evidenceIds: selectedEvidence,
-        incidents: incidents.filter(i => selectedIncidents.includes(i.id)).map(i => i.data),
-        communications: communications.filter(c => selectedComms.includes(c.id)).map(c => c.data),
-        evidence: evidence.filter(e => selectedEvidence.includes(e.id)).map(e => e.data),
+        incidents: incidents.filter(i => selectedIncidents.includes(i.id)),
+        communications: communications.filter(c => selectedComms.includes(c.id)),
+        evidence: evidence.filter(e => selectedEvidence.includes(e.id)),
       });
 
       return result.data;
@@ -120,8 +120,8 @@ export default function SolicitorBriefGenerator() {
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900">{incident.data?.title}</p>
-                          <p className="text-xs text-slate-500">{incident.data?.date}</p>
+                          <p className="text-sm font-medium text-slate-900">{incident.title}</p>
+                          <p className="text-xs text-slate-500">{incident.date}</p>
                         </div>
                       </div>
                     ))
@@ -146,8 +146,8 @@ export default function SolicitorBriefGenerator() {
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900">{comm.data?.subject}</p>
-                          <p className="text-xs text-slate-500">{comm.data?.type} • {comm.data?.date}</p>
+                          <p className="text-sm font-medium text-slate-900">{comm.subject}</p>
+                          <p className="text-xs text-slate-500">{comm.type} • {comm.date}</p>
                         </div>
                       </div>
                     ))
@@ -172,8 +172,8 @@ export default function SolicitorBriefGenerator() {
                           className="mt-1"
                         />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900">{evid.data?.title}</p>
-                          <p className="text-xs text-slate-500">{evid.data?.evidence_type}</p>
+                          <p className="text-sm font-medium text-slate-900">{evid.title}</p>
+                          <p className="text-xs text-slate-500">{evid.evidence_type}</p>
                         </div>
                       </div>
                     ))
