@@ -5,8 +5,95 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { AlertCircle, CheckCircle2, AlertTriangle, Loader2, FileCheck, Clock, Link2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, AlertTriangle, Loader2, FileCheck, Clock, Link2, FileText, MessageSquare, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+
+const TYPE_META = {
+  evidence: { label: 'Evidence', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' },
+  communication: { label: 'Communication', icon: MessageSquare, color: 'text-purple-600', bg: 'bg-purple-50 border-purple-200' },
+  incident: { label: 'Incident', icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50 border-red-200' },
+};
+
+function LinkedItemCard({ type, record, isActive, onClick }) {
+  const meta = TYPE_META[type];
+  const Icon = meta.icon;
+  const title = record.title || record.subject || record.from || 'Unnamed';
+  const sub = record.date || record.date_collected || record.type || record.evidence_type || '';
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 p-2 rounded border text-left transition-all ${isActive ? meta.bg + ' ring-1 ring-offset-0' : 'bg-white border-slate-200 hover:bg-slate-50'}`}
+    >
+      <Icon className={`w-4 h-4 flex-shrink-0 ${meta.color}`} />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-slate-900 truncate">{title}</p>
+        {sub && <p className="text-xs text-slate-500 capitalize">{sub.replace(/_/g, ' ')}</p>}
+      </div>
+      <Badge variant="outline" className="text-xs shrink-0">{meta.label}</Badge>
+      <ExternalLink className="w-3 h-3 text-slate-400 shrink-0" />
+    </button>
+  );
+}
+
+function LinkedItemDetail({ item, onClose }) {
+  const meta = TYPE_META[item.type];
+  const r = item.record;
+  return (
+    <div className={`rounded-lg border p-4 ${meta.bg} space-y-2`}>
+      <div className="flex justify-between items-center">
+        <span className={`text-xs font-bold uppercase tracking-wide ${meta.color}`}>{meta.label} Detail</span>
+        <button onClick={onClose} className="text-xs text-slate-500 hover:text-slate-800">✕ Close</button>
+      </div>
+      {item.type === 'evidence' && (
+        <div className="space-y-1 text-sm">
+          <p><strong>Title:</strong> {r.title}</p>
+          {r.evidence_type && <p><strong>Type:</strong> {r.evidence_type.replace(/_/g, ' ')}</p>}
+          {r.date_collected && <p><strong>Date Collected:</strong> {r.date_collected}</p>}
+          {r.relevance && <p><strong>Relevance:</strong> {r.relevance.replace(/_/g, ' ')}</p>}
+          {r.strength && <p><strong>Strength:</strong> {r.strength}</p>}
+          {r.description && <p className="text-slate-600">{r.description}</p>}
+          {r.notes && <p className="italic text-slate-500">{r.notes}</p>}
+        </div>
+      )}
+      {item.type === 'communication' && (
+        <div className="space-y-1 text-sm">
+          <p><strong>Subject:</strong> {r.subject}</p>
+          {r.from && <p><strong>From:</strong> {r.from}</p>}
+          {r.to && <p><strong>To:</strong> {r.to}</p>}
+          {r.date && <p><strong>Date:</strong> {r.date}</p>}
+          {r.type && <p><strong>Type:</strong> {r.type.replace(/_/g, ' ')}</p>}
+          {r.tone && <p><strong>Tone:</strong> {r.tone}</p>}
+          {r.content && <p className="text-slate-600 border-t pt-2 mt-2">{r.content}</p>}
+          {r.concerning_elements?.length > 0 && (
+            <div>
+              <strong>Concerning Elements:</strong>
+              <ul className="list-disc ml-4 text-slate-600">
+                {r.concerning_elements.map((el, i) => <li key={i}>{el}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+      {item.type === 'incident' && (
+        <div className="space-y-1 text-sm">
+          <p><strong>Title:</strong> {r.title}</p>
+          {r.date && <p><strong>Date:</strong> {r.date}</p>}
+          {r.incident_type && <p><strong>Type:</strong> {r.incident_type.replace(/_/g, ' ')}</p>}
+          {r.severity && <p><strong>Severity:</strong> {r.severity}</p>}
+          {r.description && <p className="text-slate-600">{r.description}</p>}
+          {r.rics_violations?.length > 0 && (
+            <div>
+              <strong>RICS Violations:</strong>
+              <ul className="list-disc ml-4 text-slate-600">
+                {r.rics_violations.map((v, i) => <li key={i}>{v}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const VALIDATION_TYPES = {
   missing: 'Missing Documentation',
@@ -29,6 +116,8 @@ export default function EvidenceValidator() {
   const [selectedIncidents, setSelectedIncidents] = useState([]);
   const [validationReport, setValidationReport] = useState(null);
   const [filterSeverity, setFilterSeverity] = useState(null);
+  const [expandedLinks, setExpandedLinks] = useState({});
+  const [activeLinkedItem, setActiveLinkedItem] = useState(null); // { type, id }
 
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
@@ -99,6 +188,38 @@ export default function EvidenceValidator() {
     filterSeverity === null || issue.severity === filterSeverity
   ) || [];
 
+  // Build lookup maps from selected items
+  const evidenceMap = Object.fromEntries(evidence.filter(e => selectedEvidence.includes(e.id)).map(e => [e.id, { ...(e.data ?? e), id: e.id }]));
+  const commMap = Object.fromEntries(communications.filter(c => selectedCommunications.includes(c.id)).map(c => [c.id, { ...(c.data ?? c), id: c.id }]));
+  const incidentMap = Object.fromEntries(incidents.filter(i => selectedIncidents.includes(i.id)).map(i => [i.id, { ...(i.data ?? i), id: i.id }]));
+
+  const toggleLinks = (issueIdx) => {
+    setExpandedLinks(prev => ({ ...prev, [issueIdx]: !prev[issueIdx] }));
+  };
+
+  // Resolve linked items from an issue's relatedIds field (array of {type, id})
+  // Also do best-effort fuzzy match from relatedItems text if relatedIds not present
+  const resolveLinkedItems = (issue) => {
+    const linked = [];
+    if (issue.relatedIds) {
+      issue.relatedIds.forEach(ref => {
+        if (ref.type === 'evidence' && evidenceMap[ref.id]) linked.push({ type: 'evidence', record: evidenceMap[ref.id] });
+        else if (ref.type === 'communication' && commMap[ref.id]) linked.push({ type: 'communication', record: commMap[ref.id] });
+        else if (ref.type === 'incident' && incidentMap[ref.id]) linked.push({ type: 'incident', record: incidentMap[ref.id] });
+      });
+    }
+    // Fallback: match relatedItems text against record titles/subjects
+    if (linked.length === 0 && issue.relatedItems) {
+      issue.relatedItems.forEach(text => {
+        const lower = text.toLowerCase();
+        Object.values(evidenceMap).forEach(r => { if (r.title && lower.includes(r.title.toLowerCase())) linked.push({ type: 'evidence', record: r }); });
+        Object.values(commMap).forEach(r => { if (r.subject && lower.includes(r.subject.toLowerCase())) linked.push({ type: 'communication', record: r }); });
+        Object.values(incidentMap).forEach(r => { if (r.title && lower.includes(r.title.toLowerCase())) linked.push({ type: 'incident', record: r }); });
+      });
+    }
+    return linked;
+  };
+
   if (validationReport) {
     const criticalCount = validationReport.issues.filter(i => i.severity === 'critical').length;
     const highCount = validationReport.issues.filter(i => i.severity === 'high').length;
@@ -112,7 +233,7 @@ export default function EvidenceValidator() {
               <h1 className="text-3xl font-bold text-slate-900">Validation Report</h1>
               <p className="text-slate-600 mt-1">Generated: {new Date().toLocaleDateString()}</p>
             </div>
-            <Button onClick={() => setValidationReport(null)} variant="outline">
+            <Button onClick={() => { setValidationReport(null); setActiveLinkedItem(null); setExpandedLinks({}); }} variant="outline">
               Validate New Set
             </Button>
           </div>
@@ -201,67 +322,101 @@ export default function EvidenceValidator() {
                 </CardContent>
               </Card>
             ) : (
-              filteredIssues.map((issue, idx) => (
-                <Card key={idx} className={
-                  issue.severity === 'critical' ? 'border-red-200 bg-red-50' :
-                  issue.severity === 'high' ? 'border-orange-200 bg-orange-50' :
-                  issue.severity === 'medium' ? 'border-amber-200 bg-amber-50' :
-                  'border-blue-200 bg-blue-50'
-                }>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3 flex-1">
-                        {SEVERITY_ICONS[issue.severity]}
-                        <div>
-                          <h3 className="font-semibold text-slate-900">{issue.title}</h3>
-                          <Badge variant="outline" className="mt-1 text-xs">
-                            {VALIDATION_TYPES[issue.type] || issue.type}
-                          </Badge>
+              filteredIssues.map((issue, idx) => {
+                const linkedItems = resolveLinkedItems(issue);
+                const linksOpen = expandedLinks[idx];
+                return (
+                  <Card key={idx} className={
+                    issue.severity === 'critical' ? 'border-red-200 bg-red-50' :
+                    issue.severity === 'high' ? 'border-orange-200 bg-orange-50' :
+                    issue.severity === 'medium' ? 'border-amber-200 bg-amber-50' :
+                    'border-blue-200 bg-blue-50'
+                  }>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3 flex-1">
+                          {SEVERITY_ICONS[issue.severity]}
+                          <div>
+                            <h3 className="font-semibold text-slate-900">{issue.title}</h3>
+                            <Badge variant="outline" className="mt-1 text-xs">
+                              {VALIDATION_TYPES[issue.type] || issue.type}
+                            </Badge>
+                          </div>
                         </div>
+                        <Badge className={
+                          issue.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                          issue.severity === 'high' ? 'bg-orange-100 text-orange-800' :
+                          issue.severity === 'medium' ? 'bg-amber-100 text-amber-800' :
+                          'bg-blue-100 text-blue-800'
+                        }>
+                          {issue.severity}
+                        </Badge>
                       </div>
-                      <Badge className={
-                        issue.severity === 'critical' ? 'bg-red-100 text-red-800' :
-                        issue.severity === 'high' ? 'bg-orange-100 text-orange-800' :
-                        issue.severity === 'medium' ? 'bg-amber-100 text-amber-800' :
-                        'bg-blue-100 text-blue-800'
-                      }>
-                        {issue.severity}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-slate-700">{issue.description}</p>
-                    
-                    {issue.evidence && (
-                      <div className="bg-white p-3 rounded border border-slate-200 text-sm">
-                        <p className="font-semibold text-slate-900 mb-1">Evidence:</p>
-                        <p className="text-slate-700">{issue.evidence}</p>
-                      </div>
-                    )}
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-sm text-slate-700">{issue.description}</p>
 
-                    {issue.recommendation && (
-                      <div className="bg-white p-3 rounded border border-slate-200 text-sm">
-                        <p className="font-semibold text-slate-900 mb-1">Recommendation:</p>
-                        <p className="text-slate-700">{issue.recommendation}</p>
-                      </div>
-                    )}
+                      {issue.evidence && (
+                        <div className="bg-white p-3 rounded border border-slate-200 text-sm">
+                          <p className="font-semibold text-slate-900 mb-1">Evidence:</p>
+                          <p className="text-slate-700">{issue.evidence}</p>
+                        </div>
+                      )}
 
-                    {issue.relatedItems && issue.relatedItems.length > 0 && (
-                      <div className="text-sm">
-                        <p className="font-semibold text-slate-900 mb-2">Related Items:</p>
-                        <ul className="space-y-1">
-                          {issue.relatedItems.map((item, i) => (
-                            <li key={i} className="text-slate-700 flex items-start gap-2">
-                              <Link2 className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
+                      {issue.recommendation && (
+                        <div className="bg-white p-3 rounded border border-slate-200 text-sm">
+                          <p className="font-semibold text-slate-900 mb-1">Recommendation:</p>
+                          <p className="text-slate-700">{issue.recommendation}</p>
+                        </div>
+                      )}
+
+                      {/* Linked Items */}
+                      {(linkedItems.length > 0 || (issue.relatedItems && issue.relatedItems.length > 0)) && (
+                        <div>
+                          <button
+                            onClick={() => toggleLinks(idx)}
+                            className="flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+                          >
+                            <Link2 className="w-4 h-4" />
+                            Linked Items ({linkedItems.length > 0 ? linkedItems.length : issue.relatedItems?.length})
+                            {linksOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+
+                          {linksOpen && (
+                            <div className="mt-2 space-y-2">
+                              {linkedItems.length > 0 ? (
+                                linkedItems.map((linked, li) => (
+                                  <LinkedItemCard
+                                    key={li}
+                                    type={linked.type}
+                                    record={linked.record}
+                                    isActive={activeLinkedItem?.type === linked.type && activeLinkedItem?.id === linked.record.id}
+                                    onClick={() => setActiveLinkedItem(
+                                      activeLinkedItem?.id === linked.record.id ? null : { type: linked.type, id: linked.record.id, record: linked.record }
+                                    )}
+                                  />
+                                ))
+                              ) : (
+                                issue.relatedItems.map((item, i) => (
+                                  <div key={i} className="flex items-start gap-2 bg-white border border-slate-200 rounded p-2 text-sm text-slate-600">
+                                    <Link2 className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                                    {item}
+                                  </div>
+                                ))
+                              )}
+
+                              {/* Expanded record detail */}
+                              {activeLinkedItem && linkedItems.some(l => l.record.id === activeLinkedItem.id) && (
+                                <LinkedItemDetail item={activeLinkedItem} onClose={() => setActiveLinkedItem(null)} />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })
             )}
           </div>
         </div>
