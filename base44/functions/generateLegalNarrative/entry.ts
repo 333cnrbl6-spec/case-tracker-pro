@@ -90,13 +90,19 @@ Jurisdiction: England & Wales. Produce a comprehensive structured legal narrativ
     // Audit trail logging - COMPLIANCE REQUIREMENT
     console.log(`[AUDIT] GENERATE | LegalCase:${case_id} | ${user.email} | model:${AI_MODELS.PROFESSIONAL_DOCUMENTS} | type:ai_narrative`);
 
-    // Save narrative back to case
+    // Upload narrative to file storage to avoid field size limits
+    const narrativeJson = JSON.stringify(narrative);
+    const fileResponse = await base44.integrations.Core.UploadFile({
+      file: new Blob([narrativeJson], { type: 'application/json' })
+    });
+
+    // Save only the file URL to the case
     await base44.entities.LegalCase.update(case_id, {
-      ai_narrative: JSON.stringify(narrative),
+      ai_narrative: fileResponse.file_url,
       narrative_generated_at: new Date().toISOString()
     });
 
-    return Response.json({ success: true, narrative, case_ref: legalCase.case_ref });
+    return Response.json({ success: true, narrative, case_ref: legalCase.case_ref, narrative_url: fileResponse.file_url });
   } catch (error) {
     console.error('generateLegalNarrative error:', error);
     return Response.json({ error: error.message }, { status: 500 });

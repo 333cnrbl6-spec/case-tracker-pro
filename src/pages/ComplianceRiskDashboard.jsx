@@ -312,49 +312,63 @@ export default function ComplianceRiskDashboard() {
                                                 </div>
                                             </div>
 
-                                            {latestRisk.predicted_failures && (
-                                                <div>
-                                                    <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
-                                                        <Target className="w-4 h-4" />
-                                                        Predicted Failures
-                                                    </h4>
-                                                    <div className="space-y-2">
-                                                        {JSON.parse(latestRisk.predicted_failures).slice(0, 3).map((failure, idx) => (
-                                                            <div key={idx} className="text-sm p-3 bg-slate-50 rounded-lg border">
-                                                                <div className="flex justify-between items-center mb-1">
-                                                                    <span className="font-medium text-slate-800">{failure.failure_type}</span>
-                                                                    <Badge variant="outline">
-                                                                        {failure.probability}% probability
-                                                                    </Badge>
-                                                                </div>
-                                                                <p className="text-slate-600">{failure.description}</p>
-                                                                <p className="text-xs text-slate-500 mt-1">
-                                                                    Timeframe: {failure.timeframe_days} days | Severity: {failure.severity}
-                                                                </p>
+                                            {latestRisk.predicted_failures && (() => {
+                                                try {
+                                                    const failures = JSON.parse(latestRisk.predicted_failures);
+                                                    return failures.length > 0 && (
+                                                        <div>
+                                                            <h4 className="text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                                                                <Target className="w-4 h-4" />
+                                                                Predicted Failures
+                                                            </h4>
+                                                            <div className="space-y-2">
+                                                                {failures.slice(0, 3).map((failure, idx) => (
+                                                                    <div key={idx} className="text-sm p-3 bg-slate-50 rounded-lg border">
+                                                                        <div className="flex justify-between items-center mb-1">
+                                                                            <span className="font-medium text-slate-800">{failure.failure_type}</span>
+                                                                            <Badge variant="outline">
+                                                                                {failure.probability}% probability
+                                                                            </Badge>
+                                                                        </div>
+                                                                        <p className="text-slate-600">{failure.description}</p>
+                                                                        <p className="text-xs text-slate-500 mt-1">
+                                                                            Timeframe: {failure.timeframe_days} days | Severity: {failure.severity}
+                                                                        </p>
+                                                                    </div>
+                                                                ))}
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                                        </div>
+                                                    );
+                                                } catch (e) {
+                                                    return null;
+                                                }
+                                            })()}
 
-                                            {latestRisk.recommended_actions && (
-                                                <div>
-                                                    <h4 className="text-sm font-semibold text-slate-700 mb-2">Recommended Actions</h4>
-                                                    <div className="space-y-1">
-                                                        {JSON.parse(latestRisk.recommended_actions).slice(0, 3).map((action, idx) => (
-                                                            <div key={idx} className="text-sm flex items-center gap-2">
-                                                                <AlertCircle className={`w-4 h-4 ${
-                                                                    action.priority === 'critical' ? 'text-red-600' :
-                                                                    action.priority === 'high' ? 'text-orange-600' :
-                                                                    'text-blue-600'
-                                                                }`} />
-                                                                <span>{action.action}</span>
-                                                                <span className="text-xs text-slate-500">({action.deadline_days} days)</span>
+                                            {latestRisk.recommended_actions && (() => {
+                                                try {
+                                                    const actions = JSON.parse(latestRisk.recommended_actions);
+                                                    return actions.length > 0 && (
+                                                        <div>
+                                                            <h4 className="text-sm font-semibold text-slate-700 mb-2">Recommended Actions</h4>
+                                                            <div className="space-y-1">
+                                                                {actions.slice(0, 3).map((action, idx) => (
+                                                                    <div key={idx} className="text-sm flex items-center gap-2">
+                                                                        <AlertCircle className={`w-4 h-4 ${
+                                                                            action.priority === 'critical' ? 'text-red-600' :
+                                                                            action.priority === 'high' ? 'text-orange-600' :
+                                                                            'text-blue-600'
+                                                                        }`} />
+                                                                        <span>{action.action}</span>
+                                                                        <span className="text-xs text-slate-500">({action.deadline_days} days)</span>
+                                                                    </div>
+                                                                ))}
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
+                                                        </div>
+                                                    );
+                                                } catch (e) {
+                                                    return null;
+                                                }
+                                            })()}
 
                                             <div className="flex gap-2">
                                                 <Link to={`/case-manager?case_id=${caseItem.id}`}>

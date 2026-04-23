@@ -174,22 +174,30 @@ Return JSON exactly as follows:
     },
   });
 
+  // Validate LLM response has required fields
+  if (!assessment.overall_risk_score || !assessment.risk_level) {
+    return Response.json({ 
+      error: 'LLM failed to generate required risk fields',
+      assessment 
+    }, { status: 500 });
+  }
+
   // Persist to database
   const riskRecord = await base44.asServiceRole.entities.ComplianceRisk.create({
     case_id: case_id || 'portfolio',
     assessment_date: new Date().toISOString().split('T')[0],
     overall_risk_score: assessment.overall_risk_score,
     risk_level: assessment.risk_level,
-    risk_categories: JSON.stringify(assessment.risk_categories),
-    predicted_failures: JSON.stringify(assessment.predicted_failures),
-    risk_factors: JSON.stringify(assessment.risk_factors),
-    recommended_actions: JSON.stringify(assessment.recommended_actions),
-    confidence_score: assessment.confidence_score,
+    risk_categories: JSON.stringify(assessment.risk_categories || {}),
+    predicted_failures: JSON.stringify(assessment.predicted_failures || []),
+    risk_factors: JSON.stringify(assessment.risk_factors || []),
+    recommended_actions: JSON.stringify(assessment.recommended_actions || []),
+    confidence_score: assessment.confidence_score || 0,
     analyzed_by: user.email,
     details: JSON.stringify({
-      executive_summary: assessment.executive_summary,
-      further_investigations: assessment.further_investigations,
-      ocr_risk_elevation: assessment.ocr_risk_elevation,
+      executive_summary: assessment.executive_summary || '',
+      further_investigations: assessment.further_investigations || [],
+      ocr_risk_elevation: assessment.ocr_risk_elevation || 'N/A',
     }),
   });
 
