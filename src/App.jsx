@@ -42,6 +42,7 @@ import InvestigationCompliance from '@/pages/InvestigationCompliance';
 import PermissionsManager from '@/pages/PermissionsManager';
 import Pricing from '@/pages/Pricing';
 import CaseOverviewDashboard from '@/pages/CaseOverviewDashboard';
+import RICSComplianceDashboard from '@/pages/RICSComplianceDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -105,6 +106,7 @@ const AuthenticatedApp = () => {
       <Route path="/compliance-dashboard" element={<InvestigationCompliance />} />
       <Route path="/permissions" element={<PermissionsManager />} />
       <Route path="/case-overview" element={<CaseOverviewDashboard />} />
+      <Route path="/rics-compliance" element={<RICSComplianceDashboard />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
