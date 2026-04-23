@@ -8,13 +8,34 @@ Deno.serve(async (req) => {
 
     const { evidence_id, file_url, title } = await req.json();
 
-    // Step 1: Extract raw content from PDF via AI vision
+    // Step 1: Use ExtractDataFromUploadedFile to get text content from PDF
+    let pdfTextContent = '';
+    try {
+      const extracted = await base44.asServiceRole.integrations.Core.ExtractDataFromUploadedFile({
+        file_url: file_url,
+        json_schema: {
+          type: "object",
+          properties: {
+            raw_text: { type: "string", description: "All text content extracted from the PDF" }
+          }
+        }
+      });
+      pdfTextContent = extracted?.output?.raw_text || '';
+    } catch (e) {
+      // fallback: pass file_url directly if extraction fails
+      pdfTextContent = `[PDF file: ${file_url}]`;
+    }
+
+    // Step 2: Extract raw content from PDF via AI
     const extraction = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: `You are a legal document analyst. Carefully read this PDF document and extract ALL content from it.
+      prompt: `You are a legal document analyst. Carefully read this PDF document content and extract ALL records from it.
 
 This is a fragment of a larger legal evidence bundle relating to a professional misconduct case involving a RICS surveyor.
 
-For every distinct document, email, letter, report, invoice, photograph description, or record you can identify within this PDF, extract:
+PDF CONTENT:
+${pdfTextContent}
+
+For every distinct document, email, letter, report, invoice, photograph description, or record you can identify, extract:
 1. The document type (email, letter, invoice, report, photograph, contract, valuation, other)
 2. Date (as precise as possible — day/month/year if visible, otherwise month/year or year only)
 3. Who it is FROM
@@ -45,7 +66,6 @@ Return a JSON object with this structure:
   "date_range": "earliest to latest date visible in this fragment",
   "key_parties": ["names of all people/organisations mentioned"]
 }`,
-      file_urls: [file_url],
       response_json_schema: {
         type: "object",
         properties: {
@@ -72,7 +92,6 @@ Return a JSON object with this structure:
           key_parties: { type: "array", items: { type: "string" } }
         }
       },
-      model: "gpt_5_4"
     });
 
     // Step 2: Save extracted documents as Evidence records
