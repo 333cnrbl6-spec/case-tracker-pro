@@ -1,0 +1,71 @@
+{
+  "name": "WitnessInvitation",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "ID of the related incident"
+    },
+    "secure_token": {
+      "type": "string",
+      "description": "Secure random token for the invitation link"
+    },
+    "witness_name": {
+      "type": "string",
+      "description": "Name of the witness (optional, can be filled later)"
+    },
+    "witness_email": {
+      "type": "string",
+      "description": "Email address of the witness"
+    },
+    "witness_phone": {
+      "type": "string",
+      "description": "Phone number of the witness (optional)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "invited",
+        "registered",
+        "completed"
+      ],
+      "default": "pending",
+      "description": "Status of the witness invitation"
+    },
+    "invited_by": {
+      "type": "string",
+      "description": "Email of the user who created the invitation"
+    },
+    "invited_at": {
+      "type": "string",
+      "description": "ISO timestamp when invitation was created"
+    },
+    "accessed_at": {
+      "type": "string",
+      "description": "ISO timestamp when witness first accessed the link"
+    },
+    "registered_at": {
+      "type": "string",
+      "description": "ISO timestamp when witness registered their account"
+    },
+    "witness_user_id": {
+      "type": "string",
+      "description": "User ID of the witness after registration"
+    },
+    "evidence_submitted": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of evidence items submitted by this witness"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal notes about the witness or invitation"
+    }
+  },
+  "required": [
+    "incident_id",
+    "secure_token",
+    "witness_email"
+  ]
+}

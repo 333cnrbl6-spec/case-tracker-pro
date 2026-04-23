@@ -27,6 +27,7 @@ import AISummaryBanner from '@/components/AISummaryBanner';
 import IncidentAISummary from '@/components/IncidentAISummary';
 import RICSRiskAssessor from '@/components/RICSRiskAssessor';
 import IncidentTimeline from '@/components/IncidentTimeline';
+import WitnessLinkGenerator from '@/components/WitnessLinkGenerator';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -357,6 +358,7 @@ ${incidents.map((inc, i) => `${i + 1}. [${inc.severity?.toUpperCase()}] ${inc.da
                       </div>
                     </div>
                     <div className="flex gap-2">
+                       <WitnessLinkGenerator incidentId={incident.id} incidentTitle={incident.title} />
                        <Button variant="ghost" size="icon" onClick={() => handleEditIncident(incident)}>
                          <Edit2 className="w-4 h-4" />
                        </Button>
