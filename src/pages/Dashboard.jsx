@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CaseMigrationWizard from '@/components/CaseMigrationWizard';
+import QuickCaseSetup from '@/components/QuickCaseSetup';
 import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
@@ -18,6 +19,7 @@ import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 export default function Dashboard() {
   const [drillDown, setDrillDown] = useState(null); // { incidents, label }
   const [migrationOpen, setMigrationOpen] = useState(false);
+  const [quickSetupOpen, setQuickSetupOpen] = useState(false);
 
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
@@ -63,16 +65,31 @@ export default function Dashboard() {
              <h1 className="text-4xl font-bold text-slate-900 mb-2">Case Assessment Dashboard</h1>
              <p className="text-slate-600">Building evidence against Malcolm Belcher - RICS Conduct Investigation</p>
            </div>
-           <Button 
-             onClick={() => setMigrationOpen(true)}
-             className="gap-2 bg-indigo-600 hover:bg-indigo-700 whitespace-nowrap"
-           >
-             <span>📋</span>
-             Create Case from Evidence
-           </Button>
+           <div className="flex gap-2">
+             <Button 
+               onClick={() => setQuickSetupOpen(true)}
+               className="gap-2 bg-green-600 hover:bg-green-700 whitespace-nowrap"
+             >
+               <span>⚡</span>
+               Bradley v. Belcher
+             </Button>
+             <Button 
+               onClick={() => setMigrationOpen(true)}
+               variant="outline"
+               className="gap-2 whitespace-nowrap"
+             >
+               <span>📋</span>
+               Custom Case
+             </Button>
+           </div>
          </div>
 
-         {/* Migration Wizard */}
+         {/* Migration Wizards */}
+         <QuickCaseSetup 
+           open={quickSetupOpen}
+           onOpenChange={setQuickSetupOpen}
+           onSuccess={() => setQuickSetupOpen(false)}
+         />
          <CaseMigrationWizard 
            open={migrationOpen}
            onOpenChange={setMigrationOpen}
