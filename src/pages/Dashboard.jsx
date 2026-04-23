@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import CaseMigrationWizard from '@/components/CaseMigrationWizard';
 import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
@@ -16,6 +17,7 @@ import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export default function Dashboard() {
   const [drillDown, setDrillDown] = useState(null); // { incidents, label }
+  const [migrationOpen, setMigrationOpen] = useState(false);
 
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
@@ -56,10 +58,26 @@ export default function Dashboard() {
     <>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Case Assessment Dashboard</h1>
-          <p className="text-slate-600">Building evidence against Malcolm Belcher - RICS Conduct Investigation</p>
-        </div>
+         <div className="mb-8 flex justify-between items-start">
+           <div>
+             <h1 className="text-4xl font-bold text-slate-900 mb-2">Case Assessment Dashboard</h1>
+             <p className="text-slate-600">Building evidence against Malcolm Belcher - RICS Conduct Investigation</p>
+           </div>
+           <Button 
+             onClick={() => setMigrationOpen(true)}
+             className="gap-2 bg-indigo-600 hover:bg-indigo-700 whitespace-nowrap"
+           >
+             <span>📋</span>
+             Create Case from Evidence
+           </Button>
+         </div>
+
+         {/* Migration Wizard */}
+         <CaseMigrationWizard 
+           open={migrationOpen}
+           onOpenChange={setMigrationOpen}
+           onSuccess={() => setMigrationOpen(false)}
+         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card>
