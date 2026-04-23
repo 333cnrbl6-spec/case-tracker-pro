@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
+import { AlertTriangle, Plus, Edit2, Trash2, Loader2, LayoutGrid } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import FilterBar from '@/components/FilterBar';
 import {
   Dialog,
@@ -147,6 +148,13 @@ export default function Incidents() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Incidents & Breaches</h1>
+          <div className="flex gap-2">
+            <Link to="/incident-kanban">
+              <Button variant="outline" className="gap-2">
+                <LayoutGrid className="w-4 h-4" />
+                Kanban Board
+              </Button>
+            </Link>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-red-600 hover:bg-red-700">
@@ -272,6 +280,7 @@ export default function Incidents() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <div className="mb-6">
