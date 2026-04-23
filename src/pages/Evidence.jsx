@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import DocumentDropZone from '../components/DocumentDropZone';
+import BatchAutoTagButton from '@/components/BatchAutoTagButton';
 import AnnotationPanel from '../components/AnnotationPanel';
 import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestions';
 import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
@@ -109,6 +110,7 @@ export default function Evidence() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Evidence & Documents</h1>
           <div className="flex gap-2">
+            <BatchAutoTagButton />
             <Button variant="outline" className="gap-2" onClick={() => generateEvidenceReport(filteredEvidence)}>
               <Download className="w-4 h-4" />
               Download Report
