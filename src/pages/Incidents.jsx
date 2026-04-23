@@ -26,6 +26,7 @@ import RemediationPlan from '@/components/RemediationPlan';
 import AISummaryBanner from '@/components/AISummaryBanner';
 import IncidentAISummary from '@/components/IncidentAISummary';
 import RICSRiskAssessor from '@/components/RICSRiskAssessor';
+import IncidentTimeline from '@/components/IncidentTimeline';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -398,6 +399,7 @@ ${incidents.map((inc, i) => `${i + 1}. [${inc.severity?.toUpperCase()}] ${inc.da
                       )}
                     </div>
                   )}
+                <IncidentTimeline incident={incident} evidence={evidence} communications={communications} />
                 <div className="pt-3 border-t border-slate-100">
                   <RemediationPlan incident={incident} />
                 </div>
