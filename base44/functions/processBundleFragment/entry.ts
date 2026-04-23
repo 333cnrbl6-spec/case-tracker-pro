@@ -72,7 +72,7 @@ Return a JSON object with this structure:
           key_parties: { type: "array", items: { type: "string" } }
         }
       },
-      model: "claude_sonnet_4_6"
+      model: "gpt_5_4"
     });
 
     // Step 2: Save extracted documents as Evidence records
