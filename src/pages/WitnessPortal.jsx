@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Upload, CheckCircle2, AlertCircle, FileUp } from 'lucide-react';
 import { toast } from 'sonner';
+import ConflictChecker from '@/components/ConflictChecker';
 
 export default function WitnessPortal() {
   const { token } = useParams();
@@ -26,6 +27,7 @@ export default function WitnessPortal() {
   const [uploadFile, setUploadFile] = useState(null);
   const [description, setDescription] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [showConflictCheck, setShowConflictCheck] = useState(false);
 
   useEffect(() => {
     validateToken();
@@ -293,35 +295,32 @@ export default function WitnessPortal() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      setUploadFile(null);
-                      setDescription('');
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={!uploadFile || uploading}
-                    className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700"
-                  >
-                    {uploading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-4 h-4" />
-                        Submit Evidence
-                      </>
-                    )}
-                  </Button>
-                </div>
+                   <Button
+                     type="button"
+                     variant="outline"
+                     className="flex-1"
+                     onClick={() => setShowConflictCheck(true)}
+                   >
+                     Check Conflicts
+                   </Button>
+                   <Button
+                     type="submit"
+                     disabled={!uploadFile || uploading}
+                     className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700"
+                   >
+                     {uploading ? (
+                       <>
+                         <Loader2 className="w-4 h-4 animate-spin" />
+                         Uploading...
+                       </>
+                     ) : (
+                       <>
+                         <Upload className="w-4 h-4" />
+                         Submit Evidence
+                       </>
+                     )}
+                   </Button>
+                 </div>
 
                 <p className="text-xs text-slate-500 text-center">
                   You can upload multiple files—submit one at a time and come back for more.
@@ -331,14 +330,33 @@ export default function WitnessPortal() {
           </Card>
         )}
 
+        {/* Conflict Checker Modal */}
+         {showConflictCheck && step === 'upload' && (
+           <Card className="border-indigo-200 bg-indigo-50">
+             <CardHeader>
+               <CardTitle>Conflict of Interest Check</CardTitle>
+             </CardHeader>
+             <CardContent>
+               <ConflictChecker 
+                 witnessName={fullName}
+                 documentContent={description}
+                 incidentId={invitation?.incident_id}
+                 onClose={() => setShowConflictCheck(false)}
+               />
+             </CardContent>
+           </Card>
+         )}
+
         {/* Info */}
-        <Card className="bg-slate-50 border-slate-200">
-          <CardContent className="pt-6 text-sm text-slate-700 space-y-2">
-            <p>✓ Your data is secure and encrypted</p>
-            <p>✓ Only authorized investigators can view your submission</p>
-            <p>✓ You can submit multiple files at any time</p>
-          </CardContent>
-        </Card>
+         {!showConflictCheck && (
+           <Card className="bg-slate-50 border-slate-200">
+             <CardContent className="pt-6 text-sm text-slate-700 space-y-2">
+               <p>✓ Your data is secure and encrypted</p>
+               <p>✓ Only authorized investigators can view your submission</p>
+               <p>✓ You can submit multiple files at any time</p>
+             </CardContent>
+           </Card>
+         )}
       </div>
     </div>
   );
