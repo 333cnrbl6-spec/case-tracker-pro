@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, AlertTriangle, FileText, CheckCircle2, Clock, ShieldAlert, FileCheck, ArrowRight } from 'lucide-react';
+import { AlertCircle, AlertTriangle, FileText, CheckCircle2, Clock, ShieldAlert, FileCheck, ArrowRight, Download } from 'lucide-react';
+import { generateCaseOverviewReport } from '@/lib/generatePDF';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -72,6 +73,10 @@ export default function CaseOverviewDashboard() {
             <p className="text-slate-500 mt-1">Live snapshot of evidence, incidents & validation status</p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => generateCaseOverviewReport({ incidents, evidence, communications })}>
+              <Download className="w-4 h-4" />
+              Download Report
+            </Button>
             <Link to="/evidence-validator">
               <Button variant="outline" className="gap-2">
                 <FileCheck className="w-4 h-4" /> Run Validation

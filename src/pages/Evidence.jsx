@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FileText, Plus, Trash2, ExternalLink } from 'lucide-react';
+import { FileText, Plus, Trash2, ExternalLink, Download } from 'lucide-react';
+import { generateEvidenceReport } from '@/lib/generatePDF';
 import FilterBar from '@/components/FilterBar';
 import AISummaryBanner from '@/components/AISummaryBanner';
 import {
@@ -107,6 +108,11 @@ export default function Evidence() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-slate-900">Evidence & Documents</h1>
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => generateEvidenceReport(filteredEvidence)}>
+              <Download className="w-4 h-4" />
+              Download Report
+            </Button>
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2 bg-green-600 hover:bg-green-700">
@@ -230,6 +236,7 @@ export default function Evidence() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         <DocumentDropZone onEvidenceCreated={() => queryClient.invalidateQueries({ queryKey: ['evidence'] })} />
