@@ -47,6 +47,7 @@ import RICSComplianceDashboard from '@/pages/RICSComplianceDashboard';
 import NetworkMap from '@/pages/NetworkMap';
 import RICSRiskModule from '@/pages/RICSRiskModule';
 import IncidentKanban from '@/pages/IncidentKanban';
+import ReportBuilder from '@/pages/ReportBuilder';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -117,6 +118,7 @@ const AuthenticatedApp = () => {
       <Route path="/network-map" element={<NetworkMap />} />
       <Route path="/rics-risk" element={<RICSRiskModule />} />
       <Route path="/incident-kanban" element={<IncidentKanban />} />
+      <Route path="/report-builder" element={<ReportBuilder />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
