@@ -53,15 +53,15 @@ export default function EvidenceValidator() {
 
       const evidenceData = evidence
         .filter(e => selectedEvidence.includes(e.id))
-        .map(e => ({ id: e.id, ...e.data }));
+        .map(e => ({ id: e.id, ...(e.data ?? e) }));
 
       const communicationData = communications
         .filter(c => selectedCommunications.includes(c.id))
-        .map(c => ({ id: c.id, ...c.data }));
+        .map(c => ({ id: c.id, ...(c.data ?? c) }));
 
       const incidentData = incidents
         .filter(i => selectedIncidents.includes(i.id))
-        .map(i => ({ id: i.id, ...i.data }));
+        .map(i => ({ id: i.id, ...(i.data ?? i) }));
 
       const result = await base44.functions.invoke('validateEvidence', {
         evidence: evidenceData,
@@ -300,10 +300,10 @@ export default function EvidenceValidator() {
                       className="mt-1"
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{e.data.title}</p>
-                      <p className="text-xs text-slate-500">{e.data.evidence_type}</p>
-                      {e.data.date_collected && (
-                        <p className="text-xs text-slate-500">📅 {e.data.date_collected}</p>
+                      <p className="text-sm font-medium text-slate-900">{(e.data ?? e).title}</p>
+                      <p className="text-xs text-slate-500">{(e.data ?? e).evidence_type}</p>
+                      {(e.data ?? e).date_collected && (
+                        <p className="text-xs text-slate-500">📅 {(e.data ?? e).date_collected}</p>
                       )}
                     </div>
                   </div>
@@ -332,9 +332,9 @@ export default function EvidenceValidator() {
                       className="mt-1"
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{c.data.subject}</p>
-                      <p className="text-xs text-slate-500">{c.data.type}</p>
-                      <p className="text-xs text-slate-500">📅 {c.data.date}</p>
+                      <p className="text-sm font-medium text-slate-900">{(c.data ?? c).subject}</p>
+                      <p className="text-xs text-slate-500">{(c.data ?? c).type}</p>
+                      <p className="text-xs text-slate-500">📅 {(c.data ?? c).date}</p>
                     </div>
                   </div>
                 ))
@@ -362,9 +362,9 @@ export default function EvidenceValidator() {
                       className="mt-1"
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{i.data.title}</p>
-                      <p className="text-xs text-slate-500">{i.data.incident_type}</p>
-                      <p className="text-xs text-slate-500">📅 {i.data.date}</p>
+                      <p className="text-sm font-medium text-slate-900">{(i.data ?? i).title}</p>
+                      <p className="text-xs text-slate-500">{(i.data ?? i).incident_type}</p>
+                      <p className="text-xs text-slate-500">📅 {(i.data ?? i).date}</p>
                     </div>
                   </div>
                 ))
