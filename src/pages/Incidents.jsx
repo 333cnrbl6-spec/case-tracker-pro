@@ -18,6 +18,8 @@ import {
 import RuleRecommendations from '@/components/RuleRecommendations';
 import IncidentRulesPanel from '@/components/IncidentRulesPanel';
 import IncidentAIAssistant from '@/components/IncidentAIAssistant';
+import RiskScoreBadge from '@/components/RiskScoreBadge';
+import { scoreIncident } from '@/lib/riskScoring';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -252,7 +254,9 @@ export default function Incidents() {
               <p className="text-slate-500">No incidents logged yet. Start documenting your case.</p>
             </Card>
           ) : (
-            incidents.map((incident) => (
+            incidents.map((incident) => {
+              const risk = scoreIncident(incident);
+              return (
               <Card key={incident.id} className="border-l-4 border-l-red-600">
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
@@ -261,12 +265,13 @@ export default function Incidents() {
                         <AlertTriangle className="w-5 h-5 text-red-600" />
                         {incident.title}
                       </CardTitle>
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex gap-2 flex-wrap items-center">
                         <Badge className={severityColors[incident.severity]}>
                           {incident.severity.charAt(0).toUpperCase() + incident.severity.slice(1)}
                         </Badge>
                         <Badge variant="outline">{incident.incident_type.replace(/_/g, ' ')}</Badge>
                         <span className="text-xs text-slate-500">{new Date(incident.date).toLocaleDateString()}</span>
+                        <RiskScoreBadge score={risk.score} level={risk.level} size="sm" />
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -313,7 +318,8 @@ export default function Incidents() {
                   )}
                 </CardContent>
               </Card>
-            ))
+              );
+            })
           )}
         </div>
       </div>

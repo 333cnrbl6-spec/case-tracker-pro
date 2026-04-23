@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Plus, Trash2, ExternalLink } from 'lucide-react';
 import AISummaryBanner from '@/components/AISummaryBanner';
+import RiskScoreBadge from '@/components/RiskScoreBadge';
+import { scoreCommunication } from '@/lib/riskScoring';
 import AnnotationPanel from '../components/AnnotationPanel';
 import {
   Dialog,
@@ -204,7 +206,9 @@ ${communications.map((c, i) => `${i + 1}. [${c.tone?.toUpperCase()}] ${c.date} |
               <p className="text-slate-500">No communications logged. Start documenting Belcher's communications.</p>
             </Card>
           ) : (
-            communications.map((comm) => (
+            communications.map((comm) => {
+              const risk = scoreCommunication(comm);
+              return (
               <Card key={comm.id}>
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
@@ -219,6 +223,7 @@ ${communications.map((c, i) => `${i + 1}. [${c.tone?.toUpperCase()}] ${c.date} |
                           {comm.tone.charAt(0).toUpperCase() + comm.tone.slice(1)}
                         </Badge>
                         <span className="text-xs text-slate-500">{new Date(comm.date).toLocaleDateString()}</span>
+                        <RiskScoreBadge score={risk.score} level={risk.level} size="sm" />
                       </div>
                     </div>
                     <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(comm.id)}>
@@ -249,7 +254,8 @@ ${communications.map((c, i) => `${i + 1}. [${c.tone?.toUpperCase()}] ${c.date} |
                   />
                 </CardContent>
               </Card>
-            ))
+              );
+            })
           )}
         </div>
       </div>
