@@ -20,6 +20,7 @@ import IncidentRulesPanel from '@/components/IncidentRulesPanel';
 import IncidentAIAssistant from '@/components/IncidentAIAssistant';
 import RiskScoreBadge from '@/components/RiskScoreBadge';
 import { scoreIncident } from '@/lib/riskScoring';
+import RemediationPlan from '@/components/RemediationPlan';
 
 const severityColors = {
   low: 'bg-blue-100 text-blue-800',
@@ -316,11 +317,14 @@ export default function Incidents() {
                       )}
                     </div>
                   )}
+                <div className="pt-3 border-t border-slate-100">
+                  <RemediationPlan incident={incident} />
+                </div>
                 </CardContent>
-              </Card>
-              );
-            })
-          )}
+                </Card>
+                );
+                })
+                )}
         </div>
       </div>
     </div>
