@@ -64,6 +64,7 @@ const NAV_GROUPS = [
   {
     label: 'Analytics & Reporting',
     items: [
+      { path: '/executive-dashboard', icon: TrendingUp, label: 'Executive Dashboard' },
       { path: '/analytics', icon: BarChart2, label: 'Analytics' },
       { path: '/practice-analytics', icon: Activity, label: 'Practice Analytics' },
       { path: '/fee-earner-analytics', icon: Users, label: 'Fee Earner Analytics' },

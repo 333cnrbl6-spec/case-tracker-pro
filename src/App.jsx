@@ -24,6 +24,7 @@ import RICSDocumentGenerator from '@/pages/RICSDocumentGenerator';
 import RICSRulesLibrary from '@/pages/RICSRulesLibrary';
 import ComplianceChecklist from '@/pages/ComplianceChecklist';
 import AnalyticsDashboard from '@/pages/AnalyticsDashboard';
+import ExecutiveDashboard from '@/pages/ExecutiveDashboard';
 import EvidenceValidator from '@/pages/EvidenceValidator';
 import IncidentTaskManager from '@/pages/IncidentTaskManager';
 import CaseManager from '@/pages/CaseManager';
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
       <Route path="/rics-rules" element={<RICSRulesLibrary />} />
       <Route path="/compliance-checklist" element={<ComplianceChecklist />} />
       <Route path="/analytics" element={<AnalyticsDashboard />} />
+      <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
       <Route path="/evidence-validator" element={<EvidenceValidator />} />
       <Route path="/incident-tasks" element={<IncidentTaskManager />} />
       <Route path="/case-manager" element={<CaseManager />} />
