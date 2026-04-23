@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Plus, Trash2, ExternalLink } from 'lucide-react';
+import FilterBar from '@/components/FilterBar';
 import AISummaryBanner from '@/components/AISummaryBanner';
 import RiskScoreBadge from '@/components/RiskScoreBadge';
 import { scoreCommunication } from '@/lib/riskScoring';
@@ -31,6 +32,7 @@ const toneColors = {
 
 export default function Communications() {
   const [open, setOpen] = useState(false);
+  const [filters, setFilters] = useState({ search: '', type: 'all', tone: 'all', date_from: 'all', date_to: 'all', person: 'all' });
   const [formData, setFormData] = useState({
     date: '',
     type: 'email',
@@ -46,6 +48,20 @@ export default function Communications() {
   const { data: communications = [] } = useQuery({
     queryKey: ['communications'],
     queryFn: () => base44.entities.Communication.list('-date'),
+  });
+
+  const filteredComms = communications.filter(c => {
+    const q = filters.search?.toLowerCase() || '';
+    if (q && !c.subject?.toLowerCase().includes(q) && !c.content?.toLowerCase().includes(q) &&
+        !c.from?.toLowerCase().includes(q) && !c.to?.toLowerCase().includes(q)) return false;
+    if (filters.type !== 'all' && c.type !== filters.type) return false;
+    if (filters.tone !== 'all' && c.tone !== filters.tone) return false;
+    if (filters.date_from !== 'all' && filters.date_from && c.date < filters.date_from) return false;
+    if (filters.date_to !== 'all' && filters.date_to && c.date > filters.date_to) return false;
+    if (filters.person !== 'all' && filters.person &&
+        !c.from?.toLowerCase().includes(filters.person.toLowerCase()) &&
+        !c.to?.toLowerCase().includes(filters.person.toLowerCase())) return false;
+    return true;
   });
 
   const createMutation = useMutation({
@@ -200,13 +216,35 @@ ${communications.map((c, i) => `${i + 1}. [${c.tone?.toUpperCase()}] ${c.date} |
           </div>
         )}
 
+        <FilterBar
+          filters={filters}
+          onChange={setFilters}
+          totalCount={communications.length}
+          resultCount={filteredComms.length}
+          config={[
+            { key: 'tone', label: 'Tone', type: 'select', options: [
+              { value: 'neutral', label: 'Neutral' }, { value: 'professional', label: 'Professional' },
+              { value: 'dismissive', label: 'Dismissive' }, { value: 'aggressive', label: 'Aggressive' },
+              { value: 'threatening', label: 'Threatening' }, { value: 'unprofessional', label: 'Unprofessional' },
+            ]},
+            { key: 'type', label: 'Type', type: 'select', options: [
+              { value: 'email', label: 'Email' }, { value: 'letter', label: 'Letter' },
+              { value: 'phone_call', label: 'Phone Call' }, { value: 'in_person', label: 'In Person' },
+              { value: 'message', label: 'Message' }, { value: 'other', label: 'Other' },
+            ]},
+            { key: 'person', label: 'From / To Person', type: 'text' },
+            { key: 'date_from', label: 'Date From', type: 'date' },
+            { key: 'date_to', label: 'Date To', type: 'date' },
+          ]}
+        />
+
         <div className="space-y-4">
-          {communications.length === 0 ? (
+          {filteredComms.length === 0 ? (
             <Card className="text-center py-12">
-              <p className="text-slate-500">No communications logged. Start documenting Belcher's communications.</p>
+              <p className="text-slate-500">{communications.length === 0 ? 'No communications logged. Start documenting communications.' : 'No communications match the current filters.'}</p>
             </Card>
           ) : (
-            communications.map((comm) => {
+            filteredComms.map((comm) => {
               const risk = scoreCommunication(comm);
               return (
               <Card key={comm.id}>

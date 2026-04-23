@@ -45,6 +45,7 @@ import CaseOverviewDashboard from '@/pages/CaseOverviewDashboard';
 import RICSComplianceDashboard from '@/pages/RICSComplianceDashboard';
 import NetworkMap from '@/pages/NetworkMap';
 import RICSRiskModule from '@/pages/RICSRiskModule';
+import AppHeader from '@/components/AppHeader';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,7 +72,9 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <Routes>
+    <>
+      <AppHeader />
+      <Routes>
       {/* Add your page Route elements here */}
       <Route path="/" element={<Dashboard />} />
       <Route path="/incidents" element={<Incidents />} />
@@ -114,6 +117,7 @@ const AuthenticatedApp = () => {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </>
   );
 };
 

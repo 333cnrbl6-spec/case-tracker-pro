@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Plus, Trash2, ExternalLink } from 'lucide-react';
+import FilterBar from '@/components/FilterBar';
 import AISummaryBanner from '@/components/AISummaryBanner';
 import {
   Dialog,
@@ -32,6 +33,7 @@ const strengthColors = {
 
 export default function Evidence() {
   const [open, setOpen] = useState(false);
+  const [filters, setFilters] = useState({ search: '', evidence_type: 'all', strength: 'all', relevance: 'all', date_from: 'all', date_to: 'all' });
   const [formData, setFormData] = useState({
     date_collected: '',
     title: '',
@@ -47,6 +49,17 @@ export default function Evidence() {
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list('-date_collected'),
+  });
+
+  const filteredEvidence = evidence.filter(e => {
+    const q = filters.search?.toLowerCase() || '';
+    if (q && !e.title?.toLowerCase().includes(q) && !e.description?.toLowerCase().includes(q) && !e.notes?.toLowerCase().includes(q)) return false;
+    if (filters.evidence_type !== 'all' && e.evidence_type !== filters.evidence_type) return false;
+    if (filters.strength !== 'all' && e.strength !== filters.strength) return false;
+    if (filters.relevance !== 'all' && e.relevance !== filters.relevance) return false;
+    if (filters.date_from !== 'all' && filters.date_from && e.date_collected < filters.date_from) return false;
+    if (filters.date_to !== 'all' && filters.date_to && e.date_collected > filters.date_to) return false;
+    return true;
   });
 
   const { data: incidents = [] } = useQuery({
@@ -238,13 +251,40 @@ ${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} â€
           </div>
         )}
 
-        <div className="space-y-4 mt-8">
-           {evidence.length === 0 ? (
+        <FilterBar
+          filters={filters}
+          onChange={setFilters}
+          totalCount={evidence.length}
+          resultCount={filteredEvidence.length}
+          config={[
+            { key: 'strength', label: 'Strength', type: 'select', options: [
+              { value: 'weak', label: 'Weak' }, { value: 'moderate', label: 'Moderate' },
+              { value: 'strong', label: 'Strong' }, { value: 'critical', label: 'Critical' },
+            ]},
+            { key: 'evidence_type', label: 'Type', type: 'select', options: [
+              { value: 'document', label: 'Document' }, { value: 'communication', label: 'Communication' },
+              { value: 'report', label: 'Report' }, { value: 'valuation', label: 'Valuation' },
+              { value: 'contract', label: 'Contract' }, { value: 'witness_statement', label: 'Witness Statement' },
+              { value: 'photograph', label: 'Photograph' }, { value: 'recording_transcript', label: 'Recording' },
+              { value: 'other', label: 'Other' },
+            ]},
+            { key: 'relevance', label: 'Relevance', type: 'select', options: [
+              { value: 'rics_violation', label: 'RICS Violation' }, { value: 'legal_violation', label: 'Legal Violation' },
+              { value: 'pattern', label: 'Pattern' }, { value: 'credibility', label: 'Credibility' },
+              { value: 'context', label: 'Context' }, { value: 'other', label: 'Other' },
+            ]},
+            { key: 'date_from', label: 'Date From', type: 'date' },
+            { key: 'date_to', label: 'Date To', type: 'date' },
+          ]}
+        />
+
+        <div className="space-y-4">
+           {filteredEvidence.length === 0 ? (
             <Card className="text-center py-12">
-              <p className="text-slate-500">No evidence added yet. Start organizing your supporting documents.</p>
+              <p className="text-slate-500">{evidence.length === 0 ? 'No evidence added yet. Start organizing your supporting documents.' : 'No evidence matches the current filters.'}</p>
             </Card>
           ) : (
-            evidence.map((item) => (
+            filteredEvidence.map((item) => (
               <Card key={item.id}>
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">

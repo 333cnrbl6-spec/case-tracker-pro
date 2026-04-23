@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertTriangle, Plus, Edit2, Trash2, Loader2 } from 'lucide-react';
+import FilterBar from '@/components/FilterBar';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +36,7 @@ const severityColors = {
 export default function Incidents() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [filters, setFilters] = useState({ search: '', severity: 'all', incident_type: 'all', status: 'all', date_from: 'all', date_to: 'all', rics_violation: 'all' });
   const [linkedRules, setLinkedRules] = useState([]);
   const [formData, setFormData] = useState({
     date: '',
@@ -52,6 +54,21 @@ export default function Incidents() {
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
     queryFn: () => base44.entities.Incident.list('-date'),
+  });
+
+  const filteredIncidents = incidents.filter(i => {
+    const q = filters.search?.toLowerCase() || '';
+    if (q && !i.title?.toLowerCase().includes(q) && !i.description?.toLowerCase().includes(q) &&
+        !i.rics_violations?.some(v => v.toLowerCase().includes(q)) &&
+        !i.incident_type?.toLowerCase().includes(q)) return false;
+    if (filters.severity !== 'all' && i.severity !== filters.severity) return false;
+    if (filters.incident_type !== 'all' && i.incident_type !== filters.incident_type) return false;
+    if (filters.status !== 'all' && i.status !== filters.status) return false;
+    if (filters.date_from !== 'all' && filters.date_from && i.date < filters.date_from) return false;
+    if (filters.date_to !== 'all' && filters.date_to && i.date > filters.date_to) return false;
+    if (filters.rics_violation !== 'all' && filters.rics_violation &&
+        !i.rics_violations?.some(v => v.toLowerCase().includes(filters.rics_violation.toLowerCase()))) return false;
+    return true;
   });
 
   const { data: evidence = [] } = useQuery({
@@ -261,6 +278,35 @@ export default function Incidents() {
           <RICSRiskAssessor compact={true} />
         </div>
 
+        <FilterBar
+          filters={filters}
+          onChange={setFilters}
+          totalCount={incidents.length}
+          resultCount={filteredIncidents.length}
+          config={[
+            { key: 'severity', label: 'Severity', type: 'select', options: [
+              { value: 'low', label: 'Low' }, { value: 'medium', label: 'Medium' },
+              { value: 'high', label: 'High' }, { value: 'critical', label: 'Critical' },
+            ]},
+            { key: 'incident_type', label: 'Type', type: 'select', options: [
+              { value: 'communication', label: 'Communication' },
+              { value: 'professional_conduct', label: 'Professional Conduct' },
+              { value: 'document_issue', label: 'Document Issue' },
+              { value: 'gatekeeping', label: 'Gatekeeping' },
+              { value: 'information_control', label: 'Information Control' },
+              { value: 'harassment', label: 'Harassment' },
+              { value: 'other', label: 'Other' },
+            ]},
+            { key: 'status', label: 'Status', type: 'select', options: [
+              { value: 'open', label: 'Open' }, { value: 'reviewed', label: 'Reviewed' },
+              { value: 'assessed', label: 'Assessed' }, { value: 'escalated', label: 'Escalated' },
+            ]},
+            { key: 'date_from', label: 'Date From', type: 'date' },
+            { key: 'date_to', label: 'Date To', type: 'date' },
+            { key: 'rics_violation', label: 'RICS Violation', type: 'text' },
+          ]}
+        />
+
         {incidents.length > 0 && (
           <div className="mb-6">
             <AISummaryBanner
@@ -275,12 +321,12 @@ ${incidents.map((inc, i) => `${i + 1}. [${inc.severity?.toUpperCase()}] ${inc.da
         )}
 
         <div className="space-y-4">
-          {incidents.length === 0 ? (
+          {filteredIncidents.length === 0 ? (
             <Card className="text-center py-12">
-              <p className="text-slate-500">No incidents logged yet. Start documenting your case.</p>
+              <p className="text-slate-500">{incidents.length === 0 ? 'No incidents logged yet. Start documenting your case.' : 'No incidents match the current filters.'}</p>
             </Card>
           ) : (
-            incidents.map((incident) => {
+            filteredIncidents.map((incident) => {
               const risk = scoreIncident(incident);
               return (
               <Card key={incident.id} className="border-l-4 border-l-red-600">
