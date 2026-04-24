@@ -223,7 +223,7 @@ Extract:
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 mb-2">Evidence Scanner</h1>
-          <p className="text-slate-600">Upload your document bundle — AI will OCR, classify, match to existing records, and auto-save everything.</p>
+          <p className="text-slate-600">Upload your document bundle — AI will read, classify, match to existing records, and auto-save everything. All file types accepted including Excel, Word, PDF and images.</p>
           <div className="mt-3 flex items-center gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 w-fit">
             <Brain className="w-3.5 h-3.5" />
             Sample data guard active — only Bradley/Belcher/Powell case documents will be saved
@@ -242,7 +242,7 @@ Extract:
                 isDragActive ? 'border-indigo-500 bg-indigo-50' : 'border-slate-300 bg-slate-50'
               }`}
             >
-              <input id="file-input" type="file" onChange={handleChange} multiple className="hidden" />
+              <input id="file-input" type="file" onChange={handleChange} multiple accept="*/*" className="hidden" />
               {inProgress ? (
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
@@ -254,7 +254,7 @@ Extract:
                   <Upload className="w-10 h-10 text-slate-400" />
                   <div>
                     <p className="font-medium text-slate-900">Drop your entire document bundle here</p>
-                    <p className="text-sm text-slate-600">PDFs, images, scans — any order, any quantity</p>
+                    <p className="text-sm text-slate-600">PDFs, Excel, Word, images, CSV, scans — any file type, any order, any quantity</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => document.getElementById('file-input').click()}>
                     Browse Files
