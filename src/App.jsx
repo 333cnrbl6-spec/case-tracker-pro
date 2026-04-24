@@ -65,6 +65,7 @@ import HelpAndDocs from '@/pages/HelpAndDocs';
 import RICSComplianceAdvisor from '@/pages/RICSComplianceAdvisor';
 import DocumentTemplateEngine from '@/pages/DocumentTemplateEngine';
 import VisualNetworkMap from '@/pages/VisualNetworkMap';
+import SpecialismFrameworkViewer from '@/components/SpecialismFrameworkViewer';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -153,6 +154,7 @@ const AuthenticatedApp = () => {
       <Route path="/compliance-advisor" element={<RICSComplianceAdvisor />} />
       <Route path="/document-templates" element={<DocumentTemplateEngine />} />
       <Route path="/network-map" element={<VisualNetworkMap />} />
+      <Route path="/specialisms" element={<SpecialismFrameworkViewer />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
