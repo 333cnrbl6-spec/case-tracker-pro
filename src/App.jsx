@@ -55,7 +55,7 @@ import DisclosureBundleBuilder from '@/pages/DisclosureBundleBuilder';
 import CostScheduleAnalysis from '@/pages/CostScheduleAnalysis';
 import FinancialLossSummary from '@/pages/FinancialLossSummary';
 import BatchExportBuilder from '@/pages/BatchExportBuilder';
-import CaseRiskDashboard from '@/pages/CaseRiskDashboard';
+import CaseRiskDashboard from '@/pages/CaseRiskDashboard.jsx';
 import ProfessionalEntityDatabase from '@/pages/ProfessionalEntityDatabase';
 import BreachDiscoveryTool from '@/pages/BreachDiscoveryTool';
 import InteractiveEventTimeline from '@/pages/InteractiveEventTimeline';
