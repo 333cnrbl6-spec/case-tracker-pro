@@ -30,23 +30,23 @@ export default function InvestigationCompliance() {
   // Calculate metrics
   const metrics = useMemo(() => {
     const severityCounts = {
-      critical: incidents.filter(i => i.data.severity === 'critical').length,
-      high: incidents.filter(i => i.data.severity === 'high').length,
-      medium: incidents.filter(i => i.data.severity === 'medium').length,
-      low: incidents.filter(i => i.data.severity === 'low').length,
+      critical: incidents.filter(i => i.severity === 'critical').length,
+      high: incidents.filter(i => i.severity === 'high').length,
+      medium: incidents.filter(i => i.severity === 'medium').length,
+      low: incidents.filter(i => i.severity === 'low').length,
     };
 
     const statusCounts = {
-      open: incidents.filter(i => i.data.status === 'open').length,
-      reviewed: incidents.filter(i => i.data.status === 'reviewed').length,
-      assessed: incidents.filter(i => i.data.status === 'assessed').length,
-      escalated: incidents.filter(i => i.data.status === 'escalated').length,
+      open: incidents.filter(i => i.status === 'open').length,
+      reviewed: incidents.filter(i => i.status === 'reviewed').length,
+      assessed: incidents.filter(i => i.status === 'assessed').length,
+      escalated: incidents.filter(i => i.status === 'escalated').length,
     };
 
     // RICS violations aggregation
     const ricsViolations = {};
     incidents.forEach(incident => {
-      incident.data.rics_violations?.forEach(violation => {
+      incident.rics_violations?.forEach(violation => {
         ricsViolations[violation] = (ricsViolations[violation] || 0) + 1;
       });
     });
@@ -58,29 +58,29 @@ export default function InvestigationCompliance() {
 
     // Task deadline analysis
     const overdueCount = tasks.filter(t => {
-      if (!t.data.deadline || t.data.status === 'completed') return false;
-      return differenceInDays(new Date(t.data.deadline), new Date()) < 0;
+      if (!t.deadline || t.status === 'completed') return false;
+      return differenceInDays(new Date(t.deadline), new Date()) < 0;
     }).length;
 
     const upcomingCount = tasks.filter(t => {
-      if (!t.data.deadline || t.data.status === 'completed') return false;
-      const daysLeft = differenceInDays(new Date(t.data.deadline), new Date());
+      if (!t.deadline || t.status === 'completed') return false;
+      const daysLeft = differenceInDays(new Date(t.deadline), new Date());
       return daysLeft >= 0 && daysLeft <= 7;
     }).length;
 
     const onTimeCount = tasks.filter(t => {
-      if (!t.data.deadline || t.data.status === 'completed') return false;
-      return differenceInDays(new Date(t.data.deadline), new Date()) > 7;
+      if (!t.deadline || t.status === 'completed') return false;
+      return differenceInDays(new Date(t.deadline), new Date()) > 7;
     }).length;
 
-    const completedCount = tasks.filter(t => t.data.status === 'completed').length;
+    const completedCount = tasks.filter(t => t.status === 'completed').length;
     const totalTasks = tasks.length;
 
     // Assignee workload
     const workloadByAssignee = {};
     tasks.forEach(task => {
-      if (task.data.assigned_to) {
-        workloadByAssignee[task.data.assigned_to] = (workloadByAssignee[task.data.assigned_to] || 0) + 1;
+      if (task.assigned_to) {
+        workloadByAssignee[task.assigned_to] = (workloadByAssignee[task.assigned_to] || 0) + 1;
       }
     });
 
@@ -94,15 +94,15 @@ export default function InvestigationCompliance() {
 
     // Incident timeline (last 7 incidents by date)
     const incidentTimeline = incidents
-      .sort((a, b) => new Date(b.data.date) - new Date(a.data.date))
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 7)
       .reverse()
       .map(i => ({
-        date: new Date(i.data.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
-        critical: i.data.severity === 'critical' ? 1 : 0,
-        high: i.data.severity === 'high' ? 1 : 0,
-        medium: i.data.severity === 'medium' ? 1 : 0,
-        low: i.data.severity === 'low' ? 1 : 0,
+        date: new Date(i.date).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
+        critical: i.severity === 'critical' ? 1 : 0,
+        high: i.severity === 'high' ? 1 : 0,
+        medium: i.severity === 'medium' ? 1 : 0,
+        low: i.severity === 'low' ? 1 : 0,
       }));
 
     return {
