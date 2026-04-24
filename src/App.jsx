@@ -67,6 +67,8 @@ import DocumentTemplateEngine from '@/pages/DocumentTemplateEngine';
 import VisualNetworkMap from '@/pages/VisualNetworkMap';
 import SpecialismFrameworkViewer from '@/components/SpecialismFrameworkViewer';
 import AutomatedBundleGenerator from '@/pages/AutomatedBundleGenerator';
+import ClientPortalManager from '@/pages/ClientPortalManager';
+import ClientPortalView from '@/pages/ClientPortalView';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -157,6 +159,8 @@ const AuthenticatedApp = () => {
       <Route path="/network-map" element={<VisualNetworkMap />} />
       <Route path="/specialisms" element={<SpecialismFrameworkViewer />} />
       <Route path="/bundle-generator" element={<AutomatedBundleGenerator />} />
+      <Route path="/client-portal-manager" element={<ClientPortalManager />} />
+      <Route path="/client-portal" element={<ClientPortalView />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

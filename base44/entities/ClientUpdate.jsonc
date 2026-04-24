@@ -1,0 +1,117 @@
+{
+  "name": "ClientUpdate",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related case ID"
+    },
+    "case_ref": {
+      "type": "string",
+      "description": "Case reference for quick display"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "progress_update",
+        "feedback",
+        "signature_request",
+        "document_share",
+        "milestone"
+      ],
+      "description": "Type of client communication"
+    },
+    "title": {
+      "type": "string",
+      "description": "Update title visible to client"
+    },
+    "content": {
+      "type": "string",
+      "description": "Update message/feedback text"
+    },
+    "visibility": {
+      "type": "string",
+      "enum": [
+        "public",
+        "internal_only"
+      ],
+      "default": "public",
+      "description": "Whether visible to client"
+    },
+    "document_url": {
+      "type": "string",
+      "description": "URL of attached document (for signature requests or shares)"
+    },
+    "document_name": {
+      "type": "string",
+      "description": "Name of the document"
+    },
+    "signature_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether document requires client signature"
+    },
+    "signature_status": {
+      "type": "string",
+      "enum": [
+        "not_requested",
+        "pending",
+        "signed",
+        "rejected"
+      ],
+      "default": "not_requested",
+      "description": "Current signature status"
+    },
+    "signature_date": {
+      "type": "string",
+      "description": "ISO timestamp when document was signed"
+    },
+    "signature_ip": {
+      "type": "string",
+      "description": "IP address where signature was executed"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Deadline for action (if signature request)"
+    },
+    "author_email": {
+      "type": "string",
+      "description": "Email of solicitor who created update"
+    },
+    "client_viewed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether client has viewed this update"
+    },
+    "client_viewed_at": {
+      "type": "string",
+      "description": "ISO timestamp when client viewed update"
+    },
+    "sentiment": {
+      "type": "string",
+      "enum": [
+        "positive",
+        "neutral",
+        "cautionary"
+      ],
+      "default": "neutral",
+      "description": "Emotional tone for client context"
+    },
+    "action_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether client action is required"
+    },
+    "published_at": {
+      "type": "string",
+      "description": "ISO timestamp when update was published to client portal"
+    }
+  },
+  "required": [
+    "case_id",
+    "type",
+    "title",
+    "content"
+  ]
+}
