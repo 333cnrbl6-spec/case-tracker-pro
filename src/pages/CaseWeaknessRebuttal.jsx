@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, AlertTriangle, Save, Loader2, MessageSquare, CheckCircle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Save, Loader2, MessageSquare, CheckCircle, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -16,6 +16,7 @@ export default function CaseWeaknessRebuttal() {
   const [rebuttals, setRebuttals] = useState({});
   const [expandedWeakness, setExpandedWeakness] = useState(null);
   const [linkedEvidence, setLinkedEvidence] = useState({});
+  const [generatingIdx, setGeneratingIdx] = useState(null);
 
   const { data: cases = [] } = useQuery({
     queryKey: ['legal-cases'],
@@ -100,6 +101,25 @@ export default function CaseWeaknessRebuttal() {
       toast.success('Weakness rebuttals saved');
     },
     onError: (e) => toast.error(e.message)
+  });
+
+  const generateRebuttalMutation = useMutation({
+    mutationFn: async (idx) => {
+      const result = await base44.functions.invoke('generateWeaknessRebuttal', {
+        weakness: narrative?.weaknesses[idx],
+        evidence_ids: linkedEvidence[idx] || []
+      });
+      return result.data.rebuttal;
+    },
+    onSuccess: (rebuttal, idx) => {
+      setRebuttals({ ...rebuttals, [idx]: rebuttal });
+      toast.success('Rebuttal generated');
+      setGeneratingIdx(null);
+    },
+    onError: () => {
+      toast.error('Failed to generate rebuttal');
+      setGeneratingIdx(null);
+    }
   });
 
   if (!caseId) {
@@ -271,7 +291,24 @@ export default function CaseWeaknessRebuttal() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
+                      {(linkedEvidence[idx] || []).length > 0 && (
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setGeneratingIdx(idx);
+                            generateRebuttalMutation.mutate(idx);
+                          }}
+                          disabled={generatingIdx === idx}
+                          className="bg-indigo-600 hover:bg-indigo-700 gap-1"
+                        >
+                          {generatingIdx === idx ? (
+                            <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
+                          ) : (
+                            <><Sparkles className="w-4 h-4" /> AI Draft</>
+                          )}
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         onClick={() => {
