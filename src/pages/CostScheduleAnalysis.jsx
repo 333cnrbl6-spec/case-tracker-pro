@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, TrendingDown, FileSpreadsheet, AlertTriangle, PoundSterling, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import CostScheduleDropZone from '@/components/CostScheduleDropZone';
 
 const PROPERTIES = ['29 Clifton Road', '4 Trinity Buildings', '5 Victoria Street', '4 Victoria Street', 'Trinity Buildings', 'Yardie Lane', 'Waltons Parade'];
 
@@ -80,7 +81,9 @@ export default function CostScheduleAnalysis() {
     queryFn: () => base44.entities.Evidence.list('-date_collected'),
   });
 
-  const costScheduleEvidence = evidenceRecords.filter(e => e.evidence_type === 'cost_schedule');
+  const costScheduleEvidence = evidenceRecords.filter(e =>
+    e.title?.toLowerCase().includes('cost schedule') || e.title?.toLowerCase().includes('trinity') || e.title?.toLowerCase().includes('clifton') || e.notes?.includes('drop zone')
+  );
 
   const confirmedLoss = KEY_DISPUTES.reduce((sum, d) => sum + d.loss, 0);
   const materialsTotal = MATERIALS_EXPENDITURE.reduce((sum, m) => sum + m.amount, 0);
@@ -114,10 +117,20 @@ export default function CostScheduleAnalysis() {
             <CardContent className="pt-4">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingDown className="w-4 h-4 text-red-600" />
-                <span className="text-xs font-semibold text-red-700 uppercase">Confirmed Loss (partial)</span>
+                <span className="text-xs font-semibold text-red-700 uppercase">Downvaluation Loss (partial)</span>
               </div>
               <p className="text-2xl font-bold text-red-800">£{confirmedLoss.toLocaleString()}</p>
-              <p className="text-xs text-red-600 mt-1">From 2 of ~40 line items at Clifton Road only</p>
+              <p className="text-xs text-red-600 mt-1">29 Clifton Rd — 2 of ~40 items only</p>
+            </CardContent>
+          </Card>
+          <Card className="border-red-300 bg-red-100">
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="w-4 h-4 text-red-700" />
+                <span className="text-xs font-semibold text-red-800 uppercase">Outstanding — Trinity</span>
+              </div>
+              <p className="text-2xl font-bold text-red-900">£3,287.76</p>
+              <p className="text-xs text-red-700 mt-1">Retention + Payment 6 + Additionals withheld</p>
             </CardContent>
           </Card>
           <Card className="border-amber-200 bg-amber-50">
@@ -151,6 +164,9 @@ export default function CostScheduleAnalysis() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Drop zone */}
+        <CostScheduleDropZone onSaved={() => refetch()} />
 
         {/* Disputed line items */}
         <Card className="mb-6">
