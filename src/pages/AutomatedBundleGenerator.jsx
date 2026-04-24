@@ -33,6 +33,7 @@ export default function AutomatedBundleGenerator() {
   const [selectedComms, setSelectedComms] = useState([]);
   const [generating, setGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [generatedBundles, setGeneratedBundles] = useState([]);
 
   // Fetch cases
   const { data: cases = [] } = useQuery({
@@ -140,15 +141,28 @@ export default function AutomatedBundleGenerator() {
 
       if (response.data) {
         // Convert response to blob and download
+        const fileName = `Bundle_${selectedCase?.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`;
         const blob = new Blob([response.data], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Bundle_${selectedCase?.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`;
+        a.download = fileName;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+        
+        // Add to generated bundles list
+        setGeneratedBundles(prev => [...prev, {
+          id: `${selectedCaseId}-${Date.now()}`,
+          caseRef: selectedCase?.case_ref,
+          fileName,
+          docCount: (includeEvidence ? selectedEvidence.length : 0) +
+                    (includeIncidents ? selectedIncidents.length : 0) +
+                    (includeComms ? selectedComms.length : 0),
+          timestamp: new Date().toLocaleTimeString(),
+        }]);
+        
         toast.success('Bundle generated and downloaded');
       }
     } catch (error) {
@@ -470,6 +484,35 @@ export default function AutomatedBundleGenerator() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Generated Bundles */}
+            {generatedBundles.length > 0 && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Download className="w-5 h-5" /> Generated Bundles
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {generatedBundles.map(bundle => (
+                      <div
+                        key={bundle.id}
+                        className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{bundle.caseRef}</p>
+                          <p className="text-xs text-slate-600">{bundle.docCount} documents • {bundle.timestamp}</p>
+                        </div>
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <Check className="w-3 h-3" /> Downloaded
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Format Specifications */}
             <Card className="bg-blue-50 border-blue-200">
