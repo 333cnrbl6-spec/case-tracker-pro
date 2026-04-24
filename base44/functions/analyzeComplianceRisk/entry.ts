@@ -60,7 +60,6 @@ Deno.serve(async (req) => {
     .map(([type, count]) => `${type.replace(/_/g, ' ')} (${count} occurrences)`);
 
   const assessment = await base44.integrations.Core.InvokeLLM({
-    model: 'claude_sonnet_4_6',
     prompt: `You are a senior RICS compliance risk analyst. Conduct a comprehensive automated risk assessment based on the following data from a professional conduct investigation.
 
 === CASE DATA ===
@@ -175,11 +174,12 @@ Return JSON exactly as follows:
   });
 
   // Validate LLM response has required fields
-  if (!assessment.overall_risk_score || !assessment.risk_level) {
+  if (!assessment || !assessment.overall_risk_score || !assessment.risk_level) {
+    console.error('LLM Assessment failed:', assessment);
     return Response.json({ 
       error: 'LLM failed to generate required risk fields',
-      assessment 
-    }, { status: 500 });
+      details: assessment 
+    }, { status: 400 });
   }
 
   // Persist to database

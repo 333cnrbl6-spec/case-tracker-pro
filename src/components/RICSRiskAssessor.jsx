@@ -72,20 +72,25 @@ export default function RICSRiskAssessor({ ocrSignals = null, compact = false })
 
   const run = async () => {
     setLoading(true);
-    const payload = { case_id: null };
-    if (ocrSignals) {
-      payload.ocr_signals = {
-        contradiction_count: ocrSignals.contradictions?.length || 0,
-        new_fact_count: ocrSignals.new_facts?.length || 0,
-        rics_flags: ocrSignals.rics_flags || [],
-        overall_assessment: ocrSignals.overall_assessment || '',
-        contradictions: ocrSignals.contradictions || [],
-      };
+    try {
+      const payload = { case_id: null };
+      if (ocrSignals) {
+        payload.ocr_signals = {
+          contradiction_count: ocrSignals.contradictions?.length || 0,
+          new_fact_count: ocrSignals.new_facts?.length || 0,
+          rics_flags: ocrSignals.rics_flags || [],
+          overall_assessment: ocrSignals.overall_assessment || '',
+          contradictions: ocrSignals.contradictions || [],
+        };
+      }
+      const res = await base44.functions.invoke('analyzeComplianceRisk', payload);
+      setAssessment(res.data?.risk_assessment);
+      queryClient.invalidateQueries({ queryKey: ['complianceRisks'] });
+    } catch (error) {
+      console.error('Risk assessment failed:', error);
+    } finally {
+      setLoading(false);
     }
-    const res = await base44.functions.invoke('analyzeComplianceRisk', payload);
-    setAssessment(res.data?.risk_assessment);
-    queryClient.invalidateQueries({ queryKey: ['complianceRisks'] });
-    setLoading(false);
   };
 
   const data = assessment || (latestStored ? {
