@@ -134,12 +134,40 @@ export default function CaseWeaknessRebuttal() {
     }
   }, [rebuttals, linkedEvidence]);
 
-  if (!caseId) {
+  if (!caseId && cases.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-500 mb-4">No case selected.</p>
           <Link to="/case-manager"><Button>Go to Case Manager</Button></Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!caseId && cases.length > 0) {
+    return (
+      <div className="min-h-screen bg-slate-50 p-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">Case Weakness Rebuttal</h1>
+            <p className="text-slate-600 mt-2">Select a case to review and rebut identified weaknesses</p>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Select a Case</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {cases.filter(c => c.ai_narrative).map((c) => (
+                <Link key={c.id} to={`/case-weakness-rebuttal?case_id=${c.id}`}>
+                  <div className="p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition">
+                    <p className="font-medium text-slate-900">{c.case_ref}</p>
+                    <p className="text-sm text-slate-600">{c.client_name}</p>
+                  </div>
+                </Link>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
