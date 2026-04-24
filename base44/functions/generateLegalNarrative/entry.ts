@@ -92,9 +92,20 @@ Jurisdiction: England & Wales. Produce a comprehensive structured legal narrativ
     const narrativeJson = JSON.stringify(narrative);
     console.log('[generateLegalNarrative] Narrative JSON size:', narrativeJson.length, 'bytes');
 
+    // Upload narrative as file if it exceeds field size limit
+    let narrativeUrl = null;
+    if (narrativeJson.length > 25000) {
+      console.log('[generateLegalNarrative] Narrative too large, uploading as file...');
+      const blob = new Blob([narrativeJson], { type: 'application/json' });
+      const file = new File([blob], `narrative-${case_id}.json`);
+      const uploadResult = await base44.integrations.Core.UploadFile({ file });
+      narrativeUrl = uploadResult.file_url;
+      console.log('[generateLegalNarrative] Narrative uploaded to:', narrativeUrl);
+    }
+
     console.log('[generateLegalNarrative] Updating case record...');
     await base44.entities.LegalCase.update(case_id, {
-      ai_narrative: narrativeJson,
+      ai_narrative: narrativeUrl || narrativeJson,
       narrative_generated_at: new Date().toISOString()
     });
     console.log('[generateLegalNarrative] Case updated successfully');

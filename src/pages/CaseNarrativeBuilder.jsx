@@ -29,14 +29,26 @@ export default function CaseNarrativeBuilder() {
   useEffect(() => {
     if (!legalCase?.ai_narrative) return;
     
-    try {
-      const parsed = JSON.parse(legalCase.ai_narrative);
-      // Handle case where schema wrapper is included
-      const narrativeData = parsed.properties ? parsed.properties : parsed;
-      setNarrative(narrativeData);
-    } catch (e) {
-      console.error('Failed to parse narrative:', e);
-    }
+    const loadNarrative = async () => {
+      try {
+        let narrativeText = legalCase.ai_narrative;
+        
+        // If it's a URL, fetch the content
+        if (narrativeText.startsWith('http')) {
+          const response = await fetch(narrativeText);
+          narrativeText = await response.text();
+        }
+        
+        const parsed = JSON.parse(narrativeText);
+        // Handle case where schema wrapper is included
+        const narrativeData = parsed.properties ? parsed.properties : parsed;
+        setNarrative(narrativeData);
+      } catch (e) {
+        console.error('Failed to load narrative:', e);
+      }
+    };
+    
+    loadNarrative();
   }, [legalCase]);
 
   const generateMutation = useMutation({
