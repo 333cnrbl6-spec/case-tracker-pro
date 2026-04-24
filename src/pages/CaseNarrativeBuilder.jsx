@@ -35,7 +35,13 @@ export default function CaseNarrativeBuilder() {
 
   const selectedCase = cases.find((c) => c.id === selectedCaseId);
   const narrative = selectedCase?.ai_narrative
-    ? JSON.parse(selectedCase.ai_narrative)
+    ? (() => {
+        try {
+          return JSON.parse(selectedCase.ai_narrative);
+        } catch {
+          return null;
+        }
+      })()
     : null;
 
   // Generate narrative mutation
