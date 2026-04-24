@@ -40,7 +40,7 @@ const SEVERITY_BADGE = {
 export default function ComplianceAlerts() {
   const queryClient = useQueryClient();
 
-  const { data: alerts = [], isLoading } = useQuery({
+  const { data: alerts = [], isLoading, refetch } = useQuery({
     queryKey: ['compliance-alerts'],
     queryFn: () => base44.entities.ComplianceAlert.list('-created_date'),
   });
@@ -52,6 +52,15 @@ export default function ComplianceAlerts() {
       toast.success('Compliance alerts refreshed');
     },
     onError: (e) => toast.error(e.message)
+  });
+
+  const limitationCheckMutation = useMutation({
+    mutationFn: () => base44.functions.invoke('checkLimitationDateAlerts', {}),
+    onSuccess: (data) => {
+      refetch();
+      toast.success(`Limitation check complete: ${data.alerts_sent} alert${data.alerts_sent > 1 ? 's' : ''} sent`);
+    },
+    onError: (e) => toast.error('Limitation check failed: ' + e.message)
   });
 
   const updateAlertMutation = useMutation({
@@ -75,17 +84,28 @@ export default function ComplianceAlerts() {
             <p className="text-slate-500 mt-1">
               {activeAlerts.length} active {critical.length > 0 && <span className="text-red-600 font-semibold">· {critical.length} critical/urgent</span>}
               {limitationAlerts.length > 0 && <span className="text-red-700 font-bold"> · ⚠️ {limitationAlerts.length} limitation date alert{limitationAlerts.length > 1 ? 's' : ''}</span>}
+              <span className="text-slate-400 text-xs ml-2">(Automated daily check at 8am UTC)</span>
             </p>
           </div>
-          <Button
-            onClick={() => refreshMutation.mutate()}
-            disabled={refreshMutation.isPending}
-            variant="outline"
-            className="gap-2"
-          >
-            {refreshMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            Refresh Alerts
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => limitationCheckMutation.mutate()}
+              disabled={limitationCheckMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 gap-2"
+            >
+              {limitationCheckMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
+              Check Limitations Now
+            </Button>
+            <Button
+              onClick={() => refreshMutation.mutate()}
+              disabled={refreshMutation.isPending}
+              variant="outline"
+              className="gap-2"
+            >
+              {refreshMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+              Refresh All
+            </Button>
+          </div>
         </div>
 
         {/* Critical Banner */}
