@@ -229,7 +229,7 @@ export default function CaseRiskDashboard() {
 
                       <RiskScoreBar score={risk.risk_score} />
 
-                      {risk.risk_factors.length > 0 && (
+                      {risk.risk_factors && risk.risk_factors.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-slate-200">
                           <p className="text-xs font-semibold text-slate-700 mb-2">Risk Factors:</p>
                           <ul className="text-xs text-slate-600 space-y-1">
