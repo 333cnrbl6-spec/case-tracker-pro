@@ -11,14 +11,10 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Both case IDs required' }, { status: 400 });
     }
 
-    // Fetch both cases
-    const [cases1, cases2] = await Promise.all([
-      base44.entities.LegalCase.filter({ id: case_id_1 }),
-      base44.entities.LegalCase.filter({ id: case_id_2 })
-    ]);
-
-    const case1 = cases1[0];
-    const case2 = cases2[0];
+    // Fetch both cases - using list and filter by case_ref instead
+    const allCases = await base44.entities.LegalCase.list();
+    const case1 = allCases.find(c => c.id === case_id_1 || c.case_ref === case_id_1);
+    const case2 = allCases.find(c => c.id === case_id_2 || c.case_ref === case_id_2);
 
     if (!case1 || !case2) {
       return Response.json({ error: 'One or both cases not found' }, { status: 404 });

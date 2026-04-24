@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
 import CaseTimeline from '@/components/CaseTimeline';
+import DuplicateCaseMerger from '@/components/DuplicateCaseMerger';
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-800',
@@ -66,6 +67,8 @@ export default function CaseManager() {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [editingId, setEditingId] = useState(null);
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
+  const [duplicatePair, setDuplicatePair] = useState(null);
 
   const { data: cases = [], isLoading } = useQuery({
     queryKey: ['legal-cases'],
@@ -130,6 +133,27 @@ export default function CaseManager() {
     const d = daysUntil(c.limitation_date);
     return d !== null && d <= 30 && c.status !== 'closed' && c.status !== 'settled';
   }).length;
+
+  // Detect duplicate cases (same client, opponent, case type)
+  const findDuplicates = () => {
+    for (let i = 0; i < cases.length; i++) {
+      for (let j = i + 1; j < cases.length; j++) {
+        const a = cases[i];
+        const b = cases[j];
+        if (
+          a.client_name === b.client_name &&
+          a.opponent_name === b.opponent_name &&
+          a.case_type === b.case_type &&
+          a.id !== b.id
+        ) {
+          return [a, b];
+        }
+      }
+    }
+    return null;
+  };
+
+  const duplicates = findDuplicates();
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">
@@ -277,6 +301,33 @@ export default function CaseManager() {
           </Card>
         )}
 
+        {/* Duplicate Alert */}
+        {duplicates && view === 'list' && (
+          <Card className="mb-6 border-amber-200 bg-amber-50">
+            <CardContent className="pt-4 flex items-start justify-between">
+              <div className="flex items-start gap-3 flex-1">
+                <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-amber-900">Duplicate cases detected</p>
+                  <p className="text-xs text-amber-800 mt-1">
+                    {duplicates[0].case_ref} and {duplicates[1].case_ref} appear to be the same case (same client, opponent, and type).
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => {
+                  setDuplicatePair(duplicates);
+                  setMergeDialogOpen(true);
+                }}
+                size="sm"
+                className="bg-amber-600 hover:bg-amber-700 shrink-0"
+              >
+                Merge
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Filters */}
         {view === 'list' && <Card className="mb-6">
           <CardContent className="pt-4">
@@ -371,6 +422,19 @@ export default function CaseManager() {
             ))}
           </div>
         ) : null}
+
+        {/* Duplicate Case Merger */}
+        {duplicatePair && (
+          <DuplicateCaseMerger
+            case1={duplicatePair[0]}
+            case2={duplicatePair[1]}
+            open={mergeDialogOpen}
+            onClose={() => {
+              setMergeDialogOpen(false);
+              setDuplicatePair(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );
