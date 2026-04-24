@@ -53,6 +53,7 @@ export default function RICSRulesLibrary() {
   const rulesByCategory = useMemo(() => {
     const grouped = {};
     filteredRules.forEach(rule => {
+      if (!rule.data) return;
       const category = rule.data.category;
       if (!grouped[category]) {
         grouped[category] = [];

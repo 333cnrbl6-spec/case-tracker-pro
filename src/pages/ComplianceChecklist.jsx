@@ -280,19 +280,21 @@ export default function ComplianceChecklist() {
                 <p className="text-sm text-slate-500">No rules available</p>
               ) : (
                 rules.map(rule => (
-                  <div key={rule.id} className="flex items-start gap-3 p-2 hover:bg-slate-50 rounded">
-                    <Checkbox
-                      checked={selectedRules.includes(rule.id)}
-                      onChange={() => toggleRule(rule.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">
-                        <span className="font-mono text-indigo-600">{rule.data.rule_number}</span> {rule.data.title}
-                      </p>
-                      <Badge variant="outline" className="mt-1 text-xs">{rule.data.category}</Badge>
+                  rule.data && (
+                    <div key={rule.id} className="flex items-start gap-3 p-2 hover:bg-slate-50 rounded">
+                      <Checkbox
+                        checked={selectedRules.includes(rule.id)}
+                        onChange={() => toggleRule(rule.id)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-900">
+                          <span className="font-mono text-indigo-600">{rule.data.rule_number}</span> {rule.data.title}
+                        </p>
+                        <Badge variant="outline" className="mt-1 text-xs">{rule.data.category}</Badge>
+                      </div>
                     </div>
-                  </div>
+                  )
                 ))
               )}
             </CardContent>
