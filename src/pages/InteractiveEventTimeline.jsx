@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -62,7 +62,7 @@ export default function InteractiveEventTimeline() {
   });
 
   // Combine all events
-  useMemo(() => {
+  useEffect(() => {
     const combined = [
       ...incidents.map(i => ({
         id: `incident-${i.id}`,
@@ -97,9 +97,7 @@ export default function InteractiveEventTimeline() {
     ].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     setEvents(combined);
-    if (orderedEventIds.length === 0) {
-      setOrderedEventIds(combined.map(e => e.id));
-    }
+    setOrderedEventIds(combined.map(e => e.id));
   }, [incidents, communications, evidence]);
 
   // Filter events
