@@ -24,20 +24,20 @@ const reportTypes = [
         entity: 'LegalCase'
     },
     {
-        id: 'gift_aid',
-        title: 'Gift Aid Summary',
-        description: 'Charity Commission compliance and donation declarations',
-        icon: Heart,
-        color: 'bg-pink-600 hover:bg-pink-700',
-        entity: 'Charity'
+        id: 'case_compliance',
+        title: 'Case Compliance Summary',
+        description: 'Evidence validation, audit trails, and risk assessments',
+        icon: Shield,
+        color: 'bg-green-600 hover:bg-green-700',
+        entity: 'LegalCase'
     },
     {
-        id: 'gas_safety',
-        title: 'Gas Safety Compliance',
-        description: 'Property safety certificates and landlord compliance',
-        icon: Home,
-        color: 'bg-blue-600 hover:bg-blue-700',
-        entity: 'Property'
+        id: 'incident_report',
+        title: 'Incident Analysis Report',
+        description: 'Breach patterns, severity clustering, and remediation tracking',
+        icon: AlertTriangle,
+        color: 'bg-orange-600 hover:bg-orange-700',
+        entity: 'Incident'
     }
 ];
 
