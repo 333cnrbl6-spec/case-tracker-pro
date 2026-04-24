@@ -40,7 +40,7 @@ export default function PermissionsManager() {
     return acc;
   }, {});
 
-  const usersWithRole = users.filter(u => u.data.role === selectedRole);
+  const usersWithRole = users.filter(u => u.role === selectedRole);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
@@ -118,8 +118,8 @@ export default function PermissionsManager() {
                     {usersWithRole.map(user => (
                       <div key={user.id} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 truncate">{user.data.full_name}</p>
-                          <p className="text-xs text-slate-600 truncate">{user.data.email}</p>
+                          <p className="font-medium text-slate-900 truncate">{user.full_name}</p>
+                          <p className="text-xs text-slate-600 truncate">{user.email}</p>
                         </div>
                       </div>
                     ))}
