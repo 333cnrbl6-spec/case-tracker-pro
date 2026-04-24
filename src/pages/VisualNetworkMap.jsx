@@ -6,11 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { Activity, Network, TrendingUp, Users } from 'lucide-react';
 
 const NodeTypeColors = {
-  case: '#3B82F6',
+  case: '#0EA5E9',
   client: '#10B981',
-  opponent: '#EF4444',
-  incident: '#F59E0B',
-  surveyor: '#8B5CF6',
+  opponent: '#DC2626',
+  incident: '#F97316',
+  surveyor: '#A855F7',
   party: '#6B7280',
 };
 
@@ -108,12 +108,12 @@ export default function VisualNetworkMap() {
 
     // Draw function
     const draw = () => {
-      ctx.fillStyle = '#f8fafc';
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw edges
-      ctx.strokeStyle = '#cbd5e1';
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 2;
       edges.forEach((edge) => {
         const source = nodes.find((n) => n.id === edge.source);
         const target = nodes.find((n) => n.id === edge.target);
@@ -142,11 +142,11 @@ export default function VisualNetworkMap() {
 
         // Label
         if (isSelected || node.size > 6) {
-          ctx.fillStyle = '#334155';
-          ctx.font = 'bold 12px sans-serif';
+          ctx.fillStyle = '#000000';
+          ctx.font = 'bold 13px sans-serif';
           ctx.textAlign = 'center';
           ctx.globalAlpha = 1;
-          ctx.fillText(node.label.substring(0, 12), node.x, node.y + node.size + 13);
+          ctx.fillText(node.label.substring(0, 12), node.x, node.y + node.size + 14);
         }
       });
 
@@ -244,7 +244,7 @@ export default function VisualNetworkMap() {
         <CardContent className="h-full p-0">
           <canvas
             ref={canvasRef}
-            className="w-full h-full bg-slate-50 dark:bg-slate-800 rounded-lg cursor-pointer"
+            className="w-full h-full bg-white dark:bg-slate-900 rounded-lg cursor-pointer"
             style={{ display: 'block' }}
           />
         </CardContent>
