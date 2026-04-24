@@ -257,13 +257,23 @@ export default function BatchExportBuilder() {
 
         {/* Evidence Selector */}
         <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <FileText className="w-5 h-5" /> Select Evidence Items
-              </span>
-              <Badge variant="outline">{selectedEvidenceIds.length} selected</Badge>
+          <CardHeader className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" /> Select Evidence Items
             </CardTitle>
+            <div className="flex items-center gap-3">
+              <Badge variant="outline">{selectedEvidenceIds.length} selected</Badge>
+              {evidence.length > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedEvidenceIds(selectedEvidenceIds.length === evidence.length ? [] : evidence.map(e => e.id))}
+                  className="text-xs h-7"
+                >
+                  {selectedEvidenceIds.length === evidence.length ? 'Deselect All' : 'Select All'}
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             {evidence.length === 0 ? (
