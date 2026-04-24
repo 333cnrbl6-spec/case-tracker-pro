@@ -52,6 +52,7 @@ import WitnessPortal from '@/pages/WitnessPortal';
 import CaseTimeline from '@/pages/CaseTimeline';
 import DisclosureBundleBuilder from '@/pages/DisclosureBundleBuilder';
 import CostScheduleAnalysis from '@/pages/CostScheduleAnalysis';
+import FinancialLossSummary from '@/pages/FinancialLossSummary';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -128,6 +129,7 @@ const AuthenticatedApp = () => {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/disclosure-bundle" element={<DisclosureBundleBuilder />} />
       <Route path="/cost-schedules" element={<CostScheduleAnalysis />} />
+      <Route path="/financial-loss" element={<FinancialLossSummary />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

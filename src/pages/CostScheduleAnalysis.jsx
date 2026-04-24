@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, TrendingDown, FileSpreadsheet, AlertTriangle, PoundSterling, RefreshCw } from 'lucide-react';
+import { ArrowLeft, TrendingDown, FileSpreadsheet, AlertTriangle, PoundSterling, RefreshCw, BarChart2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CostScheduleDropZone from '@/components/CostScheduleDropZone';
 
@@ -105,9 +105,16 @@ export default function CostScheduleAnalysis() {
               <h1 className="text-2xl font-bold text-slate-900">Cost Schedule Analysis</h1>
               <p className="text-slate-600 mt-1">Tracking Bradley's agreed rates vs surveyor downvaluations across all properties</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => refetch()}>
-              <RefreshCw className="w-4 h-4 mr-2" /> Refresh
-            </Button>
+            <div className="flex gap-2">
+              <Link to="/financial-loss">
+                <Button size="sm" className="gap-2 bg-red-700 hover:bg-red-800 text-white">
+                  <BarChart2 className="w-4 h-4" /> Financial Loss Summary
+                </Button>
+              </Link>
+              <Button variant="outline" size="sm" onClick={() => refetch()}>
+                <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+              </Button>
+            </div>
           </div>
         </div>
 
