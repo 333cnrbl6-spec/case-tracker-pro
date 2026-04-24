@@ -29,6 +29,7 @@ import EvidenceValidator from '@/pages/EvidenceValidator';
 import IncidentTaskManager from '@/pages/IncidentTaskManager';
 import CaseManager from '@/pages/CaseManager';
 import CaseNarrativeBuilder from '@/pages/CaseNarrativeBuilder';
+import CaseWeaknessRebuttal from '@/pages/CaseWeaknessRebuttal';
 import ComplianceAlerts from '@/pages/ComplianceAlerts';
 import PracticeAnalytics from '@/pages/PracticeAnalytics';
 import OnboardingWizard from '@/pages/OnboardingWizard';
@@ -106,6 +107,7 @@ const AuthenticatedApp = () => {
       <Route path="/incident-tasks" element={<IncidentTaskManager />} />
       <Route path="/case-manager" element={<CaseManager />} />
       <Route path="/case-narrative-builder" element={<CaseNarrativeBuilder />} />
+      <Route path="/case-weakness-rebuttal" element={<CaseWeaknessRebuttal />} />
       <Route path="/compliance-alerts" element={<ComplianceAlerts />} />
       <Route path="/practice-analytics" element={<PracticeAnalytics />} />
       <Route path="/onboarding" element={<OnboardingWizard />} />
