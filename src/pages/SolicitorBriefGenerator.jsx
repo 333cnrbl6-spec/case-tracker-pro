@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, FileText, Download, Eye } from 'lucide-react';
+import { Loader2, FileText, Download, Eye, CheckSquare } from 'lucide-react';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
 
 export default function SolicitorBriefGenerator() {
   const [selectedIncidents, setSelectedIncidents] = useState([]);
@@ -60,16 +61,97 @@ export default function SolicitorBriefGenerator() {
   const downloadBrief = () => {
     if (!briefData) return;
 
-    const htmlContent = generateHTML(briefData);
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Solicitor_Brief_${new Date().toISOString().split('T')[0]}.html`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    try {
+      const doc = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 15;
+      const lineHeight = 7;
+      let yPos = margin;
+
+      const addText = (text, fontSize = 11, isBold = false) => {
+        doc.setFontSize(fontSize);
+        doc.setFont(undefined, isBold ? 'bold' : 'normal');
+        const lines = doc.splitTextToSize(text, pageWidth - margin * 2);
+        
+        if (yPos + lines.length * lineHeight > pageHeight - margin) {
+          doc.addPage();
+          yPos = margin;
+        }
+        
+        doc.text(lines, margin, yPos);
+        yPos += lines.length * lineHeight + 3;
+      };
+
+      // Header
+      doc.setFontSize(16);
+      doc.setFont(undefined, 'bold');
+      doc.text('SOLICITOR BRIEF', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 10;
+      
+      doc.setFontSize(10);
+      doc.setFont(undefined, 'normal');
+      doc.text(`Generated: ${new Date().toISOString().split('T')[0]}`, pageWidth / 2, yPos, { align: 'center' });
+      doc.text('CONFIDENTIAL - PRIVILEGED AND WITHOUT PREJUDICE', pageWidth / 2, yPos + 5, { align: 'center' });
+      yPos += 15;
+
+      // Executive Summary
+      addText('Executive Summary', 13, true);
+      addText(briefData.executive_summary, 11, false);
+      yPos += 5;
+
+      // Factual Background
+      addText('Factual Background', 13, true);
+      addText(briefData.factual_background, 11, false);
+      yPos += 5;
+
+      // Claims
+      if (briefData.claims?.length > 0) {
+        addText('Identified Legal Claims', 13, true);
+        briefData.claims.forEach(claim => {
+          addText(claim.claim_type, 12, true);
+          addText(claim.basis, 11, false);
+          addText(`Elements: ${claim.elements?.join(', ')}`, 10, false);
+          yPos += 2;
+        });
+      }
+
+      // Evidence
+      addText('Evidence Strength Assessment', 13, true);
+      addText(`Overall Strength: ${briefData.evidence_strength}`, 11, true);
+      addText(briefData.evidence_analysis, 11, false);
+      if (briefData.evidence_gaps?.length > 0) {
+        addText('Evidence Gaps:', 11, true);
+        briefData.evidence_gaps.forEach(gap => addText(`• ${gap}`, 10, false));
+      }
+      yPos += 5;
+
+      // Damages
+      if (briefData.damages_categories?.length > 0) {
+        addText('Damages Estimation', 13, true);
+        briefData.damages_categories.forEach(cat => {
+          addText(`${cat.type}: ${cat.estimated_range}`, 11, true);
+          addText(cat.description, 10, false);
+        });
+        addText(`Total Estimated Range: ${briefData.total_damages_range}`, 11, true);
+      }
+      yPos += 5;
+
+      // Strategy
+      addText('Recommended Litigation Strategy', 13, true);
+      addText('Phase 1: Pre-Litigation', 12, true);
+      addText(briefData.strategy_phase1, 11, false);
+      addText('Phase 2: Litigation', 12, true);
+      addText(briefData.strategy_phase2, 11, false);
+      addText('Risk Assessment', 12, true);
+      addText(briefData.risk_assessment, 11, false);
+
+      doc.save(`Solicitor_Brief_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success('Brief downloaded as PDF');
+    } catch (error) {
+      toast.error('Failed to generate PDF');
+      console.error(error);
+    }
   };
 
   const toggleIncident = (id) => {
@@ -90,6 +172,30 @@ export default function SolicitorBriefGenerator() {
     );
   };
 
+  const selectAllIncidents = () => {
+    setSelectedIncidents(incidents.map(i => i.id));
+  };
+
+  const deselectAllIncidents = () => {
+    setSelectedIncidents([]);
+  };
+
+  const selectAllComms = () => {
+    setSelectedComms(communications.map(c => c.id));
+  };
+
+  const deselectAllComms = () => {
+    setSelectedComms([]);
+  };
+
+  const selectAllEvidence = () => {
+    setSelectedEvidence(evidence.map(e => e.id));
+  };
+
+  const deselectAllEvidence = () => {
+    setSelectedEvidence([]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-8">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -106,7 +212,23 @@ export default function SolicitorBriefGenerator() {
               {/* Incidents Selection */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Select Incidents ({selectedIncidents.length})</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">Select Incidents ({selectedIncidents.length})</CardTitle>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={selectAllIncidents}
+                        className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={deselectAllIncidents}
+                        className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                      >
+                        None
+                      </button>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                   {incidents.length === 0 ? (
@@ -132,7 +254,23 @@ export default function SolicitorBriefGenerator() {
               {/* Communications Selection */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Select Communications ({selectedComms.length})</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">Select Communications ({selectedComms.length})</CardTitle>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={selectAllComms}
+                        className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={deselectAllComms}
+                        className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                      >
+                        None
+                      </button>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                   {communications.length === 0 ? (
@@ -158,7 +296,23 @@ export default function SolicitorBriefGenerator() {
               {/* Evidence Selection */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Select Evidence ({selectedEvidence.length})</CardTitle>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base">Select Evidence ({selectedEvidence.length})</CardTitle>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={selectAllEvidence}
+                        className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                      >
+                        All
+                      </button>
+                      <button
+                        onClick={deselectAllEvidence}
+                        className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                      >
+                        None
+                      </button>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                   {evidence.length === 0 ? (
@@ -381,94 +535,4 @@ function BriefPreview({ brief }) {
       </div>
     </div>
   );
-}
-
-function generateHTML(brief) {
-  const date = new Date().toISOString().split('T')[0];
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Solicitor Brief</title>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; }
-    h1 { color: #1a202c; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    h2 { color: #2d3748; margin-top: 30px; }
-    h3 { color: #4a5568; }
-    .header { text-align: center; margin-bottom: 40px; }
-    .section { margin-bottom: 30px; page-break-inside: avoid; }
-    .claim { border-left: 4px solid #4f46e5; padding-left: 15px; margin-bottom: 15px; }
-    .evidence-gap { background: #fef3c7; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    .damages { background: #f3f4f6; padding: 10px; border-radius: 5px; margin: 10px 0; }
-    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #999; font-size: 12px; color: #666; }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <h1>SOLICITOR BRIEF</h1>
-    <p>Generated: ${date}</p>
-    <p>CONFIDENTIAL - PRIVILEGED AND WITHOUT PREJUDICE</p>
-  </div>
-
-  <div class="section">
-    <h2>Executive Summary</h2>
-    <p>${brief.executive_summary.replace(/\n/g, '<br>')}</p>
-  </div>
-
-  <div class="section">
-    <h2>Factual Background</h2>
-    <p>${brief.factual_background.replace(/\n/g, '<br>')}</p>
-  </div>
-
-  <div class="section">
-    <h2>Identified Legal Claims</h2>
-    ${brief.claims?.map(claim => `
-      <div class="claim">
-        <h3>${claim.claim_type}</h3>
-        <p>${claim.basis}</p>
-        <p><strong>Elements:</strong> ${claim.elements?.join(', ')}</p>
-      </div>
-    `).join('')}
-  </div>
-
-  <div class="section">
-    <h2>Evidence Strength Assessment</h2>
-    <p><strong>Overall Strength:</strong> ${brief.evidence_strength}</p>
-    <p>${brief.evidence_analysis.replace(/\n/g, '<br>')}</p>
-    ${brief.evidence_gaps?.length > 0 ? `
-      <div class="evidence-gap">
-        <strong>Evidence Gaps:</strong>
-        <ul>${brief.evidence_gaps.map(gap => `<li>${gap}</li>`).join('')}</ul>
-      </div>
-    ` : ''}
-  </div>
-
-  <div class="section">
-    <h2>Damages Estimation</h2>
-    ${brief.damages_categories?.map(cat => `
-      <div class="damages">
-        <strong>${cat.type}:</strong> ${cat.estimated_range}<br>
-        ${cat.description}
-      </div>
-    `).join('')}
-    <p><strong>Total Estimated Range:</strong> ${brief.total_damages_range}</p>
-  </div>
-
-  <div class="section">
-    <h2>Recommended Litigation Strategy</h2>
-    <h3>Phase 1: Pre-Litigation</h3>
-    <p>${brief.strategy_phase1.replace(/\n/g, '<br>')}</p>
-    <h3>Phase 2: Litigation</h3>
-    <p>${brief.strategy_phase2.replace(/\n/g, '<br>')}</p>
-    <h3>Risk Assessment</h3>
-    <p>${brief.risk_assessment.replace(/\n/g, '<br>')}</p>
-  </div>
-
-  <div class="footer">
-    <p>This brief is generated for legal assessment purposes. Professional legal advice should be obtained before proceeding.</p>
-  </div>
-</body>
-</html>
-  `;
 }
