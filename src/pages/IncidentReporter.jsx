@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { FileText, Download, AlertCircle, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function IncidentReporter() {
   const [selectedIncident, setSelectedIncident] = useState(null);
@@ -42,7 +43,7 @@ export default function IncidentReporter() {
     mutationFn: async (incidentId) => {
       setGeneratingId(incidentId);
       const response = await base44.functions.invoke('generateIncidentReport', {
-        incidentId
+        incident_id: incidentId
       });
       return response.data;
     },
@@ -50,19 +51,32 @@ export default function IncidentReporter() {
       const incident = incidents.find(i => i.id === incidentId);
       const filename = `Incident_Report_${incident?.title.substring(0, 30).replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
       
-      const blob = new Blob([data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      if (!data) {
+        toast.error('Failed to generate report: Empty response');
+        setGeneratingId(null);
+        return;
+      }
+
+      try {
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        toast.success('Report generated and downloaded successfully');
+      } catch (err) {
+        toast.error('Failed to download report: ' + err.message);
+      }
 
       setGeneratingId(null);
     },
-    onError: () => {
+    onError: (error) => {
+      toast.error('Failed to generate report: ' + (error.response?.data?.error || error.message));
       setGeneratingId(null);
     }
   });
