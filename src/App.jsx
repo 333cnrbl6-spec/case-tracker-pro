@@ -55,6 +55,7 @@ import DisclosureBundleBuilder from '@/pages/DisclosureBundleBuilder';
 import CostScheduleAnalysis from '@/pages/CostScheduleAnalysis';
 import FinancialLossSummary from '@/pages/FinancialLossSummary';
 import BatchExportBuilder from '@/pages/BatchExportBuilder';
+import CaseRiskDashboard from '@/pages/CaseRiskDashboard';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -133,6 +134,7 @@ const AuthenticatedApp = () => {
       <Route path="/cost-schedules" element={<CostScheduleAnalysis />} />
       <Route path="/financial-loss" element={<FinancialLossSummary />} />
       <Route path="/batch-export" element={<BatchExportBuilder />} />
+      <Route path="/case-risk-dashboard" element={<CaseRiskDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

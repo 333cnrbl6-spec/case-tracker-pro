@@ -58,6 +58,7 @@ const NAV_GROUPS = [
     items: [
       { path: '/case-manager', icon: Layers, label: 'Case Manager' },
       { path: '/case-overview', icon: LayoutDashboard, label: 'Case Overview' },
+      { path: '/case-risk-dashboard', icon: TrendingUp, label: 'Risk Dashboard' },
       { path: '/incident-tasks', icon: ClipboardList, label: 'Task Manager' },
       { path: '/incident-reporter', icon: AlertTriangle, label: 'Incident Reporter' },
       { path: '/communication-mapper', icon: Map, label: 'Comm. Mapper' },
