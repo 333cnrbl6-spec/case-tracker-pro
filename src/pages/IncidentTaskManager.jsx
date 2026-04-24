@@ -58,23 +58,23 @@ export default function IncidentTaskManager() {
   });
 
   const incidentTasks = selectedIncident
-    ? tasks.filter(t => t.data.incident_id === selectedIncident.id)
+    ? tasks.filter(t => t.incident_id === selectedIncident.id)
     : [];
 
   const filteredTasks = incidentTasks.filter(task => {
-    if (filterStatus && task.data.status !== filterStatus) return false;
-    if (filterPriority && task.data.priority !== filterPriority) return false;
+    if (filterStatus && task.status !== filterStatus) return false;
+    if (filterPriority && task.priority !== filterPriority) return false;
     return true;
   });
 
   const overdueTasks = filteredTasks.filter(t => {
-    if (t.data.deadline && new Date(t.data.deadline) < new Date()) {
-      return !['completed', 'blocked'].includes(t.data.status);
+    if (t.deadline && new Date(t.deadline) < new Date()) {
+      return !['completed', 'blocked'].includes(t.status);
     }
     return false;
   });
 
-  const completedCount = incidentTasks.filter(t => t.data.status === 'completed').length;
+  const completedCount = incidentTasks.filter(t => t.status === 'completed').length;
   const progressPercent = incidentTasks.length > 0 ? Math.round((completedCount / incidentTasks.length) * 100) : 0;
 
   if (!selectedIncident) {
@@ -88,11 +88,11 @@ export default function IncidentTaskManager() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {incidents.map(incident => {
-              const incidentTasks = tasks.filter(t => t.data.incident_id === incident.id);
-              const completedTasks = incidentTasks.filter(t => t.data.status === 'completed').length;
+              const incidentTasks = tasks.filter(t => t.incident_id === incident.id);
+              const completedTasks = incidentTasks.filter(t => t.status === 'completed').length;
               const overdue = incidentTasks.filter(t => {
-                if (t.data.deadline && new Date(t.data.deadline) < new Date()) {
-                  return !['completed', 'blocked'].includes(t.data.status);
+                if (t.deadline && new Date(t.deadline) < new Date()) {
+                  return !['completed', 'blocked'].includes(t.status);
                 }
                 return false;
               }).length;
@@ -104,7 +104,7 @@ export default function IncidentTaskManager() {
                   onClick={() => setSelectedIncident(incident)}
                 >
                   <CardHeader>
-                    <CardTitle className="text-base line-clamp-2">{incident.data.title}</CardTitle>
+                    <CardTitle className="text-base line-clamp-2">{incident.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
@@ -138,8 +138,8 @@ export default function IncidentTaskManager() {
                       )}
                     </div>
 
-                    <Badge className={STATUS_COLORS[incident.data.status] || 'bg-slate-100'}>
-                      {incident.data.status || 'open'}
+                    <Badge className={STATUS_COLORS[incident.status] || 'bg-slate-100'}>
+                      {incident.status || 'open'}
                     </Badge>
                   </CardContent>
                 </Card>
@@ -160,7 +160,7 @@ export default function IncidentTaskManager() {
             <Button variant="ghost" size="sm" onClick={() => setSelectedIncident(null)} className="mb-2">
               ← Back to Incidents
             </Button>
-            <h1 className="text-3xl font-bold text-slate-900">{selectedIncident.data.title}</h1>
+            <h1 className="text-3xl font-bold text-slate-900">{selectedIncident.title}</h1>
             <p className="text-slate-600 mt-1">Manage tasks and track resolution progress</p>
           </div>
           <Button onClick={() => setShowForm(true)} className="gap-2">
