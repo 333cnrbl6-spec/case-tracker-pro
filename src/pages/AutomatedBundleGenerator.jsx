@@ -140,9 +140,13 @@ export default function AutomatedBundleGenerator() {
       });
 
       if (response.data) {
-        // Convert response to blob and download
+        // Handle both ArrayBuffer and Blob responses
+        const pdfData = response.data instanceof ArrayBuffer 
+          ? response.data 
+          : await response.data.arrayBuffer();
+        
         const fileName = `Bundle_${selectedCase?.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`;
-        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const blob = new Blob([pdfData], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
