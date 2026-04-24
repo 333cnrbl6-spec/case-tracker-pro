@@ -16,6 +16,7 @@ export default function CaseNarrativeBuilder() {
   const queryClient = useQueryClient();
   const [narrative, setNarrative] = useState(null);
   const [showPDFPanel, setShowPDFPanel] = useState(false);
+  const [isGeneratingBrief, setIsGeneratingBrief] = useState(false);
 
   const { data: cases = [] } = useQuery({
     queryKey: ['legal-cases'],
@@ -43,6 +44,33 @@ export default function CaseNarrativeBuilder() {
     },
     onError: (e) => toast.error(e.message)
   });
+
+  const downloadBriefPDF = async () => {
+    if (!narrative) return;
+    try {
+      setIsGeneratingBrief(true);
+      const response = await base44.functions.invoke('generateLegalBriefPDF', { 
+        case_id: caseId,
+        narrative 
+      });
+      
+      // Create download link
+      const blob = new Blob([JSON.stringify(response.data)], { type: 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Legal-Brief-${legalCase?.case_ref || 'case'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success('Legal brief PDF downloaded');
+    } catch (e) {
+      toast.error(e.message || 'Failed to generate PDF');
+    } finally {
+      setIsGeneratingBrief(false);
+    }
+  };
 
   if (!caseId) {
     return (
@@ -75,6 +103,20 @@ export default function CaseNarrativeBuilder() {
             >
               <Download className="w-4 h-4" /> Export PDF
             </Button>
+            {narrative && (
+              <Button
+                size="sm"
+                onClick={downloadBriefPDF}
+                disabled={isGeneratingBrief}
+                className="bg-amber-600 hover:bg-amber-700 gap-1"
+              >
+                {isGeneratingBrief ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Generating Brief...</>
+                ) : (
+                  <><FileText className="w-4 h-4" /> Download Legal Brief PDF</>
+                )}
+              </Button>
+            )}
             <Button
               size="sm"
               onClick={() => generateMutation.mutate()}
