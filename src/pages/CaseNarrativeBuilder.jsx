@@ -126,18 +126,28 @@ export default function CaseNarrativeBuilder() {
               <Download className="w-4 h-4" /> Export PDF
             </Button>
             {narrative && (
-              <Button
-                size="sm"
-                onClick={downloadBriefPDF}
-                disabled={isGeneratingBrief}
-                className="bg-amber-600 hover:bg-amber-700 gap-1"
-              >
-                {isGeneratingBrief ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Generating Brief...</>
-                ) : (
-                  <><FileText className="w-4 h-4" /> Download Legal Brief PDF</>
-                )}
-              </Button>
+              <>
+                <Link to={`/case-weakness-rebuttal?case_id=${caseId}`}>
+                  <Button
+                    size="sm"
+                    className="bg-orange-600 hover:bg-orange-700 gap-1"
+                  >
+                    <AlertTriangle className="w-4 h-4" /> Address Weaknesses
+                  </Button>
+                </Link>
+                <Button
+                  size="sm"
+                  onClick={downloadBriefPDF}
+                  disabled={isGeneratingBrief}
+                  className="bg-amber-600 hover:bg-amber-700 gap-1"
+                >
+                  {isGeneratingBrief ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Generating Brief...</>
+                  ) : (
+                    <><FileText className="w-4 h-4" /> Download Legal Brief PDF</>
+                  )}
+                </Button>
+              </>
             )}
             <Button
               size="sm"
