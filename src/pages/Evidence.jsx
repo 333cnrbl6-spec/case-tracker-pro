@@ -24,6 +24,7 @@ import AnnotationPanel from '../components/AnnotationPanel';
 import EvidenceIncidentSuggestions from '../components/EvidenceIncidentSuggestions';
 import EvidenceRuleCorrelations from '../components/EvidenceRuleCorrelations';
 import EvidenceSummary from '../components/EvidenceSummary';
+import EvidenceCommLinker from '@/components/EvidenceCommLinker';
 import OCRContradictionModule from '../components/OCRContradictionModule';
 import DocumentViewer from '@/components/DocumentViewer';
 import AnnotationManager from '@/components/AnnotationManager';
@@ -441,6 +442,8 @@ ${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} â€
                       evidence={item}
                       rules={rules}
                     />
+
+                    <EvidenceCommLinker evidence={item} />
                   </div>
                 </CardContent>
               </Card>
