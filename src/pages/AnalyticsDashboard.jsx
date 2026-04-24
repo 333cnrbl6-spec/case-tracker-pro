@@ -81,7 +81,7 @@ export default function AnalyticsDashboard() {
     topRisks
   } = analytics;
 
-  const riskPercentages = ricsViolationFrequency.map(item => ({
+  const riskPercentages = (ricsViolationFrequency || []).map(item => ({
     ...item,
     percentage: Math.round((item.count / incidentCount) * 100)
   }));
@@ -215,7 +215,7 @@ export default function AnalyticsDashboard() {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {severityDistribution.map((entry, index) => (
+                    {(severityDistribution || []).map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -273,7 +273,7 @@ export default function AnalyticsDashboard() {
               <CardTitle className="text-base">Top Risk Areas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {topRisks.map((risk, idx) => (
+               {(topRisks || []).map((risk, idx) => (
                 <div key={idx} className="flex justify-between items-start p-3 bg-slate-50 rounded border border-slate-200">
                   <div>
                     <p className="font-semibold text-slate-900 text-sm">{risk.issue}</p>
@@ -293,7 +293,7 @@ export default function AnalyticsDashboard() {
               <CardTitle className="text-base">Compliance Gaps</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {complianceGaps.map((gap, idx) => (
+               {(complianceGaps || []).map((gap, idx) => (
                 <div key={idx} className="flex justify-between items-start p-3 bg-amber-50 rounded border border-amber-200">
                   <div>
                     <p className="font-semibold text-slate-900 text-sm">{gap.gap}</p>
