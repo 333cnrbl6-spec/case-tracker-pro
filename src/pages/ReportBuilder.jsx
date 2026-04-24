@@ -159,10 +159,20 @@ export default function ReportBuilder() {
           <div className="col-span-2 space-y-6">
             {/* Incidents */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex items-center justify-between">
                 <CardTitle className="text-base">
                   Incidents ({selectedIncidents.length}/{incidents.length})
                 </CardTitle>
+                {incidents.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedIncidents(selectedIncidents.length === incidents.length ? [] : incidents.map(i => i.id))}
+                    className="text-xs h-7"
+                  >
+                    {selectedIncidents.length === incidents.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-80 overflow-y-auto">
@@ -193,10 +203,20 @@ export default function ReportBuilder() {
 
             {/* Communications */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex items-center justify-between">
                 <CardTitle className="text-base">
                   Communications ({selectedCommunications.length}/{communications.length})
                 </CardTitle>
+                {communications.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedCommunications(selectedCommunications.length === communications.length ? [] : communications.map(c => c.id))}
+                    className="text-xs h-7"
+                  >
+                    {selectedCommunications.length === communications.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -224,10 +244,20 @@ export default function ReportBuilder() {
 
             {/* Evidence */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex items-center justify-between">
                 <CardTitle className="text-base">
                   Evidence ({selectedEvidence.length}/{evidence.length})
                 </CardTitle>
+                {evidence.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedEvidence(selectedEvidence.length === evidence.length ? [] : evidence.map(e => e.id))}
+                    className="text-xs h-7"
+                  >
+                    {selectedEvidence.length === evidence.length ? 'Deselect All' : 'Select All'}
+                  </Button>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
