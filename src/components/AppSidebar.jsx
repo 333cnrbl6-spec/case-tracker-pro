@@ -5,7 +5,7 @@ import {
   Scale, BookOpen, Network, ClipboardList, BarChart2, Bell,
   CheckSquare, FileSearch, ChevronDown, ChevronRight, X, Menu,
   Gavel, Map, Activity, Clock, Users, Settings, TrendingUp,
-  Layers, Search, FileBarChart, ShieldCheck
+  Layers, Search, FileBarChart, ShieldCheck, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +22,7 @@ const NAV_GROUPS = [
     label: 'Case Evidence',
     items: [
       { path: '/incidents', icon: AlertTriangle, label: 'Incidents' },
+      { path: '/breach-discovery', icon: Sparkles, label: 'Breach Discovery' },
       { path: '/communications', icon: MessageSquare, label: 'Communications' },
       { path: '/evidence', icon: FileText, label: 'Evidence' },
       { path: '/scanner', icon: FileSearch, label: 'Evidence Scanner' },
