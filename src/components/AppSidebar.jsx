@@ -80,6 +80,7 @@ const NAV_GROUPS = [
     label: 'System',
     items: [
       { path: '/compliance-alerts', icon: Bell, label: 'Compliance Alerts' },
+      { path: '/entity-database', icon: Users, label: 'Entity Database' },
       { path: '/permissions', icon: Settings, label: 'Permissions' },
       { path: '/onboarding', icon: CheckSquare, label: 'Setup & Onboarding' },
     ],

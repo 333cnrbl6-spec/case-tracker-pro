@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
 import CaseTimeline from '@/components/CaseTimeline';
 import DuplicateCaseMerger from '@/components/DuplicateCaseMerger';
+import EntityConflictAlert from '@/components/EntityConflictAlert';
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-800',
@@ -195,8 +196,15 @@ export default function CaseManager() {
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>{editingId ? 'Edit Case' : 'New Case'}</DialogTitle>
+                   <DialogTitle>{editingId ? 'Edit Case' : 'New Case'}</DialogTitle>
                 </DialogHeader>
+                {!editingId && (formData.client_name || formData.opponent_name) && (
+                  <EntityConflictAlert 
+                    clientName={formData.client_name}
+                    opponentName={formData.opponent_name}
+                    caseRef={formData.case_ref}
+                  />
+                )}
                 <form onSubmit={handleSubmit} className="space-y-4 mt-2">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
