@@ -1,8 +1,8 @@
 import React from 'react';
 import { base44 } from '@/api/base44Client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Loader2, Download, ArrowLeft } from 'lucide-react';
+import { Loader2, Download, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import NarrativeHeader from '@/components/narrative/NarrativeHeader';
 import ChronologicalNarrative from '@/components/narrative/ChronologicalNarrative';
@@ -11,6 +11,14 @@ import UndefinedEntities from '@/components/narrative/UndefinedEntities';
 import NarrativeQueryResolver from '@/components/narrative/NarrativeQueryResolver';
 
 export default function CaseNarrative() {
+  const queryClient = useQueryClient();
+
+  const handleRefresh = () => {
+    queryClient.invalidateQueries({ queryKey: ['incidents'] });
+    queryClient.invalidateQueries({ queryKey: ['communications'] });
+    queryClient.invalidateQueries({ queryKey: ['evidence'] });
+  };
+
   const { data: incidents = [], isLoading: loadingInc } = useQuery({
     queryKey: ['incidents'],
     queryFn: () => base44.entities.Incident.list('-date'),
@@ -47,13 +55,22 @@ export default function CaseNarrative() {
           <Link to="/" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4" /> Back to Dashboard
           </Link>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => window.print()}
-          >
-            <Download className="w-4 h-4 mr-2" /> Print / Export
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.print()}
+            >
+              <Download className="w-4 h-4 mr-2" /> Print / Export
+            </Button>
+          </div>
         </div>
       </div>
 
