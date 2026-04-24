@@ -4,15 +4,17 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Network, AlertTriangle, FileText, MessageSquare, User, Zap, RefreshCw } from 'lucide-react';
+import { Network, AlertTriangle, FileText, MessageSquare, User, Zap, RefreshCw, GitCommit } from 'lucide-react';
 import NetworkGraph from '@/components/NetworkGraph';
+import ConspiracyView from '@/components/ConspiracyView';
 import { buildGraphData } from '@/lib/forceGraph';
 
 const LEGEND = [
+  { type: 'key_entity', color: 'bg-slate-800 ring-2 ring-white', label: 'Key Party (Belcher / Powell / Bradley…)', letter: '★' },
   { type: 'incident', color: 'bg-red-500', label: 'Incident', letter: 'I' },
   { type: 'evidence', color: 'bg-blue-500', label: 'Evidence', letter: 'E' },
   { type: 'communication', color: 'bg-purple-500', label: 'Communication', letter: 'C' },
-  { type: 'person', color: 'bg-amber-500', label: 'Individual', letter: 'P' },
+  { type: 'person', color: 'bg-amber-500', label: 'Other Individual', letter: 'P' },
 ];
 
 const LINK_LEGEND = [
@@ -26,6 +28,7 @@ export default function NetworkMap() {
   const [graphKey, setGraphKey] = useState(0);
   const [dimensions, setDimensions] = useState({ width: 900, height: 620 });
   const [filterType, setFilterType] = useState('all');
+  const [viewMode, setViewMode] = useState('network'); // 'network' | 'conspiracy'
 
   const { data: incidents = [] } = useQuery({ queryKey: ['incidents'], queryFn: () => base44.entities.Incident.list() });
   const { data: communications = [] } = useQuery({ queryKey: ['communications'], queryFn: () => base44.entities.Communication.list() });
@@ -79,10 +82,7 @@ export default function NetworkMap() {
             </div>
             <p className="text-slate-400 text-sm">Visual interconnection map of incidents, evidence, communications, and individuals</p>
           </div>
-          <Button variant="outline" size="sm" className="gap-2 border-slate-600 text-slate-300 hover:bg-slate-700"
-            onClick={() => setGraphKey(k => k + 1)}>
-            <RefreshCw className="w-4 h-4" /> Re-layout
-          </Button>
+
         </div>
 
         {/* Stats */}
@@ -106,33 +106,54 @@ export default function NetworkMap() {
           ))}
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex gap-2 flex-wrap">
-          {[
-            { value: 'all', label: 'All' },
-            { value: 'incident', label: 'Incidents' },
-            { value: 'evidence', label: 'Evidence' },
-            { value: 'communication', label: 'Communications' },
-          ].map(f => (
-            <button
-              key={f.value}
-              onClick={() => { setFilterType(f.value); setGraphKey(k => k + 1); }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                filterType === f.value
-                  ? 'bg-white text-slate-900'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-          <span className="ml-auto text-xs text-slate-500 self-center">{nodes.length} nodes · {links.length} connections</span>
+        {/* View mode toggle */}
+        <div className="flex gap-2 flex-wrap items-center">
+          <button
+            onClick={() => setViewMode('network')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'network' ? 'bg-white text-slate-900' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+          >
+            <Network className="w-4 h-4" /> Full Network
+          </button>
+          <button
+            onClick={() => setViewMode('conspiracy')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${viewMode === 'conspiracy' ? 'bg-red-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-red-800/60'}`}
+          >
+            <GitCommit className="w-4 h-4" /> Conspiracy / Influence Map
+          </button>
+          {viewMode === 'network' && (
+            <>
+              <div className="w-px h-6 bg-slate-600 mx-1" />
+              {[
+                { value: 'all', label: 'All' },
+                { value: 'incident', label: 'Incidents' },
+                { value: 'evidence', label: 'Evidence' },
+                { value: 'communication', label: 'Communications' },
+              ].map(f => (
+                <button
+                  key={f.value}
+                  onClick={() => { setFilterType(f.value); setGraphKey(k => k + 1); }}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${filterType === f.value ? 'bg-indigo-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+                >
+                  {f.label}
+                </button>
+              ))}
+              <span className="ml-auto text-xs text-slate-500 self-center">{nodes.length} nodes · {links.length} connections</span>
+              <Button variant="outline" size="sm" className="gap-2 border-slate-600 text-slate-300 hover:bg-slate-700 ml-2"
+                onClick={() => setGraphKey(k => k + 1)}>
+                <RefreshCw className="w-4 h-4" /> Re-layout
+              </Button>
+            </>
+          )}
         </div>
 
-        {/* Graph canvas */}
-        <div ref={containerRef} className="w-full rounded-2xl overflow-hidden border border-slate-700">
-          <NetworkGraph key={graphKey} nodes={nodes} links={links} width={dimensions.width} height={dimensions.height} />
-        </div>
+        {viewMode === 'conspiracy' ? (
+          <ConspiracyView communications={communications} incidents={incidents} />
+        ) : (
+          /* Graph canvas */
+          <div ref={containerRef} className="w-full rounded-2xl overflow-hidden border border-slate-700">
+            <NetworkGraph key={graphKey} nodes={nodes} links={links} width={dimensions.width} height={dimensions.height} />
+          </div>
+        )}
 
         {/* Legend */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

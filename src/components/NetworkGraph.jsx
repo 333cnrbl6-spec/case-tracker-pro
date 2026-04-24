@@ -7,6 +7,7 @@ const NODE_STYLE = {
   evidence: { fill: '#3b82f6', stroke: '#1d4ed8', r: 18, textColor: '#fff' },
   communication: { fill: '#a855f7', stroke: '#7e22ce', r: 18, textColor: '#fff' },
   person: { fill: '#f59e0b', stroke: '#d97706', r: 16, textColor: '#fff' },
+  key_entity: { fill: '#1e293b', stroke: '#f8fafc', r: 28, textColor: '#f8fafc' },
 };
 
 const SEVERITY_RING = { critical: '#dc2626', high: '#ea580c', medium: '#d97706', low: '#16a34a' };
@@ -174,14 +175,22 @@ export default function NetworkGraph({ nodes: rawNodes, links: rawLinks, width =
                 {node.type === 'incident' && node.severity && (
                   <circle cx={0} cy={0} r={r + 5} fill="none" stroke={SEVERITY_RING[node.severity] || '#888'} strokeWidth={2.5} opacity={0.7} />
                 )}
-                <circle cx={0} cy={0} r={r} fill={style.fill} stroke={isSelected ? '#fff' : style.stroke} strokeWidth={isSelected ? 3 : 1.5} />
+                {/* Key entity: coloured outer ring */}
+                {node.type === 'key_entity' && (
+                  <circle cx={0} cy={0} r={r + 7} fill="none" stroke={node.entityColor || '#f8fafc'} strokeWidth={3} opacity={0.85} />
+                )}
+                <circle cx={0} cy={0} r={r}
+                  fill={node.type === 'key_entity' ? (node.entityColor || style.fill) : style.fill}
+                  stroke={isSelected ? '#fff' : (node.type === 'key_entity' ? '#fff' : style.stroke)}
+                  strokeWidth={isSelected ? 3 : node.type === 'key_entity' ? 2 : 1.5}
+                />
                 {/* Type icon letter */}
-                <text x={0} y={1} textAnchor="middle" dominantBaseline="middle" fill={style.textColor} fontSize={r < 18 ? 9 : 11} fontWeight="700" style={{ pointerEvents: 'none' }}>
-                  {node.type === 'incident' ? 'I' : node.type === 'evidence' ? 'E' : node.type === 'communication' ? 'C' : 'P'}
+                <text x={0} y={1} textAnchor="middle" dominantBaseline="middle" fill={style.textColor} fontSize={node.type === 'key_entity' ? 10 : r < 18 ? 9 : 11} fontWeight="700" style={{ pointerEvents: 'none' }}>
+                  {node.type === 'incident' ? 'I' : node.type === 'evidence' ? 'E' : node.type === 'communication' ? 'C' : node.type === 'key_entity' ? node.label.split(' ')[0].slice(0, 3).toUpperCase() : 'P'}
                 </text>
-                {/* Label below */}
-                <text x={0} y={r + 12} textAnchor="middle" fill="#e2e8f0" fontSize={9} style={{ pointerEvents: 'none' }}>
-                  {truncate(node.label, 18)}
+                {/* Label below — bolder for key entities */}
+                <text x={0} y={r + 13} textAnchor="middle" fill={node.type === 'key_entity' ? '#fff' : '#e2e8f0'} fontSize={node.type === 'key_entity' ? 10 : 9} fontWeight={node.type === 'key_entity' ? '600' : '400'} style={{ pointerEvents: 'none' }}>
+                  {truncate(node.label, node.type === 'key_entity' ? 22 : 18)}
                 </text>
               </g>
             );
@@ -231,6 +240,9 @@ export default function NetworkGraph({ nodes: rawNodes, links: rawLinks, width =
           )}
           {selectedNode.type === 'person' && (
             <p className="text-xs text-slate-500">Individual identified in communications or incidents.</p>
+          )}
+          {selectedNode.type === 'key_entity' && (
+            <p className="text-xs text-slate-500">{selectedNode.role}</p>
           )}
           <p className="text-xs text-slate-400 pt-1 border-t">
             {rawLinks.filter(l => l.source === selectedNode.id || l.target === selectedNode.id).length} connection(s)
