@@ -15,9 +15,9 @@ const DETECTED_PARTIES = [
   {
     name: 'Sean Powell',
     party_type: 'person',
-    role_in_case: 'Client / Instructing party who engaged Belcher',
+    role_in_case: 'Client / Instructing party — Freeholder of 29 Clifton Road and leaseholder of all three flats (Flat 1, 2 & 3) in his own name. Director of Powell & Co Property Brighton, the letting agency managing the property. Powell instructed Belcher as QS and is evidenced objecting to Belcher\'s retrospective conditions, describing them as "never discussed" and a "leverage mechanism". Potential key witness against Belcher.',
     first_mentioned_in: 'Initial Cost Agreement Email (Nov 2023)',
-    information_gaps: ['Full name & title', 'Address', 'Professional capacity (developer? investor?)', 'Relationship to properties', 'Whether he is a witness or co-claimant']
+    information_gaps: ['Full residential or business address for service of documents', 'Whether Powell & Co Property Brighton is Ltd or sole trader — confirm Companies House', 'Whether Sean Powell is willing to provide a witness statement', 'Confirm whether Powell was the sole instructing party or if there were co-investors']
   },
   {
     name: 'Mr Bradley',
@@ -34,25 +34,32 @@ const DETECTED_PARTIES = [
     information_gaps: ['Confirmed RICS membership number (verify via RICS Find a Surveyor)', 'Professional Indemnity Insurance details', 'Companies House registration number for Vivid Surveyors Ltd']
   },
   {
-    name: '29 Clifton Road',
+    name: '29 Clifton Road — Freehold',
     party_type: 'property',
-    role_in_case: 'Primary property — freehold building converted into 3 flats; refurbishment works were carried out and form the subject of the valuation dispute. No property sale involved.',
+    role_in_case: 'Freehold title held in the name of Sean Powell. The building contains 3 residential flats (Flat 1, Flat 2, Flat 3), each held on a long lease also in the name of Sean Powell. The property is managed and let through Powell & Co Property Brighton (Director: Sean Powell). This case concerns refurbishment works carried out to Flat 3 and the communal areas — Belcher treated these as separate cost entities in his valuations, a manipulation that is central to the inflated/reduced pricing dispute.',
     first_mentioned_in: 'Cost Schedule - Live (Original Agreed)',
-    information_gaps: ['Full postcode', 'Owner of freehold at time of works (Sean Powell?)', 'Status of individual leases on the 3 flats', 'Whether works were to all 3 flats or common parts only']
+    information_gaps: ['Full postcode for 29 Clifton Road', 'Which area of Brighton/Hove?', 'Confirm whether communal area costs were in a separate schedule or artificially split within the same document', 'Confirm whether works to Flats 1 and 2 are also in dispute or solely Flat 3 and communals']
   },
   {
-    name: 'Property 2',
+    name: '29 Clifton Road — Flat 3',
     party_type: 'property',
-    role_in_case: 'Second property in the three-property refurbishment scope',
-    first_mentioned_in: 'Initial Cost Agreement (£185k across 3 properties)',
-    information_gaps: ['Full address', 'Property type', 'Owner', 'Individual agreed value', 'Current status']
+    role_in_case: 'The primary subject of the refurbishment works. Leasehold title in the name of Sean Powell. Mr Bradley carried out refurbishment works to this flat under the engagement where Belcher was instructed as Quantity Surveyor. Belcher later applied separate cost valuations to Flat 3 and the communal areas as a mechanism to reduce or manipulate the agreed total.',
+    first_mentioned_in: 'Cost Schedule - Live (Original Agreed)',
+    information_gaps: ['Confirm exact scope of works to Flat 3 only (vs communal areas)', 'Whether a separate cost schedule exists for Flat 3 alone', 'Whether the flat was tenanted during works']
   },
   {
-    name: 'Property 3',
+    name: '29 Clifton Road — Communal Areas',
     party_type: 'property',
-    role_in_case: 'Third property in the three-property refurbishment scope',
+    role_in_case: 'Communal areas of 29 Clifton Road treated by Belcher as a separate cost entity from Flat 3 — this separation is identified as a manipulation tactic to inflate or reduce specific line items and obscure the agreed overall valuation. Should properly form part of a single refurbishment cost schedule.',
+    first_mentioned_in: 'Cost Schedule - Belcher Revised',
+    information_gaps: ['Identify which documents separately itemise communal costs', 'Quantify the value Belcher attributed to communals vs Flat 3', 'Confirm whether the original agreed scope treated these as one or two items']
+  },
+  {
+    name: 'Other Properties in Scope',
+    party_type: 'property',
+    role_in_case: 'The original £185,000 agreed valuation fee covered three properties. It is now confirmed that the primary dispute concerns 29 Clifton Road (Flat 3 and communal areas). Whether the other properties in scope are additional addresses managed by Powell & Co, or other flats at 29 Clifton Road, requires clarification.',
     first_mentioned_in: 'Initial Cost Agreement (£185k across 3 properties)',
-    information_gaps: ['Full address', 'Property type', 'Owner', 'Individual agreed value', 'Current status']
+    information_gaps: ['Confirm the addresses of the other two properties in the original £185k scope', 'Were these also Sean Powell properties managed via Powell & Co?', 'Did Belcher also produce valuations for these other properties?', 'Are those valuations also disputed?']
   },
   {
     name: 'Co-instructed Architect',
