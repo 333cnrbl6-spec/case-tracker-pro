@@ -104,6 +104,22 @@ export default function RICSDocumentGenerator() {
     );
   };
 
+  const selectAllIncidents = () => {
+    setSelectedIncidents(incidents.map(i => i.id));
+  };
+
+  const deselectAllIncidents = () => {
+    setSelectedIncidents([]);
+  };
+
+  const selectAllEvidence = () => {
+    setSelectedEvidence(evidence.map(e => e.id));
+  };
+
+  const deselectAllEvidence = () => {
+    setSelectedEvidence([]);
+  };
+
   if (generatedDoc) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-8">
@@ -224,7 +240,23 @@ export default function RICSDocumentGenerator() {
                 {/* Incidents */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Incidents ({selectedIncidents.length})</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Incidents ({selectedIncidents.length})</CardTitle>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={selectAllIncidents}
+                          className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        >
+                          All
+                        </button>
+                        <button
+                          onClick={deselectAllIncidents}
+                          className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        >
+                          None
+                        </button>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                     {incidents.length === 0 ? (
@@ -250,7 +282,23 @@ export default function RICSDocumentGenerator() {
                 {/* Evidence */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-base">Supporting Evidence ({selectedEvidence.length})</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-base">Supporting Evidence ({selectedEvidence.length})</CardTitle>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={selectAllEvidence}
+                          className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        >
+                          All
+                        </button>
+                        <button
+                          onClick={deselectAllEvidence}
+                          className="text-xs px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                        >
+                          None
+                        </button>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-3 max-h-96 overflow-y-auto">
                     {evidence.length === 0 ? (
