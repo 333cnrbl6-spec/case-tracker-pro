@@ -51,9 +51,10 @@ export default function CaseNarrativeBuilder() {
         case_id: caseId,
       }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['legal-cases'] });
-      await queryClient.refetchQueries({ queryKey: ['legal-cases'] });
       toast.success('Narrative generated successfully');
+      await queryClient.invalidateQueries({ queryKey: ['legal-cases'] });
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await queryClient.refetchQueries({ queryKey: ['legal-cases'] });
     },
     onError: (error) => {
       toast.error(
