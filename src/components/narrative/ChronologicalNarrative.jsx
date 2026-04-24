@@ -195,7 +195,7 @@ export default function ChronologicalNarrative({ incidents, communications, evid
     { title: 'Phase 1: Engagement & Agreement', start: '2023-01-01', end: '2023-11-30', 
       narrative: "Mr Bradley, a contractor, was engaged in refurbishment works across multiple properties connected to Sean Powell. Malcolm Belcher MRICS was appointed as Quantity Surveyor to provide professional valuations of the completed works. At this stage, Belcher confirmed in writing an agreed valuation fee of £185,000 across three properties, with full documentation and final reports included in scope." },
     { title: 'Phase 2: Post-Completion Manipulation', start: '2023-12-01', end: '2024-01-10',
-      narrative: "Following completion of works, Belcher unilaterally reduced the agreed valuation from £185,000 to £145,000 — a £40,000 shortfall — and simultaneously imposed retrospective documentation requirements that had never been discussed during the original engagement. Mr Bradley attempted to contact Sean Powell directly to resolve the matter, but Belcher had established a gatekeeping protocol preventing direct communication. Powell himself objected to these new conditions, writing that they were 'never discussed' and felt like leverage. Belcher responded dismissively, claiming 'professional obligations' to justify his position." },
+      narrative: "Following completion of works, Belcher unilaterally reduced the agreed valuation from £185,000 to £145,000 — a £40,000 shortfall — and simultaneously imposed retrospective documentation requirements that had never been discussed during the original engagement. Mr Bradley objected to these new conditions, writing that they were 'never discussed during engagement setup' and appeared to be a 'leverage mechanism'. Belcher responded dismissively, claiming 'professional obligations' to justify his position. ⚠️ NOTE: An email in the record was originally logged as from Sean Powell making these same objections — however, given that Powell is understood to have been acting in concert with Belcher, this attribution is under review and likely reflects a misread forwarded/reply chain. The objecting language is now attributed to William Bradley pending verification of original email headers." },
     { title: 'Phase 3: Escalating Professional Misconduct', start: '2024-01-11', end: '2024-04-30',
       narrative: "Belcher's conduct escalated further. He restricted a co-instructed architect's access to survey data, citing 'client confidentiality' inappropriately. He gained access to a property without explicit consent and conducted surveys outside the agreed scope. Most critically, Land Registry records revealed that Belcher had been acting as both valuer and selling agent in the same transaction — a direct conflict of interest that was never disclosed, in breach of RICS Professional Standard PS1. Throughout this period, Belcher sent communications described as aggressive and dismissive, including a letter to Mr Bradley containing inflammatory language such as 'pathetic, totally unprofessional, childlike behaviour'." }
   ];
@@ -349,22 +349,29 @@ export default function ChronologicalNarrative({ incidents, communications, evid
           );
         })}
 
-        {/* Sean Powell Contact Attempt */}
-        <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-5">
-          <h4 className="font-semibold text-indigo-900 mb-2">Key Finding: Mr Bradley's Attempts to Contact Sean Powell</h4>
-          <p className="text-sm text-indigo-800 leading-relaxed mb-3">
-            The evidence confirms that Belcher explicitly restricted Mr Bradley's ability to communicate directly with Sean Powell. 
-            In a letter to Mr Bradley, Belcher demanded that <em>"all contractor communication must go through Belcher, not directly to Powell"</em> and 
-            <em>"no phone contact to Powell's mobile"</em>, enforcing that <em>"all contact through office only with staff intermediary"</em>.
+        {/* Powell-Belcher Conspiracy — revised framing */}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-5">
+          <h4 className="font-semibold text-red-900 mb-2">⚠️ Key Finding: Powell & Belcher — Potential Conspiracy</h4>
+          <p className="text-sm text-red-800 leading-relaxed mb-3">
+            The current understanding of the case has been revised. Sean Powell — the freeholder and instructing party — is now understood 
+            to have been acting <strong>in concert with Belcher</strong>, not as an independent client. This fundamentally changes the character 
+            of Belcher's gatekeeping behaviour: rather than Belcher cutting Powell out as a neutral client, both Powell and Belcher may have 
+            been jointly coordinating to prevent Mr Bradley from asserting his rights or receiving fair payment.
           </p>
-          <p className="text-sm text-indigo-800 leading-relaxed mb-3">
-            This gatekeeping behaviour is evidenced and confirmed by Belcher's own correspondence. Sean Powell is mentioned across 
-            multiple communications and was the client who originally engaged Belcher. Powell himself objected to Belcher's retrospective conditions, 
-            stating they were <em>"never discussed during engagement setup"</em> and appeared to be a <em>"leverage mechanism"</em>.
+          <p className="text-sm text-red-800 leading-relaxed mb-3">
+            Belcher's restriction of direct contact between Mr Bradley and Powell — demanding <em>"all contractor communication must go through Belcher"</em>, 
+            <em>"no phone contact to Powell's mobile"</em>, and <em>"all contact through office only with staff intermediary"</em> — may therefore 
+            represent a jointly agreed strategy rather than Belcher acting unilaterally.
           </p>
-          <p className="text-sm text-indigo-800 leading-relaxed">
-            Mr Bradley was therefore prevented from resolving matters directly with the instructing party, 
-            with Belcher acting as an information gatekeeper to maintain control over the engagement.
+          <p className="text-sm text-red-800 leading-relaxed mb-3">
+            <strong>Attribution alert:</strong> An email previously cited as Sean Powell objecting to the retrospective documentation conditions 
+            (using phrases such as <em>"never discussed"</em> and <em>"leverage mechanism"</em>) is now under review. Given Powell's likely 
+            alignment with Belcher, these words are more probably from <strong>William Bradley</strong>, misattributed due to a forwarded or 
+            reply email chain. Original email headers must be examined before any document relies on Powell as the author of these objections.
+          </p>
+          <p className="text-sm text-red-800 leading-relaxed">
+            If Powell and Belcher conspired together, potential causes of action extend beyond RICS professional misconduct to include 
+            civil conspiracy, fraudulent misrepresentation, and possibly breach of contract. This should be discussed with instructing solicitors.
           </p>
         </div>
       </CardContent>

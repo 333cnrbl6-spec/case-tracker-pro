@@ -15,7 +15,7 @@ const DETECTED_PARTIES = [
   {
     name: 'Sean Powell',
     party_type: 'person',
-    role_in_case: 'Client / Instructing party — Freeholder of 29 Clifton Road and leaseholder of all three flats (Flat 1, 2 & 3) in his own name. Director of Powell & Co Property Brighton, the letting agency managing the property. Powell instructed Belcher as QS and is evidenced objecting to Belcher\'s retrospective conditions, describing them as "never discussed" and a "leverage mechanism". Potential key witness against Belcher.',
+    role_in_case: '⚠️ REVISED: Likely co-conspirator with Belcher, not a neutral client. Freeholder of 29 Clifton Road and leaseholder of all three flats (Flat 1, 2 & 3) in his own name. Director of Powell & Co Property Brighton. Powell instructed Belcher as QS and is suspected of acting in concert with Belcher to withhold fair payment from Mr Bradley. An email previously attributed to Powell objecting to the retrospective conditions ("never discussed", "leverage mechanism") is now suspected to be misattributed — those words are more likely William Bradley\'s from a forwarded email chain.',
     first_mentioned_in: 'Initial Cost Agreement Email (Nov 2023)',
     information_gaps: ['Full residential or business address for service of documents', 'Whether Powell & Co Property Brighton is Ltd or sole trader — confirm Companies House', 'Whether Sean Powell is willing to provide a witness statement', 'Confirm whether Powell was the sole instructing party or if there were co-investors']
   },
