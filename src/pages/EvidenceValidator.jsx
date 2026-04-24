@@ -189,9 +189,9 @@ export default function EvidenceValidator() {
     );
   };
 
-  const filteredIssues = validationReport?.issues?.filter(issue =>
+  const filteredIssues = (validationReport?.issues || []).filter(issue =>
     filterSeverity === null || issue.severity === filterSeverity
-  ) || [];
+  );
 
   // Build lookup maps from selected items
   const evidenceMap = Object.fromEntries(evidence.filter(e => selectedEvidence.includes(e.id)).map(e => [e.id, { ...(e.data ?? e), id: e.id }]));
@@ -226,8 +226,9 @@ export default function EvidenceValidator() {
   };
 
   if (validationReport) {
-    const criticalCount = validationReport.issues.filter(i => i.severity === 'critical').length;
-    const highCount = validationReport.issues.filter(i => i.severity === 'high').length;
+    const issues = validationReport.issues || [];
+    const criticalCount = issues.filter(i => i.severity === 'critical').length;
+    const highCount = issues.filter(i => i.severity === 'high').length;
     const overallStatus = criticalCount > 0 ? 'Critical' : highCount > 0 ? 'High' : 'Moderate';
 
     return (
@@ -264,9 +265,9 @@ export default function EvidenceValidator() {
             prompt={`You are a legal compliance expert. Summarise the following evidence validation report for a RICS conduct investigation. Be concise and actionable — 3 to 5 bullet points covering: overall risk level, the most critical issues, key patterns observed, and the most important recommended next steps.
 
 Validation report data:
-- Total issues: ${validationReport.issues.length}
-- Critical issues: ${validationReport.issues.filter(i => i.severity === 'critical').length}
-- High issues: ${validationReport.issues.filter(i => i.severity === 'high').length}
+- Total issues: ${issues.length}
+- Critical issues: ${issues.filter(i => i.severity === 'critical').length}
+- High issues: ${issues.filter(i => i.severity === 'high').length}
 - Timeline integrity: ${validationReport.timelineIntegrity ? 'Verified' : 'Issues found'}
 - Communication alignment: ${validationReport.communicationAlignment ? 'Aligned' : 'Discrepancies found'}
 - Issues: ${JSON.stringify(validationReport.issues.map(i => ({ title: i.title, severity: i.severity, type: i.type, description: i.description, recommendation: i.recommendation })))}`}
@@ -277,7 +278,7 @@ Validation report data:
             <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-slate-600">Total Issues</p>
-                <p className="text-2xl font-bold text-slate-900">{validationReport.issues.length}</p>
+                <p className="text-2xl font-bold text-slate-900">{issues.length}</p>
               </CardContent>
             </Card>
             <Card>
@@ -326,7 +327,7 @@ Validation report data:
               onClick={() => setFilterSeverity(null)}
               size="sm"
             >
-              All Issues ({validationReport.issues.length})
+              All Issues ({issues.length})
             </Button>
             <Button
               variant={filterSeverity === 'critical' ? 'default' : 'outline'}
@@ -348,7 +349,15 @@ Validation report data:
 
           {/* Issues List */}
           <div className="space-y-3">
-            {filteredIssues.length === 0 ? (
+            {issues.length === 0 && (
+              <Card className="bg-amber-50 border-amber-200">
+                <CardContent className="pt-6 text-center">
+                  <AlertTriangle className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                  <p className="text-slate-700 font-semibold">No issues returned by validator</p>
+                </CardContent>
+              </Card>
+            )}
+            {filteredIssues.length === 0 && issues.length > 0 ? (
               <Card className="bg-green-50 border-green-200">
                 <CardContent className="pt-6 text-center">
                   <CheckCircle2 className="w-8 h-8 text-green-600 mx-auto mb-2" />
