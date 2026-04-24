@@ -49,13 +49,15 @@ export default function CaseNarrativeBuilder() {
     if (!narrative) return;
     try {
       setIsGeneratingBrief(true);
-      const response = await base44.functions.invoke('generateLegalBriefPDF', { 
-        case_id: caseId,
-        narrative 
+      const response = await fetch('/api/functions/generateLegalBriefPDF', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ case_id: caseId, narrative })
       });
       
-      // Create download link
-      const blob = new Blob([JSON.stringify(response.data)], { type: 'application/octet-stream' });
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -66,6 +68,7 @@ export default function CaseNarrativeBuilder() {
       window.URL.revokeObjectURL(url);
       toast.success('Legal brief PDF downloaded');
     } catch (e) {
+      console.error('PDF download error:', e);
       toast.error(e.message || 'Failed to generate PDF');
     } finally {
       setIsGeneratingBrief(false);
