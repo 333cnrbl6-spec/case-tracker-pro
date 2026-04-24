@@ -163,41 +163,64 @@ function CommunicationEntry({ comm }) {
 }
 
 export default function ChronologicalNarrative({ incidents, communications, evidence }) {
-  // Build unified timeline
+  // Build unified timeline from all real data
   const timeline = [];
 
   incidents.forEach(inc => {
     const date = inc?.date || inc?.data?.date;
-    if (date) {
-      timeline.push({ date, type: 'incident', sortDate: new Date(date), item: inc });
-    }
+    if (date) timeline.push({ date, type: 'incident', sortDate: new Date(date), item: inc });
   });
 
   communications.forEach(comm => {
     const date = comm?.date || comm?.data?.date;
-    if (date) {
-      timeline.push({ date, type: 'communication', sortDate: new Date(date), item: comm });
-    }
+    if (date) timeline.push({ date, type: 'communication', sortDate: new Date(date), item: comm });
   });
 
   evidence.forEach(ev => {
     const date = ev?.date_collected || ev?.data?.date_collected;
-    if (date) {
-      timeline.push({ date, type: 'evidence', sortDate: new Date(date), item: ev });
-    }
+    if (date) timeline.push({ date, type: 'evidence', sortDate: new Date(date), item: ev });
   });
 
-  // Sort chronologically
   timeline.sort((a, b) => a.sortDate - b.sortDate);
 
-  // Group by phase
+  // Undated items
+  const undatedEvidence = evidence.filter(ev => {
+    const date = ev?.date_collected || ev?.data?.date_collected;
+    return !date;
+  });
+
+  // ── Derive phase boundaries dynamically from actual data ──
+  // We always have 3 narrative phases — split the data roughly into thirds by date
+  const allDates = timeline.map(t => t.sortDate).filter(Boolean);
+  const minDate = allDates.length ? allDates[0] : new Date('2023-01-01');
+  const maxDate = allDates.length ? allDates[allDates.length - 1] : new Date('2024-12-31');
+
+  // Pad slightly so first/last items are always included
+  const span = maxDate - minDate;
+  const phase1End = new Date(minDate.getTime() + span * 0.38);
+  const phase2End = new Date(minDate.getTime() + span * 0.72);
+
+  const toISO = d => d.toISOString().split('T')[0];
+
   const phases = [
-    { title: 'Phase 1: Engagement & Agreement', start: '2023-01-01', end: '2023-11-30', 
-      narrative: "Mr Bradley, a contractor, was engaged in refurbishment works across multiple properties connected to Sean Powell. Malcolm Belcher MRICS was appointed as Quantity Surveyor to provide professional valuations of the completed works. At this stage, Belcher confirmed in writing an agreed valuation fee of £185,000 across three properties, with full documentation and final reports included in scope." },
-    { title: 'Phase 2: Post-Completion Manipulation', start: '2023-12-01', end: '2024-01-10',
-      narrative: "Following completion of works, Belcher unilaterally reduced the agreed valuation from £185,000 to £145,000 — a £40,000 shortfall — and simultaneously imposed retrospective documentation requirements that had never been discussed during the original engagement. Mr Bradley objected to these new conditions, writing that they were 'never discussed during engagement setup' and appeared to be a 'leverage mechanism'. Belcher responded dismissively, claiming 'professional obligations' to justify his position. ⚠️ NOTE: An email in the record was originally logged as from Sean Powell making these same objections — however, given that Powell is understood to have been acting in concert with Belcher, this attribution is under review and likely reflects a misread forwarded/reply chain. The objecting language is now attributed to William Bradley pending verification of original email headers." },
-    { title: 'Phase 3: Escalating Professional Misconduct', start: '2024-01-11', end: '2024-04-30',
-      narrative: "Belcher's conduct escalated further. He restricted a co-instructed architect's access to survey data, citing 'client confidentiality' inappropriately. He gained access to a property without explicit consent and conducted surveys outside the agreed scope. Most critically, Land Registry records revealed that Belcher had been acting as both valuer and selling agent in the same transaction — a direct conflict of interest that was never disclosed, in breach of RICS Professional Standard PS1. Throughout this period, Belcher sent communications described as aggressive and dismissive, including a letter to Mr Bradley containing inflammatory language such as 'pathetic, totally unprofessional, childlike behaviour'." }
+    {
+      title: 'Phase 1: Engagement & Agreement',
+      start: toISO(new Date(minDate.getTime() - 1)),
+      end: toISO(phase1End),
+      narrative: "Mr Bradley, a contractor, was engaged in refurbishment works across multiple properties connected to Sean Powell. Malcolm Belcher MRICS was appointed as Quantity Surveyor to provide professional valuations of the completed works. At this stage, Belcher confirmed in writing an agreed valuation fee of £185,000 across three properties, with full documentation and final reports included in scope.",
+    },
+    {
+      title: 'Phase 2: Post-Completion Manipulation',
+      start: toISO(new Date(phase1End.getTime() + 86400000)),
+      end: toISO(phase2End),
+      narrative: "Following completion of works, Belcher unilaterally reduced the agreed valuation from £185,000 to £145,000 — a £40,000 shortfall — and simultaneously imposed retrospective documentation requirements that had never been discussed during the original engagement. Mr Bradley objected to these new conditions, writing that they were 'never discussed during engagement setup' and appeared to be a 'leverage mechanism'. Belcher responded dismissively, claiming 'professional obligations' to justify his position. ⚠️ NOTE: An email in the record was originally logged as from Sean Powell making these same objections — however, given that Powell is understood to have been acting in concert with Belcher, this attribution is under review and likely reflects a misread forwarded/reply chain. The objecting language is now attributed to William Bradley pending verification of original email headers.",
+    },
+    {
+      title: 'Phase 3: Escalating Professional Misconduct',
+      start: toISO(new Date(phase2End.getTime() + 86400000)),
+      end: toISO(new Date(maxDate.getTime() + 86400000)),
+      narrative: "Belcher's conduct escalated further. He restricted a co-instructed architect's access to survey data, citing 'client confidentiality' inappropriately. He gained access to a property without explicit consent and conducted surveys outside the agreed scope. Most critically, Land Registry records revealed that Belcher had been acting as both valuer and selling agent in the same transaction — a direct conflict of interest that was never disclosed, in breach of RICS Professional Standard PS1. Throughout this period, Belcher sent communications described as aggressive and dismissive, including a letter to Mr Bradley containing inflammatory language such as 'pathetic, totally unprofessional, childlike behaviour'.",
+    },
   ];
 
   return (
@@ -207,6 +230,21 @@ export default function ChronologicalNarrative({ incidents, communications, evid
         <p className="text-sm text-slate-600">
           A complete end-to-end walkthrough of events as they unfolded, with evidenced communications and analysis.
         </p>
+        {timeline.length > 0 && (
+          <div className="flex flex-wrap gap-3 mt-2 text-xs">
+            <span className="bg-indigo-50 text-indigo-700 border border-indigo-200 rounded px-2 py-1">
+              📅 Timeline: {formatDate(toISO(minDate))} → {formatDate(toISO(maxDate))}
+            </span>
+            <span className="bg-slate-100 text-slate-600 rounded px-2 py-1">
+              {timeline.filter(t => t.type === 'incident').length} incidents · {timeline.filter(t => t.type === 'communication').length} communications · {timeline.filter(t => t.type === 'evidence').length} evidence items
+            </span>
+            {undatedEvidence.length > 0 && (
+              <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded px-2 py-1">
+                ⚠️ {undatedEvidence.length} evidence items have no date
+              </span>
+            )}
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-10">
         {phases.map((phase, phaseIdx) => {
@@ -348,6 +386,33 @@ export default function ChronologicalNarrative({ incidents, communications, evid
             </div>
           );
         })}
+
+        {/* Undated evidence */}
+        {undatedEvidence.length > 0 && (
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-8 h-8 rounded-full bg-slate-400 text-white flex items-center justify-center text-sm font-bold">?</div>
+              <h3 className="text-xl font-bold text-slate-700">Undated Evidence ({undatedEvidence.length} items)</h3>
+            </div>
+            <div className="space-y-2">
+              {undatedEvidence.map((ev, idx) => {
+                const e = ev.data || ev;
+                return (
+                  <div key={idx} className="text-sm border-l-2 border-slate-300 pl-3 py-1">
+                    <div className="flex items-start gap-3">
+                      <Badge className="bg-slate-100 text-slate-700">{e.strength || 'unknown'}</Badge>
+                      <div>
+                        <p className="font-medium text-slate-900">{e.title}</p>
+                        <p className="text-xs text-slate-500">{e.evidence_type} — no date recorded</p>
+                        {e.description && <p className="text-xs text-slate-600 mt-0.5">{e.description}</p>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Powell-Belcher Conspiracy — revised framing */}
         <div className="bg-red-50 border border-red-200 rounded-lg p-5">
