@@ -134,21 +134,15 @@ export default function CaseManager() {
     return d !== null && d <= 30 && c.status !== 'closed' && c.status !== 'settled';
   }).length;
 
-  // Detect duplicate cases (same client, opponent, case type)
+  // Detect duplicate cases (same client, opponent, case type) — optimized with Set
   const findDuplicates = () => {
-    for (let i = 0; i < cases.length; i++) {
-      for (let j = i + 1; j < cases.length; j++) {
-        const a = cases[i];
-        const b = cases[j];
-        if (
-          a.client_name === b.client_name &&
-          a.opponent_name === b.opponent_name &&
-          a.case_type === b.case_type &&
-          a.id !== b.id
-        ) {
-          return [a, b];
-        }
+    const seen = new Map();
+    for (const c of cases) {
+      const key = `${c.client_name}|${c.opponent_name}|${c.case_type}`;
+      if (seen.has(key)) {
+        return [seen.get(key), c];
       }
+      seen.set(key, c);
     }
     return null;
   };

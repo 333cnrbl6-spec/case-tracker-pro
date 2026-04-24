@@ -122,6 +122,18 @@ export default function CaseWeaknessRebuttal() {
     }
   });
 
+  // Warn on unsaved changes
+  useEffect(() => {
+    const hasChanges = Object.keys(rebuttals).some(k => rebuttals[k]) || Object.keys(linkedEvidence).some(k => linkedEvidence[k]?.length > 0);
+    if (hasChanges) {
+      window.addEventListener('beforeunload', (e) => {
+        e.preventDefault();
+        e.returnValue = '';
+      });
+      return () => window.removeEventListener('beforeunload', () => {});
+    }
+  }, [rebuttals, linkedEvidence]);
+
   if (!caseId) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">

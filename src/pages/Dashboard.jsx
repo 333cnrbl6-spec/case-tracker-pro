@@ -520,11 +520,11 @@ export default function Dashboard() {
             </Card>
           </Link>
 
-          <Link to="/compliance-dashboard" className="block">
+          <Link to="/investigation-compliance" className="block">
             <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-300 hover:shadow-lg transition-shadow cursor-pointer h-full">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <BarChart3 className="w-5 h-5 text-indigo-600" /> Compliance Dashboard
+                  <BarChart3 className="w-5 h-5 text-indigo-600" /> Investigation Compliance
                 </CardTitle>
               </CardHeader>
               <CardContent>

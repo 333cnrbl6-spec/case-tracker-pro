@@ -111,14 +111,13 @@ const AuthenticatedApp = () => {
       <Route path="/compliance-alerts" element={<ComplianceAlerts />} />
       <Route path="/practice-analytics" element={<PracticeAnalytics />} />
       <Route path="/onboarding" element={<OnboardingWizard />} />
-      <Route path="/compliance-dashboard" element={<ComplianceDashboard />} />
       <Route path="/compliance-reports" element={<ComplianceReportGenerator />} />
       <Route path="/risk-dashboard" element={<ComplianceRiskDashboard />} />
       <Route path="/audit-log" element={<AuditLog />} />
       <Route path="/fee-earner-analytics" element={<FeeEarnerAnalytics />} />
       <Route path="/timeline" element={<EventTimeline />} />
       <Route path="/incident-reporter" element={<IncidentReporter />} />
-      <Route path="/compliance-dashboard" element={<InvestigationCompliance />} />
+      <Route path="/investigation-compliance" element={<InvestigationCompliance />} />
       <Route path="/permissions" element={<PermissionsManager />} />
       <Route path="/case-overview" element={<CaseOverviewDashboard />} />
       <Route path="/rics-compliance" element={<RICSComplianceDashboard />} />
