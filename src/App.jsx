@@ -69,6 +69,7 @@ import SpecialismFrameworkViewer from '@/components/SpecialismFrameworkViewer';
 import AutomatedBundleGenerator from '@/pages/AutomatedBundleGenerator';
 import ClientPortalManager from '@/pages/ClientPortalManager';
 import ClientPortalView from '@/pages/ClientPortalView';
+import MilestoneTimeline from '@/pages/MilestoneTimeline';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -161,6 +162,7 @@ const AuthenticatedApp = () => {
       <Route path="/bundle-generator" element={<AutomatedBundleGenerator />} />
       <Route path="/client-portal-manager" element={<ClientPortalManager />} />
       <Route path="/client-portal" element={<ClientPortalView />} />
+      <Route path="/milestone-timeline" element={<MilestoneTimeline />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

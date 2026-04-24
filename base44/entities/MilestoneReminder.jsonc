@@ -1,0 +1,99 @@
+{
+  "name": "MilestoneReminder",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related case ID"
+    },
+    "case_ref": {
+      "type": "string",
+      "description": "Case reference for quick display"
+    },
+    "milestone_type": {
+      "type": "string",
+      "enum": [
+        "limitation_date",
+        "court_deadline",
+        "client_contact_due",
+        "client_care_letter_due",
+        "settlement_deadline",
+        "custom"
+      ],
+      "description": "Type of milestone"
+    },
+    "milestone_date": {
+      "type": "string",
+      "format": "date",
+      "description": "The actual deadline date"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable milestone title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Details about the milestone"
+    },
+    "days_remaining": {
+      "type": "number",
+      "description": "Days until deadline (calculated)"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "description": "Urgency level based on proximity to deadline"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether reminder notification has been sent"
+    },
+    "reminder_sent_date": {
+      "type": "string",
+      "description": "ISO timestamp when reminder was sent"
+    },
+    "email_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether email notification has been sent"
+    },
+    "email_sent_date": {
+      "type": "string",
+      "description": "ISO timestamp when email was sent"
+    },
+    "recipient_email": {
+      "type": "string",
+      "description": "Email address of fee earner to notify"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "notified",
+        "completed",
+        "dismissed"
+      ],
+      "default": "pending",
+      "description": "Status of the milestone"
+    },
+    "actions_taken": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Record of actions taken (reminders sent, etc)"
+    }
+  },
+  "required": [
+    "case_id",
+    "milestone_type",
+    "milestone_date",
+    "title"
+  ]
+}
