@@ -58,13 +58,18 @@ export default function ComplianceReportGenerator() {
                 report_type: reportType.id
             });
 
-            // Create download link
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
+            // Handle PDF response - ensure it's a Blob
+            const pdfBlob = response.data instanceof Blob 
+                ? response.data 
+                : new Blob([response.data], { type: 'application/pdf' });
+            
+            const url = window.URL.createObjectURL(pdfBlob);
             const link = document.createElement('a');
             link.href = url;
             link.download = `${reportType.id}-report-${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
 
             setSuccess(true);

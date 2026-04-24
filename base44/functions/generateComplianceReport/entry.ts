@@ -81,6 +81,53 @@ Deno.serve(async (req) => {
                 })),
                 active_alerts: alerts.filter(a => a.status === 'active').length
             };
+        } else if (report_type === 'case_compliance') {
+            const cases = await base44.entities.LegalCase.filter({});
+            const risks = await base44.entities.ComplianceRisk.filter({});
+            
+            reportData = {
+                title: 'Case Compliance Summary Report',
+                subtitle: 'Evidence Validation & Risk Assessment',
+                generated_date: new Date().toLocaleDateString('en-GB'),
+                total_cases: cases.length,
+                active_risks: risks.filter(r => r.mitigation_status !== 'mitigated').length,
+                cases: cases.slice(0, 20).map(c => ({
+                    case_ref: c.case_ref,
+                    client_name: c.client_name,
+                    status: c.status,
+                    case_type: c.case_type
+                })),
+                risk_summary: {
+                    critical: risks.filter(r => r.risk_level === 'critical').length,
+                    high: risks.filter(r => r.risk_level === 'high').length,
+                    medium: risks.filter(r => r.risk_level === 'medium').length
+                }
+            };
+        } else if (report_type === 'incident_report') {
+            const incidents = await base44.entities.Incident.filter({});
+            const tasks = await base44.entities.IncidentTask.filter({});
+            
+            reportData = {
+                title: 'Incident Analysis Report',
+                subtitle: 'Breach Patterns & Severity Clustering',
+                generated_date: new Date().toLocaleDateString('en-GB'),
+                total_incidents: incidents.length,
+                open_incidents: incidents.filter(i => i.status === 'open').length,
+                incidents: incidents.slice(0, 20).map(i => ({
+                    title: i.title,
+                    date: i.date,
+                    severity: i.severity,
+                    status: i.status,
+                    type: i.incident_type
+                })),
+                severity_summary: {
+                    critical: incidents.filter(i => i.severity === 'critical').length,
+                    high: incidents.filter(i => i.severity === 'high').length,
+                    medium: incidents.filter(i => i.severity === 'medium').length,
+                    low: incidents.filter(i => i.severity === 'low').length
+                },
+                pending_tasks: tasks.filter(t => t.status === 'not_started').length
+            };
         }
 
         // Generate PDF
@@ -179,6 +226,82 @@ Deno.serve(async (req) => {
                 yPos += 12;
                 
                 doc.setTextColor(0, 0, 0);
+            });
+        } else if (report_type === 'case_compliance') {
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Total Cases: ${reportData.total_cases} | Active Risks: ${reportData.active_risks}`, 15, yPos);
+            yPos += 10;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Risk Summary:', 15, yPos);
+            yPos += 6;
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`• Critical: ${reportData.risk_summary.critical}`, 20, yPos);
+            yPos += 5;
+            doc.text(`• High: ${reportData.risk_summary.high}`, 20, yPos);
+            yPos += 5;
+            doc.text(`• Medium: ${reportData.risk_summary.medium}`, 20, yPos);
+            yPos += 10;
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Cases Review:', 15, yPos);
+            yPos += 6;
+            
+            doc.setFont('helvetica', 'normal');
+            reportData.cases.forEach((c, idx) => {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.text(`${idx + 1}. ${c.case_ref} - ${c.client_name}`, 20, yPos);
+                yPos += 4;
+                doc.text(`Type: ${c.case_type} | Status: ${c.status}`, 25, yPos);
+                yPos += 6;
+            });
+        } else if (report_type === 'incident_report') {
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Total Incidents: ${reportData.total_incidents} | Open: ${reportData.open_incidents}`, 15, yPos);
+            yPos += 10;
+            
+            doc.setFontSize(11);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Severity Distribution:', 15, yPos);
+            yPos += 6;
+            
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`• Critical: ${reportData.severity_summary.critical}`, 20, yPos);
+            yPos += 5;
+            doc.text(`• High: ${reportData.severity_summary.high}`, 20, yPos);
+            yPos += 5;
+            doc.text(`• Medium: ${reportData.severity_summary.medium}`, 20, yPos);
+            yPos += 5;
+            doc.text(`• Low: ${reportData.severity_summary.low}`, 20, yPos);
+            yPos += 10;
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text(`Pending Tasks: ${reportData.pending_tasks}`, 15, yPos);
+            yPos += 10;
+            
+            doc.setFont('helvetica', 'bold');
+            doc.text('Incident Details:', 15, yPos);
+            yPos += 6;
+            
+            doc.setFont('helvetica', 'normal');
+            reportData.incidents.forEach((i, idx) => {
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+                doc.text(`${idx + 1}. ${i.title}`, 20, yPos);
+                yPos += 4;
+                doc.text(`Date: ${i.date} | Severity: ${i.severity} | Status: ${i.status}`, 25, yPos);
+                yPos += 6;
             });
         } else {
             doc.setFontSize(12);
