@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CaseMigrationWizard from '@/components/CaseMigrationWizard';
 import QuickCaseSetup from '@/components/QuickCaseSetup';
-import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3, Lock } from 'lucide-react';
+import StatCard from '@/components/StatCard';
+import { AlertCircle, FileText, MessageSquare, AlertTriangle, FileCheck, CheckCircle, Link2, Briefcase, FileTextIcon, Scale, BarChart2, Bell, Shield, TrendingUp, Download, BarChart3, Lock, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CaseSummaryWidget from '@/components/CaseSummaryWidget';
 import SystemAlertsPanel from '@/components/SystemAlertsPanel';
@@ -15,12 +16,20 @@ import IncidentTypeChart from '@/components/dashboard/IncidentTypeChart';
 import ResolutionTimeChart from '@/components/dashboard/ResolutionTimeChart';
 import DrillDownPanel from '@/components/dashboard/DrillDownPanel';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { audioNotifications, isAudioEnabled } from '@/lib/audioNotifications';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export default function Dashboard() {
-  const [drillDown, setDrillDown] = useState(null); // { incidents, label }
+  const [drillDown, setDrillDown] = useState(null);
   const [migrationOpen, setMigrationOpen] = useState(false);
   const [quickSetupOpen, setQuickSetupOpen] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(isAudioEnabled());
+
+  useEffect(() => {
+    if (audioEnabled) {
+      audioNotifications.success();
+    }
+  }, []);
 
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
@@ -59,31 +68,37 @@ export default function Dashboard() {
 
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-950 dark:via-blue-950 dark:to-slate-900 p-8">
       <div className="max-w-7xl mx-auto">
          <div className="mb-8 flex justify-between items-start">
-           <div>
-             <h1 className="text-4xl font-bold text-slate-900 mb-2">Case Assessment Dashboard</h1>
-             <p className="text-slate-600">Building evidence against Malcolm Belcher - RICS Conduct Investigation</p>
-           </div>
-           <div className="flex gap-2">
-             <Button 
-               onClick={() => setQuickSetupOpen(true)}
-               className="gap-2 bg-green-600 hover:bg-green-700 whitespace-nowrap"
-             >
-               <span>⚡</span>
-               Bradley v. Belcher
-             </Button>
-             <Button 
-               onClick={() => setMigrationOpen(true)}
-               variant="outline"
-               className="gap-2 whitespace-nowrap"
-             >
-               <span>📋</span>
-               Custom Case
-             </Button>
-           </div>
-         </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2">Case Assessment Dashboard</h1>
+              <p className="text-slate-600 dark:text-slate-300">Building evidence against Malcolm Belcher - RICS Conduct Investigation</p>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => {
+                  setQuickSetupOpen(true);
+                  if (audioEnabled) audioNotifications.click();
+                }}
+                className="gap-2 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 whitespace-nowrap text-white shadow-lg"
+              >
+                <Sparkles className="w-4 h-4" />
+                Bradley v. Belcher
+              </Button>
+              <Button 
+                onClick={() => {
+                  setMigrationOpen(true);
+                  if (audioEnabled) audioNotifications.click();
+                }}
+                variant="outline"
+                className="gap-2 whitespace-nowrap"
+              >
+                <span>📋</span>
+                Custom Case
+              </Button>
+            </div>
+          </div>
 
          {/* Migration Wizards */}
          <QuickCaseSetup 
@@ -98,45 +113,35 @@ export default function Dashboard() {
          />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Total Incidents</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-slate-900">{incidents.length}</div>
-              <p className="text-xs text-slate-500 mt-1">{criticalIncidents} critical, {highSeverity} high severity</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">RICS Violations Identified</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-red-600">{riicsViolations}</div>
-              <p className="text-xs text-slate-500 mt-1">Code of conduct breaches</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Potential Legal Issues</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-amber-600">{legalIssues}</div>
-              <p className="text-xs text-slate-500 mt-1">Legally actionable concerns</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-slate-600">Supporting Evidence</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-600">{evidence.length}</div>
-              <p className="text-xs text-slate-500 mt-1">Documents & communications</p>
-            </CardContent>
-          </Card>
+          <StatCard
+            icon={AlertTriangle}
+            label="Total Incidents"
+            value={incidents.length}
+            subtitle={`${criticalIncidents} critical, ${highSeverity} high`}
+            bgGradient="from-red-600 to-red-700"
+            trend={{ direction: criticalIncidents > 0 ? 'down' : 'up', value: 12 }}
+          />
+          <StatCard
+            icon={Shield}
+            label="RICS Violations"
+            value={riicsViolations}
+            subtitle="Code breaches detected"
+            bgGradient="from-orange-600 to-red-600"
+          />
+          <StatCard
+            icon={Scale}
+            label="Legal Issues"
+            value={legalIssues}
+            subtitle="Actionable concerns"
+            bgGradient="from-amber-600 to-orange-600"
+          />
+          <StatCard
+            icon={FileText}
+            label="Evidence"
+            value={evidence.length}
+            subtitle="Docs & communications"
+            bgGradient="from-primary to-secondary"
+          />
         </div>
 
         {/* Compliance Metric Charts */}
