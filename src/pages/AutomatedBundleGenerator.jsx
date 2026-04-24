@@ -22,6 +22,7 @@ import {
   FolderOpen,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import PDFPreviewModal from '@/components/PDFPreviewModal';
 
 export default function AutomatedBundleGenerator() {
   const [selectedCaseId, setSelectedCaseId] = useState('');
@@ -34,6 +35,8 @@ export default function AutomatedBundleGenerator() {
   const [generating, setGenerating] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [generatedBundles, setGeneratedBundles] = useState([]);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
 
   // Fetch cases
   const { data: cases = [] } = useQuery({
@@ -115,6 +118,40 @@ export default function AutomatedBundleGenerator() {
     );
   };
 
+  const handleConfirmDownload = () => {
+    if (!previewData) return;
+
+    const binaryString = atob(previewData.pdfBase64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = previewData.fileName;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    // Add to generated bundles list
+    setGeneratedBundles(prev => [...prev, {
+      id: `${selectedCaseId}-${Date.now()}`,
+      caseRef: selectedCase?.case_ref,
+      fileName: previewData.fileName,
+      docCount: (includeEvidence ? selectedEvidence.length : 0) +
+                (includeIncidents ? selectedIncidents.length : 0) +
+                (includeComms ? selectedComms.length : 0),
+      timestamp: new Date().toLocaleTimeString(),
+    }]);
+
+    toast.success('Bundle downloaded');
+    setPreviewData(null);
+  };
+
   const handleGenerateBundle = async () => {
     if (!selectedCaseId) {
       toast.error('Please select a case');
@@ -140,36 +177,14 @@ export default function AutomatedBundleGenerator() {
       });
 
       if (response.data?.success && response.data?.pdfBase64) {
-        // Convert base64 to blob and download
-        const binaryString = atob(response.data.pdfBase64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        
         const fileName = response.data.fileName || `Bundle_${selectedCase?.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`;
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
         
-        // Add to generated bundles list
-        setGeneratedBundles(prev => [...prev, {
-          id: `${selectedCaseId}-${Date.now()}`,
-          caseRef: selectedCase?.case_ref,
-          fileName,
-          docCount: (includeEvidence ? selectedEvidence.length : 0) +
-                    (includeIncidents ? selectedIncidents.length : 0) +
-                    (includeComms ? selectedComms.length : 0),
-          timestamp: new Date().toLocaleTimeString(),
-        }]);
-        
-        toast.success('Bundle generated and downloaded');
+        // Show preview modal
+        setPreviewData({
+          pdfBase64: response.data.pdfBase64,
+          fileName: fileName,
+        });
+        setPreviewOpen(true);
       }
     } catch (error) {
       toast.error(error.message || 'Failed to generate bundle');
@@ -552,8 +567,22 @@ export default function AutomatedBundleGenerator() {
               </CardContent>
             </Card>
           </>
-        )}
-      </div>
-    </div>
-  );
-}
+          )}
+
+          {/* PDF Preview Modal */}
+          {previewData && (
+          <PDFPreviewModal
+           isOpen={previewOpen}
+           onClose={() => {
+             setPreviewOpen(false);
+             setPreviewData(null);
+           }}
+           pdfBase64={previewData.pdfBase64}
+           fileName={previewData.fileName}
+           onConfirmDownload={handleConfirmDownload}
+          />
+          )}
+          </div>
+          </div>
+          );
+          }
