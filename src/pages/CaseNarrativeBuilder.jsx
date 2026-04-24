@@ -50,8 +50,9 @@ export default function CaseNarrativeBuilder() {
       base44.functions.invoke('generateStructuredLegalNarrative', {
         case_id: caseId,
       }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legal-cases'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['legal-cases'] });
+      await queryClient.refetchQueries({ queryKey: ['legal-cases'] });
       toast.success('Narrative generated successfully');
     },
     onError: (error) => {
