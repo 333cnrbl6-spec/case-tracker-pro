@@ -59,6 +59,9 @@ import CaseRiskDashboard from '@/pages/CaseRiskDashboard';
 import ProfessionalEntityDatabase from '@/pages/ProfessionalEntityDatabase';
 import BreachDiscoveryTool from '@/pages/BreachDiscoveryTool';
 import InteractiveEventTimeline from '@/pages/InteractiveEventTimeline';
+import FirmSettings from '@/pages/FirmSettings';
+import SecuritySettings from '@/pages/SecuritySettings';
+import HelpAndDocs from '@/pages/HelpAndDocs';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -141,6 +144,9 @@ const AuthenticatedApp = () => {
       <Route path="/entity-database" element={<ProfessionalEntityDatabase />} />
       <Route path="/breach-discovery" element={<BreachDiscoveryTool />} />
       <Route path="/event-timeline" element={<InteractiveEventTimeline />} />
+      <Route path="/settings" element={<FirmSettings />} />
+      <Route path="/security" element={<SecuritySettings />} />
+      <Route path="/help" element={<HelpAndDocs />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
