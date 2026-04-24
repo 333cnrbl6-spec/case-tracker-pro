@@ -36,7 +36,8 @@ export default function PDFExportPanel({ caseId, caseRef, onClose }) {
     },
     onError: (e) => {
       setLoadingType(null);
-      toast.error(e.message);
+      const errorMsg = e?.response?.data?.error || e.message || 'Failed to generate PDF';
+      toast.error(errorMsg);
     }
   });
 
