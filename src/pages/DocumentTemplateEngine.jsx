@@ -53,8 +53,9 @@ const TEMPLATES = [
 
 export default function DocumentTemplateEngine() {
   const [selectedCaseId, setSelectedCaseId] = useState(null);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedTemplates, setSelectedTemplates] = useState([]);
   const [generating, setGenerating] = useState(false);
+  const [generatedDocs, setGeneratedDocs] = useState([]);
 
   // Fetch active cases
   const { data: cases = [] } = useQuery({
@@ -69,26 +70,47 @@ export default function DocumentTemplateEngine() {
 
   const selectedCase = cases.find(c => c.id === selectedCaseId);
 
+  const toggleTemplate = (templateId) => {
+    setSelectedTemplates(prev =>
+      prev.includes(templateId)
+        ? prev.filter(id => id !== templateId)
+        : [...prev, templateId]
+    );
+  };
+
   const handleGenerate = async () => {
-    if (!selectedCaseId || !selectedTemplate) return;
+    if (!selectedCaseId || selectedTemplates.length === 0) return;
 
     setGenerating(true);
     try {
-      const response = await base44.functions.invoke('generateLegalDocument', {
-        caseId: selectedCaseId,
-        templateType: selectedTemplate,
-      });
+      for (const templateId of selectedTemplates) {
+        const response = await base44.functions.invoke('generateLegalDocument', {
+          caseId: selectedCaseId,
+          templateType: templateId,
+        });
 
-      // Download PDF
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${selectedCase.case_ref}_${selectedTemplate}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+        const templateObj = TEMPLATES.find(t => t.id === templateId);
+        const fileName = `${selectedCase.case_ref}_${templateId}.pdf`;
+
+        // Download PDF
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        // Add to generated docs list
+        setGeneratedDocs(prev => [...prev, {
+          id: `${templateId}-${Date.now()}`,
+          name: templateObj.name,
+          fileName,
+          timestamp: new Date().toLocaleTimeString(),
+        }]);
+      }
     } catch (error) {
       alert(`Error generating document: ${error.message}`);
     } finally {
@@ -96,7 +118,6 @@ export default function DocumentTemplateEngine() {
     }
   };
 
-  const selectedTemplateObj = TEMPLATES.find(t => t.id === selectedTemplate);
   const categories = [...new Set(TEMPLATES.map(t => t.category))];
 
   return (
@@ -172,14 +193,20 @@ export default function DocumentTemplateEngine() {
                     {TEMPLATES.filter(t => t.category === category).map((template) => (
                       <button
                         key={template.id}
-                        onClick={() => setSelectedTemplate(template.id)}
+                        onClick={() => toggleTemplate(template.id)}
                         className={`p-3 rounded-lg border-2 text-left transition-all ${
-                          selectedTemplate === template.id
+                          selectedTemplates.includes(template.id)
                             ? 'border-primary bg-primary/5'
                             : 'border-slate-200 dark:border-slate-700 hover:border-primary'
                         }`}
                       >
                         <div className="flex items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedTemplates.includes(template.id)}
+                            onChange={() => toggleTemplate(template.id)}
+                            className="mt-0.5"
+                          />
                           <span className="text-xl">{template.icon}</span>
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm">{template.name}</p>
@@ -199,20 +226,15 @@ export default function DocumentTemplateEngine() {
       </div>
 
       {/* Preview & Generate */}
-      {selectedTemplate && selectedCase && (
+      {selectedTemplates.length > 0 && selectedCase && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                {selectedTemplateObj?.icon} {selectedTemplateObj?.name}
-              </span>
+            <CardTitle className="text-lg">
+              Generate Documents ({selectedTemplates.length} selected)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg space-y-2 text-sm">
-              <p>
-                <strong>Document:</strong> {selectedTemplateObj?.name}
-              </p>
               <p>
                 <strong>Case:</strong> {selectedCase.case_ref} - {selectedCase.client_name}
               </p>
@@ -221,6 +243,9 @@ export default function DocumentTemplateEngine() {
               </p>
               <p>
                 <strong>Status:</strong> {selectedCase.status}
+              </p>
+              <p>
+                <strong>Documents:</strong> {selectedTemplates.map(id => TEMPLATES.find(t => t.id === id)?.name).join(', ')}
               </p>
             </div>
 
@@ -238,7 +263,7 @@ export default function DocumentTemplateEngine() {
                 ) : (
                   <>
                     <Download className="w-4 h-4" />
-                    Generate & Download PDF
+                    Generate & Download PDFs
                   </>
                 )}
               </Button>
@@ -253,12 +278,39 @@ export default function DocumentTemplateEngine() {
         </Card>
       )}
 
+      {/* Downloads List */}
+      {generatedDocs.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Download className="w-5 h-5" /> Generated Documents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {generatedDocs.map(doc => (
+                <div
+                  key={doc.id}
+                  className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm"
+                >
+                  <div>
+                    <p className="font-medium">{doc.name}</p>
+                    <p className="text-xs text-slate-500">{doc.timestamp}</p>
+                  </div>
+                  <Badge variant="secondary">✓ Downloaded</Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Empty State */}
-      {!selectedTemplate || !selectedCase && (
+      {selectedTemplates.length === 0 && (
         <Card className="border-dashed text-center py-12">
           <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-600 dark:text-slate-400">
-            Select a case and template above to generate documents
+            Select a case and one or more templates above to generate documents
           </p>
         </Card>
       )}
