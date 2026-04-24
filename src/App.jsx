@@ -63,6 +63,7 @@ import FirmSettings from '@/pages/FirmSettings';
 import SecuritySettings from '@/pages/SecuritySettings';
 import HelpAndDocs from '@/pages/HelpAndDocs';
 import RICSComplianceAdvisor from '@/pages/RICSComplianceAdvisor';
+import DocumentTemplateEngine from '@/pages/DocumentTemplateEngine';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -149,6 +150,7 @@ const AuthenticatedApp = () => {
       <Route path="/security" element={<SecuritySettings />} />
       <Route path="/help" element={<HelpAndDocs />} />
       <Route path="/compliance-advisor" element={<RICSComplianceAdvisor />} />
+      <Route path="/document-templates" element={<DocumentTemplateEngine />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
