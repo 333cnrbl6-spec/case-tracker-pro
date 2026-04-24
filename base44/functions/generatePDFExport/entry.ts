@@ -24,21 +24,23 @@ Deno.serve(async (req) => {
     let htmlContent = '';
 
     if (export_type === 'full_narrative') {
-      const narrative = legalCase.ai_narrative ? JSON.parse(legalCase.ai_narrative) : null;
+      if (!legalCase.ai_narrative) {
+        return Response.json({ error: 'No narrative generated yet. Generate one from the Case Narrative Builder first.' }, { status: 400 });
+      }
+      
+      const narrative = JSON.parse(legalCase.ai_narrative);
       htmlContent = `
         <h1>Legal Case Narrative — ${legalCase.case_ref}</h1>
         <p><strong>Client:</strong> ${legalCase.client_name} | <strong>Generated:</strong> ${now}</p>
         <hr/>
-        ${narrative ? `
-          <h2>Background & Parties</h2><p>${narrative.background_parties}</p>
-          <h2>Chronology</h2><p>${narrative.chronology}</p>
-          <h2>Liability Analysis</h2><p>${narrative.liability_analysis}</p>
-          <h2>Quantum Assessment</h2><p>${narrative.quantum_assessment}</p>
-          <h2>Legal Framework</h2><p>${narrative.legal_framework}</p>
-          <h2>Applicable Statutes</h2><ul>${(narrative.applicable_statutes||[]).map(s => `<li>${s}</li>`).join('')}</ul>
-          <h2>Recommended Actions</h2><ul>${(narrative.recommended_actions||[]).map(a => `<li>${a}</li>`).join('')}</ul>
-          <h2>Risk Assessment</h2><p>${narrative.risk_assessment}</p>
-        ` : '<p>No AI narrative generated yet.</p>'}
+        <h2>Background & Parties</h2><p>${narrative.background_parties || ''}</p>
+        <h2>Chronology</h2><p>${narrative.chronology || ''}</p>
+        <h2>Liability Analysis</h2><p>${narrative.liability_analysis || ''}</p>
+        <h2>Quantum Assessment</h2><p>${narrative.quantum_assessment || ''}</p>
+        <h2>Legal Framework</h2><p>${narrative.legal_framework || ''}</p>
+        ${narrative.applicable_statutes?.length > 0 ? `<h2>Applicable Statutes</h2><ul>${narrative.applicable_statutes.map(s => `<li>${s}</li>`).join('')}</ul>` : ''}
+        ${narrative.recommended_actions?.length > 0 ? `<h2>Recommended Actions</h2><ul>${narrative.recommended_actions.map(a => `<li>${a}</li>`).join('')}</ul>` : ''}
+        ${narrative.risk_assessment ? `<h2>Risk Assessment</h2><p>${narrative.risk_assessment}</p>` : ''}
       `;
     } else if (export_type === 'evidence_bundle') {
       htmlContent = `
