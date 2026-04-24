@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Upload, Loader2, CheckCircle2, AlertCircle, Trash2, Brain, Link as LinkIcon, FileText } from 'lucide-react';
+import EvidenceDocumentSnip from '@/components/EvidenceDocumentSnip';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -162,7 +163,7 @@ Extract:
       if (matchedEvidenceId) {
         // Update existing record with file URL and enriched data
         await base44.entities.Evidence.update(matchedEvidenceId, { file_url: fileUrl, notes: analysis.key_content || '' });
-        updateItem(idx, { status: 'saved', analysis, matchedEvidenceId, matchedCommId, action: 'updated_existing' });
+        updateItem(idx, { status: 'saved', analysis, fileUrl, matchedEvidenceId, matchedCommId, action: 'updated_existing' });
       } else {
         // Create new record
         const created = await base44.entities.Evidence.create(evidencePayload);
@@ -170,7 +171,7 @@ Extract:
         if (matchedCommId) {
           await base44.entities.Communication.update(matchedCommId, { file_url: fileUrl });
         }
-        updateItem(idx, { status: 'saved', analysis, matchedEvidenceId: created.id, matchedCommId, action: 'created_new' });
+        updateItem(idx, { status: 'saved', analysis, fileUrl, matchedEvidenceId: created.id, matchedCommId, action: 'created_new' });
       }
 
       queryClient.invalidateQueries({ queryKey: ['evidence'] });
@@ -301,6 +302,11 @@ Extract:
                       {item.status === 'matching' && 'Matching to existing case records...'}
                       {item.status === 'saving' && 'Saving to evidence database...'}
                     </div>
+                  )}
+
+                  {/* Original document snip */}
+                  {item.fileUrl && item.status === 'saved' && (
+                    <EvidenceDocumentSnip fileUrl={item.fileUrl} title={item.analysis?.suggested_title || item.file} compact />
                   )}
 
                   {/* AI analysis result */}

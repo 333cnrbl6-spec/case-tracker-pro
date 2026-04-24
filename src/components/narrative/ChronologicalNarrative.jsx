@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import EvidenceDocumentSnip from '@/components/EvidenceDocumentSnip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, Search, FileText, MessageSquare, BookOpen } from 'lucide-react';
@@ -150,6 +151,9 @@ function CommunicationEntry({ comm }) {
                   ))}
                 </div>
               </div>
+            )}
+            {d.file_url && (
+              <EvidenceDocumentSnip fileUrl={d.file_url} title={d.subject} compact />
             )}
           </>
         );
@@ -318,18 +322,23 @@ export default function ChronologicalNarrative({ incidents, communications, evid
                     {phaseItems.filter(t => t.type === 'evidence').map((t, idx) => {
                       const ev = t.item.data || t.item;
                       return (
-                        <div key={idx} className="flex items-start gap-3 text-sm border-l-2 border-green-300 pl-3 py-1">
-                          <Badge className={
-                            ev.strength === 'critical' ? 'bg-red-100 text-red-800' :
-                            ev.strength === 'strong' ? 'bg-amber-100 text-amber-800' :
-                            'bg-slate-100 text-slate-700'
-                          }>
-                            {ev.strength}
-                          </Badge>
-                          <div>
-                            <p className="font-medium text-slate-900">{ev.title}</p>
-                            <p className="text-xs text-slate-600">{ev.description}</p>
+                        <div key={idx} className="text-sm border-l-2 border-green-300 pl-3 py-1">
+                          <div className="flex items-start gap-3">
+                            <Badge className={
+                              ev.strength === 'critical' ? 'bg-red-100 text-red-800' :
+                              ev.strength === 'strong' ? 'bg-amber-100 text-amber-800' :
+                              'bg-slate-100 text-slate-700'
+                            }>
+                              {ev.strength}
+                            </Badge>
+                            <div>
+                              <p className="font-medium text-slate-900">{ev.title}</p>
+                              <p className="text-xs text-slate-600">{ev.description}</p>
+                            </div>
                           </div>
+                          {ev.file_url && (
+                            <EvidenceDocumentSnip fileUrl={ev.file_url} title={ev.title} compact />
+                          )}
                         </div>
                       );
                     })}
