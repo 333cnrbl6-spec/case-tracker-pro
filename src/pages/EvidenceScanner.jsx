@@ -48,12 +48,14 @@ export default function EvidenceScanner() {
     queryFn: () => base44.entities.Communication.list(),
   });
 
-  const { data: existingIncidents = [] } = useQuery({
-    queryKey: ['incidents'],
-    queryFn: () => base44.entities.Incident.list(),
-  });
+  const { data: existingIncidents = [], isLoading: incidentsLoading } = useQuery({
+     queryKey: ['incidents'],
+     queryFn: () => base44.entities.Incident.list(),
+   });
 
-  const updateItem = (idx, patch) => {
+   const isDataReady = !isProcessing && !incidentsLoading;
+
+   const updateItem = (idx, patch) => {
     setItems(prev => prev.map((it, i) => i === idx ? { ...it, ...patch } : it));
   };
 
@@ -243,7 +245,12 @@ Extract:
               }`}
             >
               <input id="file-input" type="file" onChange={handleChange} multiple accept="*/*" className="hidden" />
-              {inProgress ? (
+              {!isDataReady ? (
+                <div className="flex flex-col items-center gap-3">
+                  <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+                  <p className="text-sm font-medium text-slate-700">Loading evidence database...</p>
+                </div>
+              ) : inProgress ? (
                 <div className="flex flex-col items-center gap-3">
                   <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
                   <p className="text-sm font-medium text-slate-700">Processing batch — do not close this page</p>
@@ -256,7 +263,12 @@ Extract:
                     <p className="font-medium text-slate-900">Drop your entire document bundle here</p>
                     <p className="text-sm text-slate-600">PDFs, Excel, Word, images, CSV, scans — any file type, any order, any quantity</p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => document.getElementById('file-input').click()}>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => document.getElementById('file-input').click()}
+                    disabled={!isDataReady}
+                  >
                     Browse Files
                   </Button>
                   <p className="text-xs text-slate-500">Auto OCR • AI classify • Match existing records • Auto-save</p>

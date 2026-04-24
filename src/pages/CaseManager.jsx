@@ -97,6 +97,12 @@ export default function CaseManager() {
     }
   });
 
+  const handleDelete = (caseId, caseRef) => {
+    if (window.confirm(`Delete case ${caseRef}? This cannot be undone.`)) {
+      deleteMutation.mutate(caseId);
+    }
+  };
+
   const handleEdit = (c) => {
     setFormData({ ...EMPTY_FORM, ...c, estimated_value: c.estimated_value || '' });
     setEditingId(c.id);
@@ -409,6 +415,14 @@ export default function CaseManager() {
                           AI Narrative <ChevronRight className="w-3 h-3" />
                         </Button>
                       </Link>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => handleDelete(c.id, c.case_ref)}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

@@ -14,6 +14,7 @@ import BreachFrequencyChart from '@/components/dashboard/BreachFrequencyChart';
 import IncidentTypeChart from '@/components/dashboard/IncidentTypeChart';
 import ResolutionTimeChart from '@/components/dashboard/ResolutionTimeChart';
 import DrillDownPanel from '@/components/dashboard/DrillDownPanel';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
 
 export default function Dashboard() {
@@ -143,11 +144,17 @@ export default function Dashboard() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Compliance Metrics</h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
             <div className="lg:col-span-2">
-              <BreachFrequencyChart incidents={incidents} onDrillDown={handleMonthDrillDown} />
+              <ErrorBoundary>
+                <BreachFrequencyChart incidents={incidents} onDrillDown={handleMonthDrillDown} />
+              </ErrorBoundary>
             </div>
-            <IncidentTypeChart incidents={incidents} onDrillDown={handleTypeDrillDown} />
+            <ErrorBoundary>
+              <IncidentTypeChart incidents={incidents} onDrillDown={handleTypeDrillDown} />
+            </ErrorBoundary>
           </div>
-          <ResolutionTimeChart incidents={incidents} />
+          <ErrorBoundary>
+            <ResolutionTimeChart incidents={incidents} />
+          </ErrorBoundary>
         </div>
 
         <div className="mb-8 space-y-8">
