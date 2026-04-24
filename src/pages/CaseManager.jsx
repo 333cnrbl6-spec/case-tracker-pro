@@ -15,6 +15,7 @@ import { daysUntil } from '@/lib/dateUtils';
 import CaseTimeline from '@/components/CaseTimeline';
 import DuplicateCaseMerger from '@/components/DuplicateCaseMerger';
 import EntityConflictAlert from '@/components/EntityConflictAlert';
+import CaseTypeGuidance from '@/components/CaseTypeGuidance';
 
 const STATUS_COLORS = {
   active: 'bg-green-100 text-green-800',
@@ -194,7 +195,7 @@ export default function CaseManager() {
                   <Plus className="w-4 h-4" /> New Case
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                    <DialogTitle>{editingId ? 'Edit Case' : 'New Case'}</DialogTitle>
                 </DialogHeader>
@@ -205,7 +206,9 @@ export default function CaseManager() {
                     caseRef={formData.case_ref}
                   />
                 )}
-                <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-2">
+                  {/* Form on left */}
+                  <form onSubmit={handleSubmit} className="space-y-4 lg:col-span-1">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-1 block">Case Ref *</label>
@@ -292,7 +295,15 @@ export default function CaseManager() {
                       {saveMutation.isPending ? 'Saving...' : editingId ? 'Update Case' : 'Create Case'}
                     </Button>
                   </div>
-                </form>
+                  </form>
+
+                  {/* Guidance on right */}
+                  {formData.case_type && (
+                    <div className="lg:col-span-2">
+                      <CaseTypeGuidance caseType={formData.case_type} />
+                    </div>
+                  )}
+                  </div>
               </DialogContent>
             </Dialog>
           </div>
