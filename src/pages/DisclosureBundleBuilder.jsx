@@ -137,8 +137,18 @@ export default function DisclosureBundleBuilder() {
 
         {/* Evidence Selection */}
         <Card className="lg:col-span-1">
-          <CardHeader>
+          <CardHeader className="flex items-center justify-between">
             <CardTitle className="text-lg">Evidence ({selectedEvidence.length})</CardTitle>
+            {filteredEvidence.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedEvidence(selectedEvidence.length === filteredEvidence.length ? [] : filteredEvidence.map(e => e.id))}
+                className="text-xs h-7"
+              >
+                {selectedEvidence.length === filteredEvidence.length ? 'Deselect All' : 'Select All'}
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-3">
             <Input
@@ -177,8 +187,18 @@ export default function DisclosureBundleBuilder() {
 
         {/* Incidents Selection */}
         <Card className="lg:col-span-1">
-          <CardHeader>
+          <CardHeader className="flex items-center justify-between">
             <CardTitle className="text-lg">Incidents ({selectedIncidents.length})</CardTitle>
+            {filteredIncidents.length > 0 && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedIncidents(selectedIncidents.length === filteredIncidents.length ? [] : filteredIncidents.map(i => i.id))}
+                className="text-xs h-7"
+              >
+                {selectedIncidents.length === filteredIncidents.length ? 'Deselect All' : 'Select All'}
+              </Button>
+            )}
           </CardHeader>
           <CardContent className="space-y-3">
             <Input
