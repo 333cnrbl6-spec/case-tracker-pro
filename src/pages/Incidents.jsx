@@ -109,6 +109,12 @@ export default function Incidents() {
     },
   });
 
+  const handleDelete = (id, title) => {
+    if (window.confirm(`Delete "${title}"? This cannot be undone.`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       date: '',
@@ -127,6 +133,7 @@ export default function Incidents() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (createMutation.isPending || updateMutation.isPending) return;
     const dataToSave = {
       ...formData,
       rics_violations: linkedRules.length > 0 ? linkedRules : formData.rics_violations
@@ -276,8 +283,10 @@ export default function Incidents() {
                 )}
 
                 <div className="flex gap-3 justify-end">
-                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-red-600 hover:bg-red-700">Save Incident</Button>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={createMutation.isPending || updateMutation.isPending}>Cancel</Button>
+                  <Button type="submit" className="bg-red-600 hover:bg-red-700" disabled={createMutation.isPending || updateMutation.isPending}>
+                    {createMutation.isPending || updateMutation.isPending ? 'Saving...' : 'Save Incident'}
+                  </Button>
                 </div>
               </form>
             </DialogContent>
@@ -362,7 +371,7 @@ ${incidents.map((inc, i) => `${i + 1}. [${inc.severity?.toUpperCase()}] ${inc.da
                        <Button variant="ghost" size="icon" onClick={() => handleEditIncident(incident)}>
                          <Edit2 className="w-4 h-4" />
                        </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(incident.id)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(incident.id, incident.title)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </div>

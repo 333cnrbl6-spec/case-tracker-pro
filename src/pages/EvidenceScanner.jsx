@@ -59,8 +59,16 @@ export default function EvidenceScanner() {
     setItems(prev => prev.map((it, i) => i === idx ? { ...it, ...patch } : it));
   };
 
+  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+
   const processFile = async (file, idx) => {
     try {
+      // 0. File size validation
+      if (file.size > MAX_FILE_SIZE) {
+        updateItem(idx, { status: 'error', error: `File exceeds 100MB limit (${(file.size / 1024 / 1024).toFixed(1)}MB)` });
+        return;
+      }
+
       // 1. Upload
       updateItem(idx, { status: 'uploading' });
       const uploadRes = await base44.integrations.Core.UploadFile({ file });

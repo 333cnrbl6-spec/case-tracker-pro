@@ -111,9 +111,17 @@ export default function Evidence() {
     },
   });
 
+  const handleDelete = (id, title) => {
+    if (window.confirm(`Delete "${title}"? This cannot be undone.`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (!createMutation.isPending) {
+      createMutation.mutate(formData);
+    }
   };
 
   const handleSelectEvidence = (id) => {
@@ -268,7 +276,9 @@ export default function Evidence() {
 
                 <div className="flex gap-3 justify-end">
                   <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-green-600 hover:bg-green-700">Save</Button>
+                  <Button type="submit" className="bg-green-600 hover:bg-green-700" disabled={createMutation.isPending}>
+                    {createMutation.isPending ? 'Saving...' : 'Save'}
+                  </Button>
                 </div>
               </form>
             </DialogContent>
@@ -396,7 +406,7 @@ ${evidence.map((e, i) => `${i + 1}. [${e.strength?.toUpperCase()}] ${e.title} â€
                           </Button>
                         </a>
                       )}
-                      <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(item.id)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id, item.title)}>
                         <Trash2 className="w-4 h-4 text-red-600" />
                       </Button>
                     </div>
