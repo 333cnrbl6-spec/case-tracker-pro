@@ -41,42 +41,40 @@ export default function IncidentReporter() {
 
   const generateReportMutation = useMutation({
     mutationFn: async (incidentId) => {
-      setGeneratingId(incidentId);
       const response = await base44.functions.invoke('generateIncidentReport', {
         incident_id: incidentId
       });
-      return response.data;
+      return { data: response.data, incidentId };
     },
-    onSuccess: (data, incidentId) => {
+    onSuccess: ({ data, incidentId }) => {
       const incident = incidents.find(i => i.id === incidentId);
       const filename = `Incident_Report_${incident?.title.substring(0, 30).replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-      
+
       if (!data) {
         toast.error('Failed to generate report: Empty response');
-        setGeneratingId(null);
         return;
       }
 
       try {
-        const blob = new Blob([data], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
+        const pdfBlob = data instanceof Blob ? data : new Blob([data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
+
         toast.success('Report generated and downloaded successfully');
       } catch (err) {
         toast.error('Failed to download report: ' + err.message);
       }
-
-      setGeneratingId(null);
     },
     onError: (error) => {
       toast.error('Failed to generate report: ' + (error.response?.data?.error || error.message));
+    },
+    onSettled: () => {
       setGeneratingId(null);
     }
   });
@@ -223,7 +221,10 @@ export default function IncidentReporter() {
 
                     {/* Action */}
                     <Button
-                      onClick={() => generateReportMutation.mutate(incident.id)}
+                      onClick={() => {
+                        setGeneratingId(incident.id);
+                        generateReportMutation.mutate(incident.id);
+                      }}
                       disabled={generatingId === incident.id}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                     >

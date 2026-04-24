@@ -11,14 +11,15 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
-    const { incidentId } = body;
+    const { incident_id, incidentId } = body;
+    const actualIncidentId = incident_id || incidentId;
 
-    if (!incidentId) {
+    if (!actualIncidentId) {
       return Response.json({ error: 'Incident ID is required' }, { status: 400 });
     }
 
     // Fetch incident details
-    const incidents = await base44.entities.Incident.filter({ id: incidentId });
+    const incidents = await base44.entities.Incident.filter({ id: actualIncidentId });
     if (incidents.length === 0) {
       return Response.json({ error: 'Incident not found' }, { status: 404 });
     }
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
     const incident = incidents[0];
 
     // Fetch related tasks
-    const allTasks = await base44.entities.IncidentTask.filter({ incident_id: incidentId });
+    const allTasks = await base44.entities.IncidentTask.filter({ incident_id: actualIncidentId });
 
     // Fetch communications
     const allComms = await base44.entities.Communication.list();
@@ -114,18 +115,18 @@ Deno.serve(async (req) => {
     // Executive Summary
     addHeading('EXECUTIVE SUMMARY', 16, [139, 0, 0]);
 
-    addText('Incident Title', incident.data.title);
-    addText('Incident Type', incident.data.incident_type);
-    addText('Date of Incident', new Date(incident.data.date).toLocaleDateString('en-GB'));
-    addText('Severity Level', incident.data.severity.toUpperCase());
-    addText('Current Status', incident.data.status);
+    addText('Incident Title', incident.title);
+    addText('Incident Type', incident.incident_type);
+    addText('Date of Incident', new Date(incident.date).toLocaleDateString('en-GB'));
+    addText('Severity Level', incident.severity?.toUpperCase() || 'UNKNOWN');
+    addText('Current Status', incident.status);
 
-    if (incident.data.rics_violations && incident.data.rics_violations.length > 0) {
-      addText('RICS Violations Identified', incident.data.rics_violations.join(', '));
+    if (incident.rics_violations && incident.rics_violations.length > 0) {
+      addText('RICS Violations Identified', incident.rics_violations.join(', '));
     }
 
-    if (incident.data.legal_issues && incident.data.legal_issues.length > 0) {
-      addText('Potential Legal Issues', incident.data.legal_issues.join(', '));
+    if (incident.legal_issues && incident.legal_issues.length > 0) {
+      addText('Potential Legal Issues', incident.legal_issues.join(', '));
     }
 
     yPosition += lineHeight;
@@ -134,23 +135,23 @@ Deno.serve(async (req) => {
     // Incident Details
     addHeading('INCIDENT DETAILS', 14, [139, 0, 0]);
 
-    if (incident.data.description) {
+    if (incident.description) {
       doc.setFontSize(10);
       doc.setFont(undefined, 'bold');
       doc.text('Description:', margin, yPosition);
       yPosition += lineHeight * 1.5;
       doc.setFont(undefined, 'normal');
-      const descLines = doc.splitTextToSize(incident.data.description, maxWidth);
+      const descLines = doc.splitTextToSize(incident.description, maxWidth);
       doc.text(descLines, margin, yPosition);
       yPosition += lineHeight * Math.max(1, descLines.length * 1.2) + lineHeight;
     }
 
-    if (incident.data.evidence_notes) {
-      addText('Evidence Notes', incident.data.evidence_notes);
+    if (incident.evidence_notes) {
+      addText('Evidence Notes', incident.evidence_notes);
     }
 
-    if (incident.data.witnesses && incident.data.witnesses.length > 0) {
-      addText('Witnesses', incident.data.witnesses.join(', '));
+    if (incident.witnesses && incident.witnesses.length > 0) {
+      addText('Witnesses', incident.witnesses.join(', '));
     }
 
     yPosition += lineHeight;
@@ -167,22 +168,22 @@ Deno.serve(async (req) => {
         }
 
         doc.setFontSize(10);
-        doc.setFont(undefined, 'bold');
-        doc.text(`Task ${idx + 1}: ${task.data.title}`, margin, yPosition);
-        yPosition += lineHeight * 1.5;
+          doc.setFont(undefined, 'bold');
+          doc.text(`Task ${idx + 1}: ${task.title}`, margin, yPosition);
+          yPosition += lineHeight * 1.5;
 
-        doc.setFont(undefined, 'normal');
-        addText('Status', task.data.status);
-        addText('Priority', task.data.priority);
-        addText('Assigned To', task.data.assigned_to || 'Unassigned');
+          doc.setFont(undefined, 'normal');
+          addText('Status', task.status);
+          addText('Priority', task.priority);
+          addText('Assigned To', task.assigned_to || 'Unassigned');
 
-        if (task.data.deadline) {
-          addText('Deadline', new Date(task.data.deadline).toLocaleDateString('en-GB'));
-        }
+          if (task.deadline) {
+            addText('Deadline', new Date(task.deadline).toLocaleDateString('en-GB'));
+          }
 
-        if (task.data.notes) {
-          addText('Notes', task.data.notes);
-        }
+          if (task.notes) {
+            addText('Notes', task.notes);
+          }
 
         yPosition += lineHeight;
         doc.setDrawColor(220, 220, 220);
@@ -195,7 +196,7 @@ Deno.serve(async (req) => {
 
     // Communications
     const relatedComms = allComms.filter(c => 
-      incident.data.title && c.data.subject?.includes(incident.data.title.substring(0, 20))
+      incident.title && c.subject?.includes(incident.title.substring(0, 20))
     );
 
     if (relatedComms.length > 0) {
@@ -213,22 +214,22 @@ Deno.serve(async (req) => {
         yPosition += lineHeight * 1.5;
 
         doc.setFont(undefined, 'normal');
-        addText('Date', new Date(comm.data.date).toLocaleDateString('en-GB'));
-        addText('Type', comm.data.type);
-        addText('From', comm.data.from);
-        addText('To', comm.data.to);
-        addText('Subject', comm.data.subject);
+        addText('Date', new Date(comm.date).toLocaleDateString('en-GB'));
+        addText('Type', comm.type);
+        addText('From', comm.from);
+        addText('To', comm.to);
+        addText('Subject', comm.subject);
 
-        if (comm.data.tone) {
-          addText('Tone Assessment', comm.data.tone);
+        if (comm.tone) {
+          addText('Tone Assessment', comm.tone);
         }
 
-        if (comm.data.content) {
+        if (comm.content) {
           doc.setFont(undefined, 'bold');
           doc.text('Content:', margin, yPosition);
           yPosition += lineHeight * 1.5;
           doc.setFont(undefined, 'normal');
-          const contentLines = doc.splitTextToSize(comm.data.content.substring(0, 300), maxWidth);
+          const contentLines = doc.splitTextToSize(comm.content.substring(0, 300), maxWidth);
           doc.text(contentLines, margin, yPosition);
           yPosition += lineHeight * Math.max(1, contentLines.length * 1.2);
         }
@@ -244,7 +245,7 @@ Deno.serve(async (req) => {
 
     // Evidence Summary
     const relatedEvidence = allEvidence.filter(e =>
-      e.data.related_incidents?.includes(incidentId)
+      e.related_incidents?.includes(actualIncidentId)
     );
 
     if (relatedEvidence.length > 0) {
@@ -258,17 +259,17 @@ Deno.serve(async (req) => {
 
         doc.setFontSize(10);
         doc.setFont(undefined, 'bold');
-        doc.text(`${idx + 1}. ${ev.data.title}`, margin, yPosition);
+        doc.text(`${idx + 1}. ${ev.title}`, margin, yPosition);
         yPosition += lineHeight * 1.5;
 
         doc.setFont(undefined, 'normal');
-        addText('Type', ev.data.evidence_type);
-        addText('Date Collected', new Date(ev.data.date_collected).toLocaleDateString('en-GB'));
-        addText('Relevance', ev.data.relevance);
-        addText('Strength', ev.data.strength);
+        addText('Type', ev.evidence_type);
+        addText('Date Collected', new Date(ev.date_collected).toLocaleDateString('en-GB'));
+        addText('Relevance', ev.relevance);
+        addText('Strength', ev.strength);
 
-        if (ev.data.description) {
-          addText('Description', ev.data.description);
+        if (ev.description) {
+          addText('Description', ev.description);
         }
 
         yPosition += lineHeight;
@@ -290,7 +291,7 @@ Deno.serve(async (req) => {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Incident_Report_${incidentId}_${new Date().toISOString().split('T')[0]}.pdf"`
+        'Content-Disposition': `attachment; filename="Incident_Report_${actualIncidentId}_${new Date().toISOString().split('T')[0]}.pdf"`
       }
     });
   } catch (error) {
