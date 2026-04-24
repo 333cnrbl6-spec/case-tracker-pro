@@ -60,8 +60,9 @@ export default function ComplianceRiskDashboard() {
 
     const analyzeRiskMutation = useMutation({
         mutationFn: (caseId) => base44.functions.invoke('analyzeComplianceRisk', { case_id: caseId }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['complianceRisks'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['complianceRisks'] });
+            await queryClient.refetchQueries({ queryKey: ['complianceRisks'] });
         },
     });
 
