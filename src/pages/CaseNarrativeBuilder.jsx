@@ -1,337 +1,507 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Sparkles, Download, ArrowLeft, CheckCircle, AlertTriangle, Scale, FileText } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  FileText,
+  Loader2,
+  Download,
+  CheckCircle2,
+  AlertCircle,
+  Zap,
+  Copy,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import PDFExportPanel from '@/components/PDFExportPanel';
-import { daysUntil } from '@/lib/dateUtils';
 
 export default function CaseNarrativeBuilder() {
-  const params = new URLSearchParams(window.location.search);
-  const caseId = params.get('case_id');
   const queryClient = useQueryClient();
-  const [narrative, setNarrative] = useState(null);
-  const [showPDFPanel, setShowPDFPanel] = useState(false);
-  const [isGeneratingBrief, setIsGeneratingBrief] = useState(false);
+  const [selectedCaseId, setSelectedCaseId] = useState('');
+  const [activeSection, setActiveSection] = useState('executive_summary');
 
-  const { data: cases = [] } = useQuery({
+  // Fetch cases
+  const { data: cases = [], isLoading: casesLoading } = useQuery({
     queryKey: ['legal-cases'],
-    queryFn: () => base44.entities.LegalCase.list(),
+    queryFn: () => base44.entities.LegalCase.list('-created_date'),
   });
 
-  const legalCase = cases.find(c => c.id === caseId);
+  const selectedCase = cases.find((c) => c.id === selectedCaseId);
+  const narrative = selectedCase?.ai_narrative
+    ? JSON.parse(selectedCase.ai_narrative)
+    : null;
 
-  // Load saved narrative on mount
-  useEffect(() => {
-    if (!legalCase?.ai_narrative) return;
-    
-    const loadNarrative = async () => {
-      try {
-        let narrativeText = legalCase.ai_narrative;
-        
-        // If it's a URL, fetch the content
-        if (narrativeText.startsWith('http')) {
-          const response = await fetch(narrativeText);
-          narrativeText = await response.text();
-        }
-        
-        const parsed = JSON.parse(narrativeText);
-        // Handle case where schema wrapper is included
-        const narrativeData = parsed.properties ? parsed.properties : parsed;
-        setNarrative(narrativeData);
-      } catch (e) {
-        console.error('Failed to load narrative:', e);
-      }
-    };
-    
-    loadNarrative();
-  }, [legalCase]);
-
-  const generateMutation = useMutation({
-    mutationFn: async () => {
-      const result = await base44.functions.invoke('generateLegalNarrative', { case_id: caseId });
-      return result.data;
-    },
-    onSuccess: (data) => {
-      setNarrative(data);
+  // Generate narrative mutation
+  const generateNarrative = useMutation({
+    mutationFn: (caseId) =>
+      base44.functions.invoke('generateStructuredLegalNarrative', {
+        case_id: caseId,
+      }),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['legal-cases'] });
-      toast.success('Legal narrative generated using Claude AI');
+      toast.success('Narrative generated successfully');
     },
-    onError: (e) => toast.error(e.message)
+    onError: (error) => {
+      toast.error(
+        error.response?.data?.error || 'Failed to generate narrative'
+      );
+    },
   });
 
-  const downloadBriefPDF = async () => {
+  const handleGenerateNarrative = () => {
+    if (!selectedCaseId) {
+      toast.error('Please select a case');
+      return;
+    }
+    generateNarrative.mutate(selectedCaseId);
+  };
+
+  const exportToPDF = async () => {
     if (!narrative) return;
+
     try {
-      setIsGeneratingBrief(true);
-      const response = await fetch('/api/functions/generateLegalBriefPDF', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ case_id: caseId, narrative })
-      });
-      
-      if (!response.ok) throw new Error('Failed to generate PDF');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `Legal-Brief-${legalCase?.case_ref || 'case'}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      toast.success('Legal brief PDF downloaded');
-    } catch (e) {
-      console.error('PDF download error:', e);
-      toast.error(e.message || 'Failed to generate PDF');
-    } finally {
-      setIsGeneratingBrief(false);
+      const { jsPDF } = await import('jspdf');
+      const doc = new jsPDF();
+      let yPos = 20;
+
+      const addText = (text, fontSize = 12, isBold = false) => {
+        doc.setFontSize(fontSize);
+        doc.setFont(undefined, isBold ? 'bold' : 'normal');
+        const lines = doc.splitTextToSize(text, 170);
+        doc.text(lines, 20, yPos);
+        yPos += lines.length * (fontSize / 3) + 3;
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+      };
+
+      // Header
+      doc.setFontSize(16);
+      doc.setFont(undefined, 'bold');
+      doc.text('LEGAL CASE BRIEF', 20, 20);
+      yPos = 30;
+
+      if (narrative.case_overview) {
+        addText('CASE OVERVIEW', 12, true);
+        addText(`Case Reference: ${narrative.case_overview.title}`);
+        addText(`Type: ${narrative.case_overview.type}`);
+        addText(`Client: ${narrative.case_overview.client}`);
+        addText(`Opponent: ${narrative.case_overview.opponent}`);
+        addText(`Value: ${narrative.case_overview.value}`);
+        addText(`Status: ${narrative.case_overview.status}`);
+        yPos += 5;
+      }
+
+      if (narrative.executive_summary) {
+        addText('EXECUTIVE SUMMARY', 12, true);
+        addText(narrative.executive_summary, 11);
+        yPos += 5;
+      }
+
+      if (narrative.background_and_facts) {
+        addText('BACKGROUND & FACTS', 12, true);
+        addText(narrative.background_and_facts, 11);
+        yPos += 5;
+      }
+
+      if (narrative.liability_analysis) {
+        addText('LIABILITY ANALYSIS', 12, true);
+        addText(narrative.liability_analysis, 11);
+        yPos += 5;
+      }
+
+      if (narrative.key_evidence && narrative.key_evidence.length > 0) {
+        addText('KEY EVIDENCE', 12, true);
+        narrative.key_evidence.forEach((e) => {
+          addText(`• ${e.description}`, 10);
+          addText(`  Strength: ${e.strength} | Impact: ${e.impact}`, 9);
+        });
+        yPos += 3;
+      }
+
+      if (narrative.strengths && narrative.strengths.length > 0) {
+        addText('CASE STRENGTHS', 12, true);
+        narrative.strengths.forEach((s) => {
+          addText(`✓ ${s}`, 11);
+        });
+        yPos += 3;
+      }
+
+      if (narrative.weaknesses && narrative.weaknesses.length > 0) {
+        addText('IDENTIFIED WEAKNESSES', 12, true);
+        narrative.weaknesses.forEach((w) => {
+          addText(`⚠ ${w}`, 11);
+        });
+        yPos += 3;
+      }
+
+      if (narrative.risks && narrative.risks.length > 0) {
+        addText('RISKS', 12, true);
+        narrative.risks.forEach((r) => {
+          addText(`• ${r}`, 11);
+        });
+        yPos += 3;
+      }
+
+      if (narrative.next_steps && narrative.next_steps.length > 0) {
+        addText('RECOMMENDED NEXT STEPS', 12, true);
+        narrative.next_steps.forEach((step, idx) => {
+          addText(`${idx + 1}. ${step}`, 11);
+        });
+      }
+
+      doc.save(
+        `${selectedCase.case_ref}_narrative_${new Date().toISOString().split('T')[0]}.pdf`
+      );
+      toast.success('PDF exported successfully');
+    } catch (error) {
+      toast.error('Failed to export PDF');
     }
   };
 
-  if (!caseId) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-500 mb-4">No case selected.</p>
-          <Link to="/case-manager"><Button>Go to Case Manager</Button></Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white border-b shadow-sm">
-        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
-          <Link to="/case-manager" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
-            <ArrowLeft className="w-4 h-4" /> Back to Cases
-          </Link>
-          <div className="flex items-center gap-2">
-            {legalCase && (
-              <span className="text-sm font-medium text-slate-700">{legalCase.case_ref} — {legalCase.client_name}</span>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowPDFPanel(v => !v)}
-              className="gap-1"
-            >
-              <Download className="w-4 h-4" /> Export PDF
-            </Button>
-            {narrative && (
-              <>
-                <Link to={`/case-weakness-rebuttal?case_id=${caseId}`}>
-                  <Button
-                    size="sm"
-                    className="bg-orange-600 hover:bg-orange-700 gap-1"
-                  >
-                    <AlertTriangle className="w-4 h-4" /> Address Weaknesses
-                  </Button>
-                </Link>
+    <div className="min-h-screen bg-slate-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <FileText className="w-8 h-8" />
+            Case Narrative Builder
+          </h1>
+          <p className="text-slate-600 mt-2">
+            AI-powered legal brief generation from case facts, communications, and evidence
+          </p>
+        </div>
+
+        {/* Case Selection & Generation */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Select & Generate Narrative</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <label className="text-sm font-medium text-slate-700 block mb-2">
+                  Select Case
+                </label>
+                <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Choose a case..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cases.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.case_ref} - {c.client_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-end gap-2">
                 <Button
-                  size="sm"
-                  onClick={downloadBriefPDF}
-                  disabled={isGeneratingBrief}
-                  className="bg-amber-600 hover:bg-amber-700 gap-1"
+                  onClick={handleGenerateNarrative}
+                  disabled={generateNarrative.isPending || !selectedCaseId}
+                  className="gap-2"
                 >
-                  {isGeneratingBrief ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Generating Brief...</>
+                  {generateNarrative.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Generating...
+                    </>
                   ) : (
-                    <><FileText className="w-4 h-4" /> Download Legal Brief PDF</>
+                    <>
+                      <Zap className="w-4 h-4" />
+                      Generate Narrative
+                    </>
                   )}
                 </Button>
-              </>
-            )}
-            <Button
-              size="sm"
-              onClick={() => generateMutation.mutate()}
-              disabled={generateMutation.isPending || !caseId}
-              className="bg-indigo-600 hover:bg-indigo-700 gap-1"
-            >
-              {generateMutation.isPending ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Generating with Claude AI...</>
-              ) : (
-                <><Sparkles className="w-4 h-4" /> {narrative ? 'Regenerate' : 'Generate'} Narrative</>
-              )}
-            </Button>
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-6">
-        {/* PDF Export Panel */}
-        {showPDFPanel && caseId && (
-          <PDFExportPanel caseId={caseId} caseRef={legalCase?.case_ref} onClose={() => setShowPDFPanel(false)} />
-        )}
+                {narrative && (
+                  <Button
+                    onClick={exportToPDF}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Export PDF
+                  </Button>
+                )}
+              </div>
+            </div>
 
-        {/* Case Summary Card */}
-        {legalCase && (
-          <Card className="border-l-4 border-l-indigo-500">
-            <CardContent className="pt-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div><p className="text-slate-500">Case Ref</p><p className="font-bold">{legalCase.case_ref}</p></div>
-                <div><p className="text-slate-500">Client</p><p className="font-semibold">{legalCase.client_name}</p></div>
-                <div><p className="text-slate-500">Opponent</p><p className="font-semibold">{legalCase.opponent_name || '—'}</p></div>
-                <div>
-                  <p className="text-slate-500 flex items-center gap-1"><AlertTriangle className="w-3.5 h-3.5 text-red-500" /> Limitation Date</p>
-                  <p className={`font-bold ${legalCase.limitation_date && daysUntil(legalCase.limitation_date) <= 30 ? 'text-red-600' : 'text-slate-900'}`}>
-                    {legalCase.limitation_date ? new Date(legalCase.limitation_date).toLocaleDateString('en-GB') : '⚠️ Not set'}
+            {selectedCase?.narrative_generated_at && (
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-green-800">
+                  <p className="font-semibold">Narrative generated</p>
+                  <p className="text-xs">
+                    {new Date(
+                      selectedCase.narrative_generated_at
+                    ).toLocaleString('en-GB')}
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        )}
+            )}
+          </CardContent>
+        </Card>
 
-        {/* No narrative yet */}
-        {!narrative && !generateMutation.isPending && (
-          <Card className="text-center py-16 border-dashed">
-            <Sparkles className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-700 mb-2">Generate AI Legal Narrative</h2>
-            <p className="text-slate-500 mb-6 max-w-md mx-auto">
-              Powered by Claude AI — generates a structured UK legal narrative including liability analysis, quantum assessment, and applicable statutes.
-            </p>
-            <Button onClick={() => generateMutation.mutate()} className="bg-indigo-600 hover:bg-indigo-700 gap-2">
-              <Sparkles className="w-4 h-4" /> Generate Narrative
-            </Button>
-            <p className="text-xs text-slate-400 mt-3">Uses Claude claude_sonnet_4_6 — higher quality AI credits</p>
-          </Card>
-        )}
-
-        {generateMutation.isPending && (
-          <Card className="text-center py-16">
-            <Loader2 className="w-12 h-12 text-indigo-600 animate-spin mx-auto mb-4" />
-            <p className="text-slate-600 font-medium">Claude AI is drafting your legal narrative...</p>
-            <p className="text-slate-400 text-sm mt-1">Analysing facts, evidence, and applicable law</p>
-          </Card>
-        )}
-
-        {/* Narrative Sections */}
-        {narrative && (
-          <div className="space-y-4">
-            {legalCase?.narrative_generated_at && (
-              <p className="text-xs text-slate-400">Last generated: {new Date(legalCase.narrative_generated_at).toLocaleString('en-GB')}</p>
+        {/* Narrative Display */}
+        {narrative ? (
+          <div className="space-y-6">
+            {/* Executive Summary */}
+            {narrative.executive_summary && (
+              <Card className="border-l-4 border-l-blue-500">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Executive Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="text-slate-700">
+                  {narrative.executive_summary}
+                </CardContent>
+              </Card>
             )}
 
-            <NarrativeSection icon={<FileText className="w-5 h-5 text-indigo-600" />} title="Background & Parties" color="indigo">
-              {narrative.background_parties}
-            </NarrativeSection>
-
-            <NarrativeSection icon={<Scale className="w-5 h-5 text-blue-600" />} title="Chronology of Events" color="blue">
-              {narrative.chronology}
-            </NarrativeSection>
-
-            <NarrativeSection icon={<Scale className="w-5 h-5 text-amber-600" />} title="Liability Analysis" color="amber">
-              {narrative.liability_analysis}
-            </NarrativeSection>
-
-            <NarrativeSection icon={<Scale className="w-5 h-5 text-green-600" />} title="Quantum Assessment" color="green">
-              {narrative.quantum_assessment}
-            </NarrativeSection>
-
-            <NarrativeSection icon={<FileText className="w-5 h-5 text-purple-600" />} title="Legal Framework" color="purple">
-              {narrative.legal_framework}
-            </NarrativeSection>
-
-            {narrative.applicable_statutes?.length > 0 && (
-              <Card className="border-l-4 border-l-purple-400">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Scale className="w-5 h-5 text-purple-600" /> Applicable Statutes & Case Law
-                  </CardTitle>
+            {/* Case Overview */}
+            {narrative.case_overview && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Case Overview</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-1">
-                    {narrative.applicable_statutes.map((s, i) => (
-                      <li key={i} className="text-sm text-slate-700 flex items-start gap-2">
-                        <span className="text-purple-600 mt-0.5">§</span> {s}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                      <p className="text-xs text-slate-600 uppercase font-semibold">
+                        Type
+                      </p>
+                      <p className="text-sm font-bold">
+                        {narrative.case_overview.type}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600 uppercase font-semibold">
+                        Client
+                      </p>
+                      <p className="text-sm font-bold">
+                        {narrative.case_overview.client}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600 uppercase font-semibold">
+                        Status
+                      </p>
+                      <Badge className="mt-1">
+                        {narrative.case_overview.status}
+                      </Badge>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600 uppercase font-semibold">
+                        Opponent
+                      </p>
+                      <p className="text-sm font-bold">
+                        {narrative.case_overview.opponent}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-600 uppercase font-semibold">
+                        Value
+                      </p>
+                      <p className="text-sm font-bold">
+                        {narrative.case_overview.value}
+                      </p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {narrative.strengths?.length > 0 && (
-                <Card className="border-l-4 border-l-green-500">
-                  <CardHeader className="pb-2"><CardTitle className="text-base text-green-700">Case Strengths</CardTitle></CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1">
-                      {narrative.strengths.map((s, i) => <li key={i} className="text-sm flex gap-2"><CheckCircle className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />{s}</li>)}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
+            {/* Tabbed Sections */}
+            <Card>
+              <CardHeader>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { id: 'background_and_facts', label: 'Facts' },
+                    { id: 'liability_analysis', label: 'Liability' },
+                    { id: 'key_evidence', label: 'Evidence' },
+                    { id: 'legal_issues', label: 'Legal Issues' },
+                    { id: 'strengths', label: 'Strengths' },
+                    { id: 'weaknesses', label: 'Weaknesses' },
+                    { id: 'risks', label: 'Risks' },
+                    { id: 'next_steps', label: 'Next Steps' },
+                  ].map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveSection(section.id)}
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                        activeSection === section.id
+                          ? 'bg-primary text-white'
+                          : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                      }`}
+                    >
+                      {section.label}
+                    </button>
+                  ))}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="prose prose-sm max-w-none">
+                  {activeSection === 'background_and_facts' && narrative.background_and_facts && (
+                    <div className="whitespace-pre-wrap text-slate-700">
+                      {narrative.background_and_facts}
+                    </div>
+                  )}
 
-              {narrative.weaknesses?.length > 0 && (
-                <Card className="border-l-4 border-l-red-400">
-                  <CardHeader className="pb-2"><CardTitle className="text-base text-red-700">Case Weaknesses / Risks</CardTitle></CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1">
-                      {narrative.weaknesses.map((w, i) => <li key={i} className="text-sm flex gap-2"><AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />{w}</li>)}
-                    </ul>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+                  {activeSection === 'liability_analysis' && narrative.liability_analysis && (
+                    <div className="whitespace-pre-wrap text-slate-700">
+                      {narrative.liability_analysis}
+                    </div>
+                  )}
 
-            {narrative.recommended_actions?.length > 0 && (
-              <Card className="border-l-4 border-l-emerald-500 bg-emerald-50">
-                <CardHeader className="pb-2"><CardTitle className="text-base text-emerald-800">Recommended Actions</CardTitle></CardHeader>
-                <CardContent>
-                  <ol className="space-y-2">
-                    {narrative.recommended_actions.map((a, i) => (
-                      <li key={i} className="text-sm flex gap-3">
-                        <span className="bg-emerald-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shrink-0 mt-0.5">{i + 1}</span>
-                        {a}
-                      </li>
-                    ))}
-                  </ol>
+                  {activeSection === 'key_evidence' && narrative.key_evidence && (
+                    <div className="space-y-3">
+                      {narrative.key_evidence.map((e, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 bg-slate-50 border border-slate-200 rounded"
+                        >
+                          <p className="font-semibold text-slate-900">
+                            {e.description}
+                          </p>
+                          <p className="text-sm text-slate-600 mt-1">
+                            <span className="font-medium">Type:</span> {e.type}{' '}
+                            | <span className="font-medium">Strength:</span>{' '}
+                            {e.strength}
+                          </p>
+                          <p className="text-sm text-slate-600">
+                            <span className="font-medium">Impact:</span>{' '}
+                            {e.impact}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeSection === 'legal_issues' && narrative.legal_issues && (
+                    <div className="space-y-3">
+                      {narrative.legal_issues.map((issue, idx) => (
+                        <div key={idx} className="border-l-4 border-blue-500 pl-4 py-2">
+                          <p className="font-semibold text-slate-900">
+                            {issue.issue}
+                          </p>
+                          <p className="text-sm text-slate-700 mt-2">
+                            {issue.analysis}
+                          </p>
+                          <Badge
+                            className={`mt-2 ${
+                              issue.risk === 'high'
+                                ? 'bg-red-100 text-red-800'
+                                : issue.risk === 'medium'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-green-100 text-green-800'
+                            }`}
+                          >
+                            {issue.risk.toUpperCase()} RISK
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {activeSection === 'strengths' && narrative.strengths && (
+                    <ul className="space-y-2">
+                      {narrative.strengths.map((s, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-slate-700"
+                        >
+                          <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span>{s}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {activeSection === 'weaknesses' && narrative.weaknesses && (
+                    <ul className="space-y-2">
+                      {narrative.weaknesses.map((w, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-slate-700"
+                        >
+                          <AlertCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                          <span>{w}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {activeSection === 'risks' && narrative.risks && (
+                    <ul className="space-y-2">
+                      {narrative.risks.map((r, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-slate-700"
+                        >
+                          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                          <span>{r}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {activeSection === 'next_steps' && narrative.next_steps && (
+                    <ol className="space-y-2">
+                      {narrative.next_steps.map((step, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-slate-700"
+                        >
+                          <span className="font-bold text-primary min-w-fit">
+                            {idx + 1}.
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Partner Review Notes */}
+            {narrative.partner_review_notes && (
+              <Card className="border-2 border-purple-200 bg-purple-50">
+                <CardHeader>
+                  <CardTitle className="text-lg text-purple-900">
+                    Partner Review Notes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-purple-900">
+                  {narrative.partner_review_notes}
                 </CardContent>
               </Card>
             )}
-
-            {narrative.risk_assessment && (
-              <NarrativeSection icon={<AlertTriangle className="w-5 h-5 text-red-600" />} title="Risk Assessment" color="red">
-                {narrative.risk_assessment}
-              </NarrativeSection>
-            )}
-
-            <div className="border-t-2 border-slate-200 pt-4 text-xs text-slate-400">
-              <p><strong>Notice:</strong> This AI-generated narrative is produced using Claude AI from documented case data. It is intended as a drafting aid for qualified legal practitioners and does not constitute legal advice. Jurisdiction: England & Wales.</p>
-            </div>
           </div>
+        ) : (
+          <Card className="text-center py-12">
+            <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-500">
+              {selectedCaseId && casesLoading
+                ? 'Loading...'
+                : selectedCaseId
+                  ? 'Click "Generate Narrative" to create an AI-powered case brief'
+                  : 'Select a case to begin'}
+            </p>
+          </Card>
         )}
       </div>
     </div>
-  );
-}
-
-function NarrativeSection({ icon, title, color, children }) {
-  const borderColors = {
-    indigo: 'border-l-indigo-500',
-    blue: 'border-l-blue-500',
-    amber: 'border-l-amber-500',
-    green: 'border-l-green-500',
-    purple: 'border-l-purple-500',
-    red: 'border-l-red-400',
-  };
-  return (
-    <Card className={`border-l-4 ${borderColors[color] || 'border-l-slate-400'}`}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base flex items-center gap-2">{icon}{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{children}</p>
-      </CardContent>
-    </Card>
   );
 }

@@ -163,6 +163,7 @@ const AuthenticatedApp = () => {
       <Route path="/client-portal-manager" element={<ClientPortalManager />} />
       <Route path="/client-portal" element={<ClientPortalView />} />
       <Route path="/milestone-timeline" element={<MilestoneTimeline />} />
+      <Route path="/case-narrative-builder" element={<CaseNarrativeBuilder />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
