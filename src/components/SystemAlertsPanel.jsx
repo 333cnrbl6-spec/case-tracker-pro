@@ -47,8 +47,8 @@ export default function SystemAlertsPanel() {
     return null;
   }
 
-  const activeAlerts = alerts.filter(a => a.data.status === 'active');
-  const acknowledgedAlerts = alerts.filter(a => a.data.status === 'acknowledged');
+  const activeAlerts = alerts.filter(a => a?.status === 'active');
+  const acknowledgedAlerts = alerts.filter(a => a?.status === 'acknowledged');
 
   return (
     <div className="space-y-4">
@@ -98,7 +98,7 @@ export default function SystemAlertsPanel() {
 }
 
 function AlertCard({ alert, isExpanded, onToggle, onAcknowledge, onResolve, isAcknowledged }) {
-  const alertData = alert.data;
+  const alertData = alert;
 
   return (
     <Card className={`border-l-4 ${alertTypeColors[alertData.alert_type] || 'border-l-slate-400'}`}>
