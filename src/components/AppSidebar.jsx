@@ -26,6 +26,7 @@ const NAV_GROUPS = [
       { path: '/evidence', icon: FileText, label: 'Evidence' },
       { path: '/scanner', icon: FileSearch, label: 'Evidence Scanner' },
       { path: '/evidence-validator', icon: CheckSquare, label: 'Evidence Validator' },
+      { path: '/batch-export', icon: Layers, label: 'Batch Export' },
     ],
   },
   {
