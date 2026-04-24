@@ -37,7 +37,7 @@ export default function CaseNarrativeBuilder() {
       return result.data;
     },
     onSuccess: (data) => {
-      setNarrative(data.narrative);
+      setNarrative(data);
       queryClient.invalidateQueries({ queryKey: ['legal-cases'] });
       toast.success('Legal narrative generated using Claude AI');
     },
