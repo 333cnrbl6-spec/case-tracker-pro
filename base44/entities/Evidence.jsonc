@@ -66,6 +66,25 @@
     "notes": {
       "type": "string",
       "description": "Additional context or analysis"
+    },
+    "validation_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "validated",
+        "flagged",
+        "archived"
+      ],
+      "default": "pending",
+      "description": "Validation status from evidence validator"
+    },
+    "validation_date": {
+      "type": "string",
+      "description": "ISO timestamp when evidence was validated"
+    },
+    "validation_notes": {
+      "type": "string",
+      "description": "Validator notes and findings"
     }
   },
   "required": [

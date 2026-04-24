@@ -123,6 +123,7 @@ export default function EvidenceValidator() {
   const [filterSeverity, setFilterSeverity] = useState(null);
   const [expandedLinks, setExpandedLinks] = useState({});
   const [activeLinkedItem, setActiveLinkedItem] = useState(null); // { type, id }
+  const [showOnlyPending, setShowOnlyPending] = useState(true);
 
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
@@ -137,6 +138,25 @@ export default function EvidenceValidator() {
   const { data: incidents = [] } = useQuery({
     queryKey: ['incidents'],
     queryFn: () => base44.entities.Incident.list(),
+  });
+
+  const updateEvidenceStatus = useMutation({
+    mutationFn: async (updates) => {
+      const promises = updates.map(({ id, status, notes }) =>
+        base44.entities.Evidence.update(id, {
+          validation_status: status,
+          validation_notes: notes,
+          validation_date: new Date().toISOString()
+        })
+      );
+      await Promise.all(promises);
+    },
+    onSuccess: () => {
+      toast.success('Evidence status updated');
+    },
+    onError: (error) => {
+      toast.error('Failed to update status: ' + error.message);
+    }
   });
 
   const validateEvidence = useMutation({
@@ -240,6 +260,21 @@ export default function EvidenceValidator() {
               <p className="text-slate-600 mt-1">Generated: {new Date().toLocaleDateString()}</p>
             </div>
             <div className="flex gap-2">
+              <Button
+                onClick={() => {
+                  updateEvidenceStatus.mutate(
+                    selectedEvidence.map(id => ({
+                      id,
+                      status: 'validated',
+                      notes: `Validated on ${new Date().toLocaleDateString()}`
+                    }))
+                  );
+                }}
+                className="gap-2 bg-green-600 hover:bg-green-700"
+                disabled={updateEvidenceStatus.isPending}
+              >
+                Mark as Validated
+              </Button>
               <Button
                 onClick={() => exportValidationPDF({
                   report: validationReport,
@@ -471,56 +506,80 @@ Validation report data:
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="border-b pb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Evidence Validator</h1>
-          <p className="text-lg text-slate-600">AI-powered cross-reference checking: RICS compliance, timeline verification, and discrepancy detection</p>
-        </div>
+         <div className="border-b pb-8">
+           <h1 className="text-4xl font-bold text-slate-900 mb-2">Evidence Validator</h1>
+           <p className="text-lg text-slate-600">AI-powered cross-reference checking: RICS compliance, timeline verification, and discrepancy detection</p>
+           <div className="flex gap-2 mt-4">
+             <Button
+               variant={showOnlyPending ? 'default' : 'outline'}
+               onClick={() => setShowOnlyPending(true)}
+               size="sm"
+             >
+               Pending Only
+             </Button>
+             <Button
+               variant={!showOnlyPending ? 'default' : 'outline'}
+               onClick={() => setShowOnlyPending(false)}
+               size="sm"
+             >
+               All Evidence
+             </Button>
+           </div>
+         </div>
 
         {/* Selection Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Evidence Selection */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <FileCheck className="w-4 h-4" />
-                  Evidence ({selectedEvidence.length}/{evidence.length})
-                </CardTitle>
-                {evidence.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedEvidence(selectedEvidence.length === evidence.length ? [] : evidence.map(e => e.id))}
-                    className="text-xs"
-                  >
-                    {selectedEvidence.length === evidence.length ? 'Deselect All' : 'Select All'}
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2 max-h-96 overflow-y-auto">
-              {evidence.length === 0 ? (
-                <p className="text-sm text-slate-500">No evidence uploaded</p>
-              ) : (
-                evidence.map(e => (
-                  <div key={e.id} className="flex items-start gap-3 p-2 hover:bg-slate-50 rounded">
-                    <Checkbox
-                      checked={selectedEvidence.includes(e.id)}
-                      onChange={() => toggleEvidence(e.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{(e.data ?? e).title}</p>
-                      <p className="text-xs text-slate-500">{(e.data ?? e).evidence_type}</p>
-                      {(e.data ?? e).date_collected && (
-                        <p className="text-xs text-slate-500">📅 {(e.data ?? e).date_collected}</p>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </CardContent>
-          </Card>
+           <Card>
+             <CardHeader>
+               <div className="flex items-center justify-between">
+                 <CardTitle className="text-base flex items-center gap-2">
+                   <FileCheck className="w-4 h-4" />
+                   Evidence ({selectedEvidence.length}/{showOnlyPending ? evidence.filter(e => (e.data ?? e).validation_status !== 'validated').length : evidence.length})
+                 </CardTitle>
+                 {evidence.length > 0 && (
+                   <Button
+                     variant="ghost"
+                     size="sm"
+                     onClick={() => {
+                       const filtered = showOnlyPending ? evidence.filter(e => (e.data ?? e).validation_status !== 'validated') : evidence;
+                       setSelectedEvidence(selectedEvidence.length === filtered.length ? [] : filtered.map(e => e.id));
+                     }}
+                     className="text-xs"
+                   >
+                     {selectedEvidence.length === (showOnlyPending ? evidence.filter(e => (e.data ?? e).validation_status !== 'validated').length : evidence.length) ? 'Deselect All' : 'Select All'}
+                   </Button>
+                 )}
+               </div>
+             </CardHeader>
+             <CardContent className="space-y-2 max-h-96 overflow-y-auto">
+               {evidence.length === 0 ? (
+                 <p className="text-sm text-slate-500">No evidence uploaded</p>
+               ) : (
+                 evidence
+                   .filter(e => !showOnlyPending || (e.data ?? e).validation_status !== 'validated')
+                   .map(e => (
+                     <div key={e.id} className="flex items-start gap-3 p-2 hover:bg-slate-50 rounded opacity-100" title={(e.data ?? e).validation_status === 'validated' ? 'This evidence has been validated' : ''}>
+                       <Checkbox
+                         checked={selectedEvidence.includes(e.id)}
+                         onChange={() => toggleEvidence(e.id)}
+                         className="mt-1"
+                       />
+                       <div className="flex-1">
+                         <p className="text-sm font-medium text-slate-900">{(e.data ?? e).title}</p>
+                         <p className="text-xs text-slate-500">{(e.data ?? e).evidence_type}</p>
+                         {(e.data ?? e).date_collected && (
+                           <p className="text-xs text-slate-500">📅 {(e.data ?? e).date_collected}</p>
+                         )}
+                         {(e.data ?? e).validation_status === 'validated' && (
+                           <Badge className="mt-1 bg-green-100 text-green-800">✓ Validated</Badge>
+                         )}
+                       </div>
+                     </div>
+                   ))
+               )}
+             </CardContent>
+           </Card>
 
           {/* Communications Selection */}
           <Card>
