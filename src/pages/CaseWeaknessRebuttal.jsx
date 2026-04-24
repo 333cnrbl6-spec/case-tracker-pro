@@ -15,10 +15,21 @@ export default function CaseWeaknessRebuttal() {
   const [narrative, setNarrative] = useState(null);
   const [rebuttals, setRebuttals] = useState({});
   const [expandedWeakness, setExpandedWeakness] = useState(null);
+  const [linkedEvidence, setLinkedEvidence] = useState({});
 
   const { data: cases = [] } = useQuery({
     queryKey: ['legal-cases'],
     queryFn: () => base44.entities.LegalCase.list(),
+  });
+
+  const { data: evidence = [] } = useQuery({
+    queryKey: ['evidence'],
+    queryFn: () => base44.entities.Evidence.list(),
+  });
+
+  const { data: communications = [] } = useQuery({
+    queryKey: ['communications'],
+    queryFn: () => base44.entities.Communication.list(),
   });
 
   const legalCase = cases.find(c => c.id === caseId);
@@ -38,9 +49,12 @@ export default function CaseWeaknessRebuttal() {
         const narrativeData = parsed.properties ? parsed.properties : parsed;
         setNarrative(narrativeData);
         
-        // Load saved rebuttals
+        // Load saved rebuttals and evidence links
         if (narrativeData.weakness_rebuttals) {
           setRebuttals(narrativeData.weakness_rebuttals);
+        }
+        if (narrativeData.weakness_evidence_links) {
+          setLinkedEvidence(narrativeData.weakness_evidence_links);
         }
       } catch (e) {
         console.error('Failed to load narrative:', e);
@@ -62,8 +76,9 @@ export default function CaseWeaknessRebuttal() {
       const parsed = JSON.parse(narrativeText);
       const narrativeData = parsed.properties ? parsed.properties : parsed;
       
-      // Update with rebuttals
+      // Update with rebuttals and linked evidence
       narrativeData.weakness_rebuttals = rebuttals;
+      narrativeData.weakness_evidence_links = linkedEvidence;
       const updated = JSON.stringify(narrativeData);
       
       // Upload if too large
@@ -99,6 +114,23 @@ export default function CaseWeaknessRebuttal() {
   }
 
   const weaknesses = narrative?.weaknesses || [];
+
+  // Find related evidence/communications for a weakness (simple keyword matching)
+  const getRelatedEvidence = (weakness) => {
+    const keywords = weakness.toLowerCase().split(' ').filter(w => w.length > 4);
+    return evidence.filter(e => {
+      const text = `${e.title} ${e.description}`.toLowerCase();
+      return keywords.some(kw => text.includes(kw));
+    }).slice(0, 3);
+  };
+
+  const getRelatedCommunications = (weakness) => {
+    const keywords = weakness.toLowerCase().split(' ').filter(w => w.length > 4);
+    return communications.filter(c => {
+      const text = `${c.subject} ${c.content}`.toLowerCase();
+      return keywords.some(kw => text.includes(kw));
+    }).slice(0, 2);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -169,16 +201,76 @@ export default function CaseWeaknessRebuttal() {
                 </CardHeader>
 
                 {expandedWeakness === idx && (
-                  <CardContent className="border-t pt-4">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Your Rebuttal / Human Perspective
-                    </label>
-                    <Textarea
-                      placeholder="Add context, counterarguments, or mitigating factors that address this weakness. Example: 'This allegation is contradicted by communication dated...' or 'The claimant's perspective is that...'"
-                      value={rebuttals[idx] || ''}
-                      onChange={(e) => setRebuttals({ ...rebuttals, [idx]: e.target.value })}
-                      className="h-32 mb-3"
-                    />
+                  <CardContent className="border-t pt-4 space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">
+                        Your Rebuttal / Human Perspective
+                      </label>
+                      <Textarea
+                        placeholder="Add context, counterarguments, or mitigating factors that address this weakness. Example: 'This allegation is contradicted by communication dated...' or 'The claimant's perspective is that...'"
+                        value={rebuttals[idx] || ''}
+                        onChange={(e) => setRebuttals({ ...rebuttals, [idx]: e.target.value })}
+                        className="h-32"
+                      />
+                    </div>
+
+                    {/* Suggested Evidence */}
+                    <div className="bg-slate-50 p-3 rounded border border-slate-200">
+                      <p className="text-xs font-medium text-slate-600 mb-2">💡 Suggested Evidence</p>
+                      <div className="space-y-2">
+                        {getRelatedEvidence(weakness).map((e) => (
+                          <button
+                            key={e.id}
+                            onClick={() => {
+                              const current = linkedEvidence[idx] || [];
+                              const updated = current.includes(e.id) 
+                                ? current.filter(id => id !== e.id)
+                                : [...current, e.id];
+                              setLinkedEvidence({ ...linkedEvidence, [idx]: updated });
+                            }}
+                            className={`w-full text-left text-xs p-2 rounded border transition ${
+                              (linkedEvidence[idx] || []).includes(e.id)
+                                ? 'bg-green-100 border-green-400'
+                                : 'bg-white border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            <div className="flex gap-2 items-start">
+                              <input type="checkbox" checked={(linkedEvidence[idx] || []).includes(e.id)} readOnly className="mt-0.5" />
+                              <div>
+                                <p className="font-medium text-slate-700">{e.title}</p>
+                                <p className="text-slate-600">{e.description?.substring(0, 60)}...</p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                        {getRelatedCommunications(weakness).map((c) => (
+                          <button
+                            key={c.id}
+                            onClick={() => {
+                              const current = linkedEvidence[idx] || [];
+                              const updated = current.includes(c.id)
+                                ? current.filter(id => id !== c.id)
+                                : [...current, c.id];
+                              setLinkedEvidence({ ...linkedEvidence, [idx]: updated });
+                            }}
+                            className={`w-full text-left text-xs p-2 rounded border transition ${
+                              (linkedEvidence[idx] || []).includes(c.id)
+                                ? 'bg-green-100 border-green-400'
+                                : 'bg-white border-slate-200 hover:bg-slate-100'
+                            }`}
+                          >
+                            <div className="flex gap-2 items-start">
+                              <input type="checkbox" checked={(linkedEvidence[idx] || []).includes(c.id)} readOnly className="mt-0.5" />
+                              <div>
+                                <p className="font-medium text-slate-700">📧 {c.subject}</p>
+                                <p className="text-slate-600">{c.from} → {c.to}</p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     <div className="flex gap-2">
                       <Button
                         size="sm"
@@ -194,7 +286,10 @@ export default function CaseWeaknessRebuttal() {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => setRebuttals({ ...rebuttals, [idx]: '' })}
+                        onClick={() => {
+                          setRebuttals({ ...rebuttals, [idx]: '' });
+                          setLinkedEvidence({ ...linkedEvidence, [idx]: [] });
+                        }}
                       >
                         Clear
                       </Button>
@@ -203,7 +298,7 @@ export default function CaseWeaknessRebuttal() {
                 )}
 
                 {rebuttals[idx] && expandedWeakness !== idx && (
-                  <CardContent className="border-t pt-4 bg-green-50">
+                  <CardContent className="border-t pt-4 bg-green-50 space-y-2">
                     <div className="flex items-start gap-2">
                       <CheckCircle className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
                       <div className="flex-1">
@@ -211,6 +306,21 @@ export default function CaseWeaknessRebuttal() {
                         <p className="text-sm text-slate-700 whitespace-pre-wrap">{rebuttals[idx]}</p>
                       </div>
                     </div>
+                    {linkedEvidence[idx]?.length > 0 && (
+                      <div className="border-t pt-2 mt-2">
+                        <p className="text-xs text-green-700 font-medium mb-1">📎 Linked Evidence ({linkedEvidence[idx].length})</p>
+                        <div className="space-y-1">
+                          {linkedEvidence[idx].map((id) => {
+                            const evid = evidence.find(e => e.id === id) || communications.find(c => c.id === id);
+                            return evid ? (
+                              <p key={id} className="text-xs text-slate-600">
+                                • {evid.title || evid.subject}
+                              </p>
+                            ) : null;
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 )}
               </Card>
