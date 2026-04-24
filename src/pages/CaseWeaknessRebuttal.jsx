@@ -159,12 +159,14 @@ export default function CaseWeaknessRebuttal() {
             </CardHeader>
             <CardContent className="space-y-2">
               {cases.filter(c => c.ai_narrative).map((c) => (
-                <Link key={c.id} to={`/case-weakness-rebuttal?case_id=${c.id}`}>
-                  <div className="p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition">
-                    <p className="font-medium text-slate-900">{c.case_ref}</p>
-                    <p className="text-sm text-slate-600">{c.client_name}</p>
-                  </div>
-                </Link>
+                <button
+                  key={c.id}
+                  onClick={() => window.location.href = `/case-weakness-rebuttal?case_id=${c.id}`}
+                  className="w-full text-left p-4 border rounded-lg hover:bg-slate-50 cursor-pointer transition"
+                >
+                  <p className="font-medium text-slate-900">{c.case_ref}</p>
+                  <p className="text-sm text-slate-600">{c.client_name}</p>
+                </button>
               ))}
             </CardContent>
           </Card>
