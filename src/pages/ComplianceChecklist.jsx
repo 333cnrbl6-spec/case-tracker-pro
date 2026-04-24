@@ -320,17 +320,19 @@ export default function ComplianceChecklist() {
                 <p className="text-sm text-slate-500">No incidents logged</p>
               ) : (
                 incidents.map(incident => (
-                  <div key={incident.id} className="flex items-start gap-3 p-2 hover:bg-slate-50 rounded">
-                    <Checkbox
-                      checked={selectedIncidents.includes(incident.id)}
-                      onChange={() => toggleIncident(incident.id)}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{incident.data.title}</p>
-                      <Badge variant="outline" className="mt-1 text-xs">{incident.data.severity}</Badge>
+                  incident.data && (
+                    <div key={incident.id} className="flex items-start gap-3 p-2 hover:bg-slate-50 rounded">
+                      <Checkbox
+                        checked={selectedIncidents.includes(incident.id)}
+                        onChange={() => toggleIncident(incident.id)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-900">{incident.data.title}</p>
+                        <Badge variant="outline" className="mt-1 text-xs">{incident.data.severity}</Badge>
+                      </div>
                     </div>
-                  </div>
+                  )
                 ))
               )}
             </CardContent>
