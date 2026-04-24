@@ -215,14 +215,16 @@ export default function CaseRiskDashboard() {
               <p className="text-slate-500 text-center py-8">No risk data available. Click "Re-calculate All" to generate analysis.</p>
             ) : (
               <div className="space-y-3">
-                {sortedRisks.map(risk => (
-                  <Link key={risk.case_id} to={`/case-manager`}>
-                    <div className={`p-4 rounded-lg border ${riskLevelColors[risk.risk_level].bg} ${riskLevelColors[risk.risk_level].border} hover:shadow-md transition-shadow cursor-pointer`}>
-                      <div className="flex items-start justify-between gap-4 mb-2">
-                        <div className="flex-1">
-                          <p className="font-semibold text-slate-900">{risk.case_ref} — {risk.client_name}</p>
-                        </div>
-                        <Badge className={riskLevelColors[risk.risk_level].badge}>{risk.risk_level.toUpperCase()}</Badge>
+                {sortedRisks.map(risk => {
+                  const level = risk.risk_level || 'low';
+                  return (
+                    <Link key={risk.case_id} to={`/case-manager`}>
+                      <div className={`p-4 rounded-lg border ${riskLevelColors[level].bg} ${riskLevelColors[level].border} hover:shadow-md transition-shadow cursor-pointer`}>
+                        <div className="flex items-start justify-between gap-4 mb-2">
+                          <div className="flex-1">
+                            <p className="font-semibold text-slate-900">{risk.case_ref} — {risk.client_name}</p>
+                          </div>
+                          <Badge className={riskLevelColors[level].badge}>{level.toUpperCase()}</Badge>
                       </div>
 
                       <RiskScoreBar score={risk.risk_score} />
@@ -263,9 +265,10 @@ export default function CaseRiskDashboard() {
                           </div>
                         </div>
                       )}
-                    </div>
-                  </Link>
-                ))}
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </CardContent>
