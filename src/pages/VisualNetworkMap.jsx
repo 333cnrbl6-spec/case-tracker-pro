@@ -108,12 +108,12 @@ export default function VisualNetworkMap() {
 
     // Draw function
     const draw = () => {
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw edges
-      ctx.strokeStyle = '#e5e7eb';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1.5;
       edges.forEach((edge) => {
         const source = nodes.find((n) => n.id === edge.source);
         const target = nodes.find((n) => n.id === edge.target);
@@ -133,8 +133,8 @@ export default function VisualNetworkMap() {
           highlightedCluster &&
           highlightedCluster.nodes.includes(node.id);
 
-        ctx.fillStyle = isSelected ? '#000000' : isInCluster ? node.color : node.color;
-        ctx.globalAlpha = isInCluster || !highlightedCluster ? 1 : 0.2;
+        ctx.fillStyle = isSelected ? '#1e293b' : isInCluster ? node.color : node.color;
+        ctx.globalAlpha = isInCluster || !highlightedCluster ? 1 : 0.25;
 
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
@@ -142,11 +142,11 @@ export default function VisualNetworkMap() {
 
         // Label
         if (isSelected || node.size > 6) {
-          ctx.fillStyle = '#000000';
-          ctx.font = 'bold 11px sans-serif';
+          ctx.fillStyle = '#334155';
+          ctx.font = 'bold 12px sans-serif';
           ctx.textAlign = 'center';
           ctx.globalAlpha = 1;
-          ctx.fillText(node.label.substring(0, 12), node.x, node.y + node.size + 12);
+          ctx.fillText(node.label.substring(0, 12), node.x, node.y + node.size + 13);
         }
       });
 
@@ -244,7 +244,7 @@ export default function VisualNetworkMap() {
         <CardContent className="h-full p-0">
           <canvas
             ref={canvasRef}
-            className="w-full h-full bg-white dark:bg-slate-900 rounded-lg cursor-pointer"
+            className="w-full h-full bg-slate-50 dark:bg-slate-800 rounded-lg cursor-pointer"
             style={{ display: 'block' }}
           />
         </CardContent>
