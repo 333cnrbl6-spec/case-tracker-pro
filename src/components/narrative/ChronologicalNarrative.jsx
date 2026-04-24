@@ -207,19 +207,19 @@ export default function ChronologicalNarrative({ incidents, communications, evid
       title: 'Phase 1: Engagement & Agreement',
       start: toISO(new Date(minDate.getTime() - 1)),
       end: toISO(phase1End),
-      narrative: "Mr Bradley, a contractor, was engaged in refurbishment works across multiple properties connected to Sean Powell. Malcolm Belcher MRICS was appointed as Quantity Surveyor to provide professional valuations of the completed works. At this stage, Belcher confirmed in writing an agreed valuation fee of £185,000 across three properties, with full documentation and final reports included in scope.",
+      narrative: "Mr Bradley, a contractor, was engaged in refurbishment works at Flat 4, Trinity Buildings, Llandudno — a single flat comprising one bathroom and one kitchen. The flat is leased by Sean Powell, who rents it out through his company vehicles; the freeholder is believed to be Mostyn Estates. Malcolm Belcher MRICS, a director of VIVID Surveyors Ltd (a limited company based in Portsmouth), was appointed as Quantity Surveyor to provide professional valuations of the completed works. At this stage, Belcher confirmed in writing an agreed valuation fee across the works, with full documentation and final reports included in scope.",
     },
     {
       title: 'Phase 2: Post-Completion Manipulation',
       start: toISO(new Date(phase1End.getTime() + 86400000)),
       end: toISO(phase2End),
-      narrative: "Following completion of works, Belcher unilaterally reduced the agreed valuation from £185,000 to £145,000 — a £40,000 shortfall — and simultaneously imposed retrospective documentation requirements that had never been discussed during the original engagement. Mr Bradley objected to these new conditions, writing that they were 'never discussed during engagement setup' and appeared to be a 'leverage mechanism'. Belcher responded dismissively, claiming 'professional obligations' to justify his position. ⚠️ NOTE: An email in the record was originally logged as from Sean Powell making these same objections — however, given that Powell is understood to have been acting in concert with Belcher, this attribution is under review and likely reflects a misread forwarded/reply chain. The objecting language is now attributed to William Bradley pending verification of original email headers.",
+      narrative: "Following completion of works at Flat 4, Trinity Buildings, Belcher — acting through VIVID Surveyors Ltd — unilaterally imposed retrospective documentation requirements that had never been discussed during the original engagement, and significantly downvalued line items in Mr Bradley's cost schedule. VIVID Surveyors Ltd, as the company through which Belcher operates, submitted counter-valuations dramatically reducing Bradley's agreed rates across multiple items in the schedule. Mr Bradley objected to these new conditions, describing them as never agreed and appearing to function as a 'leverage mechanism'. Belcher responded dismissively, citing 'professional obligations' to justify his position. ⚠️ NOTE: An email in the record was originally logged as from Sean Powell making these same objections — however, given that Powell is understood to have been acting in concert with Belcher, this attribution is under review and likely reflects a misread forwarded/reply chain. The objecting language is now attributed to William Bradley pending verification of original email headers.",
     },
     {
       title: 'Phase 3: Escalating Professional Misconduct',
       start: toISO(new Date(phase2End.getTime() + 86400000)),
       end: toISO(new Date(maxDate.getTime() + 86400000)),
-      narrative: "Belcher's conduct escalated further. He restricted a co-instructed architect's access to survey data, citing 'client confidentiality' inappropriately. He gained access to a property without explicit consent and conducted surveys outside the agreed scope. Most critically, Land Registry records revealed that Belcher had been acting as both valuer and selling agent in the same transaction — a direct conflict of interest that was never disclosed, in breach of RICS Professional Standard PS1. Throughout this period, Belcher sent communications described as aggressive and dismissive, including a letter to Mr Bradley containing inflammatory language such as 'pathetic, totally unprofessional, childlike behaviour'.",
+      narrative: "Belcher's conduct, carried out through VIVID Surveyors Ltd, escalated further. He restricted a co-instructed architect's access to survey data relating to Flat 4, Trinity Buildings, citing 'client confidentiality' inappropriately. He gained access to the flat without explicit consent and conducted surveys outside the agreed scope. Most critically, Land Registry records revealed that Belcher had been acting as both valuer and selling agent in the same transaction — a direct conflict of interest that was never disclosed, in breach of RICS Professional Standard PS1. The involvement of the freeholder, Mostyn Estates, in these events has not yet been fully determined and requires further investigation. Throughout this period, Belcher sent communications described as aggressive and dismissive, including a letter to Mr Bradley containing inflammatory language such as 'pathetic, totally unprofessional, childlike behaviour'.",
     },
   ];
 
@@ -418,21 +418,19 @@ export default function ChronologicalNarrative({ incidents, communications, evid
         <div className="bg-red-50 border border-red-200 rounded-lg p-5">
           <h4 className="font-semibold text-red-900 mb-2">⚠️ Key Finding: Powell & Belcher — Potential Conspiracy</h4>
           <p className="text-sm text-red-800 leading-relaxed mb-3">
-            The current understanding of the case has been revised. Sean Powell — the freeholder and instructing party — is now understood 
-            to have been acting <strong>in concert with Belcher</strong>, not as an independent client. This fundamentally changes the character 
-            of Belcher's gatekeeping behaviour: rather than Belcher cutting Powell out as a neutral client, both Powell and Belcher may have 
-            been jointly coordinating to prevent Mr Bradley from asserting his rights or receiving fair payment.
+            The current understanding of the case has been revised. Sean Powell — the <strong>leaseholder</strong> of Flat 4, Trinity Buildings, Llandudno (not the freeholder; the freeholder is believed to be Mostyn Estates) — rents the flat out through his company vehicles and was the instructing party. Powell is now understood to have been acting <strong>in concert with Belcher</strong>, not as an independent client. This fundamentally changes the character of Belcher's gatekeeping behaviour: rather than Belcher acting unilaterally, both Powell and Belcher may have been jointly coordinating to prevent Mr Bradley from asserting his rights or receiving fair payment.
           </p>
           <p className="text-sm text-red-800 leading-relaxed mb-3">
-            Belcher's restriction of direct contact between Mr Bradley and Powell — demanding <em>"all contractor communication must go through Belcher"</em>, 
-            <em>"no phone contact to Powell's mobile"</em>, and <em>"all contact through office only with staff intermediary"</em> — may therefore 
-            represent a jointly agreed strategy rather than Belcher acting unilaterally.
+            Malcolm Belcher MRICS operates through <strong>VIVID Surveyors Ltd</strong>, a limited company based in Portsmouth, of which he is a director. All references to "VIVID" in the cost schedule, counter-valuations, and correspondence therefore refer to this company — not an independent housing association. Belcher's restriction of direct contact between Mr Bradley and Powell — demanding <em>"all contractor communication must go through Belcher"</em>, <em>"no phone contact to Powell's mobile"</em>, and <em>"all contact through office only with staff intermediary"</em> — may represent a jointly agreed strategy designed to isolate Mr Bradley.
           </p>
           <p className="text-sm text-red-800 leading-relaxed mb-3">
             <strong>Attribution alert:</strong> An email previously cited as Sean Powell objecting to the retrospective documentation conditions 
             (using phrases such as <em>"never discussed"</em> and <em>"leverage mechanism"</em>) is now under review. Given Powell's likely 
             alignment with Belcher, these words are more probably from <strong>William Bradley</strong>, misattributed due to a forwarded or 
             reply email chain. Original email headers must be examined before any document relies on Powell as the author of these objections.
+          </p>
+          <p className="text-sm text-red-800 leading-relaxed mb-3">
+            <strong>Mostyn Estates</strong> (believed freeholder) — the role of the freeholder in these events has not yet been fully determined. It is not known whether Mostyn Estates had knowledge of, or involvement in, the arrangement between Powell and Belcher. This should be investigated as part of any formal proceedings.
           </p>
           <p className="text-sm text-red-800 leading-relaxed">
             If Powell and Belcher conspired together, potential causes of action extend beyond RICS professional misconduct to include 
