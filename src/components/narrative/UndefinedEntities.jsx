@@ -27,18 +27,18 @@ const DETECTED_PARTIES = [
     information_gaps: ['Full first name', 'Company name (if trading as Ltd)', 'Business address', 'Nature of contracting business']
   },
   {
-    name: 'Malcolm Belcher',
+    name: 'Malcolm Belcher MRICS',
     party_type: 'person',
-    role_in_case: 'Defendant / RICS Surveyor',
+    role_in_case: 'Defendant / RICS Surveyor — founder and director of Vivid Surveyors Ltd, engaged as Quantity Surveyor to value refurbishment works',
     first_mentioned_in: 'RICSSurveyorProfile',
-    information_gaps: ['Registered business address', 'Trading name / firm name', 'PI insurance details', 'Whether sole trader or limited company']
+    information_gaps: ['Confirmed RICS membership number (verify via RICS Find a Surveyor)', 'Professional Indemnity Insurance details', 'Companies House registration number for Vivid Surveyors Ltd']
   },
   {
     name: '29 Clifton Road',
     party_type: 'property',
-    role_in_case: 'Primary property — refurbishment works with documented cost schedule',
+    role_in_case: 'Primary property — freehold building converted into 3 flats; refurbishment works were carried out and form the subject of the valuation dispute. No property sale involved.',
     first_mentioned_in: 'Cost Schedule - Live (Original Agreed)',
-    information_gaps: ['Full address including postcode', 'Property type (HMO? residential?)', 'Owner at time of works', 'Current status']
+    information_gaps: ['Full postcode', 'Owner of freehold at time of works (Sean Powell?)', 'Status of individual leases on the 3 flats', 'Whether works were to all 3 flats or common parts only']
   },
   {
     name: 'Property 2',
@@ -62,11 +62,11 @@ const DETECTED_PARTIES = [
     information_gaps: ['Full name', 'Firm name', 'Professional registration', 'Whether willing to provide witness statement']
   },
   {
-    name: 'VIVID',
-    party_type: 'organisation',
-    role_in_case: 'Organisation referenced in valuation comments — appears to be housing association or client body',
+    name: 'Vivid Surveyors Ltd',
+    party_type: 'company',
+    role_in_case: 'Respondent firm — the incorporated practice through which Malcolm Belcher MRICS provided building surveying and valuation services. Suite 206, 5 Charter House, Lord Montgomery Way, Portsmouth, PO1 2SN. Tel: 07435 754379.',
     first_mentioned_in: 'Cost Schedule - Valuations (31.05.23)',
-    information_gaps: ['Full entity name', 'Role (housing association? developer?)', 'Relationship to Powell and the properties', 'Whether they instructed Belcher separately']
+    information_gaps: ['Companies House registered number', 'Confirmation of RICS regulated firm status (distinct from individual MRICS membership)', 'Whether firm holds Professional Indemnity Insurance', 'Names of any other staff involved in the valuation work']
   },
   {
     name: 'Property Manager',
@@ -89,20 +89,7 @@ const DETECTED_PARTIES = [
     first_mentioned_in: 'Incident: Undisclosed Retrospective QS Engagement',
     information_gaps: ['Names', 'Which properties they worked on', 'Willingness to provide statements']
   },
-  {
-    name: 'Estate Agent',
-    party_type: 'person',
-    role_in_case: 'Witness to Belcher acting as both valuer and selling agent',
-    first_mentioned_in: 'Conflicted Valuation Report incident',
-    information_gaps: ['Name', 'Firm', 'Which transaction involved', 'Whether aware of Belcher dual role']
-  },
-  {
-    name: 'Lending Bank',
-    party_type: 'organisation',
-    role_in_case: 'Witness/victim — relied on Belcher valuation for lending decision',
-    first_mentioned_in: 'Conflicted Valuation Report incident',
-    information_gaps: ['Bank name', 'Mortgage reference', 'Whether valuation affected lending terms']
-  },
+
 ];
 
 function PartyIcon({ type }) {
@@ -162,8 +149,9 @@ export default function UndefinedEntities() {
     },
   });
 
-  const isConfirmed = (name) => savedParties.some(p => p.data?.name === name && p.data?.confirmed);
-  const getSaved = (name) => savedParties.find(p => p.data?.name === name);
+  // Match on name, also handle slight name variations (e.g. "Malcolm Belcher" vs "Malcolm Belcher MRICS")
+  const isConfirmed = (name) => savedParties.some(p => p.data?.name && p.data.name.includes(name.split(' ')[0] + ' ' + name.split(' ')[1]) && p.data?.confirmed);
+  const getSaved = (name) => savedParties.find(p => p.data?.name && p.data.name.includes(name.split(' ')[0] + ' ' + name.split(' ')[1]));
 
   const handleConfirm = (party) => {
     const existing = getSaved(party.name);
