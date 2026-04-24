@@ -139,14 +139,16 @@ export default function AutomatedBundleGenerator() {
         communication_ids: selectedComms,
       });
 
-      if (response.data) {
-        // Handle both ArrayBuffer and Blob responses
-        const pdfData = response.data instanceof ArrayBuffer 
-          ? response.data 
-          : await response.data.arrayBuffer();
+      if (response.data?.success && response.data?.pdfBase64) {
+        // Convert base64 to blob and download
+        const binaryString = atob(response.data.pdfBase64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
         
-        const fileName = `Bundle_${selectedCase?.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`;
-        const blob = new Blob([pdfData], { type: 'application/pdf' });
+        const fileName = response.data.fileName || `Bundle_${selectedCase?.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`;
+        const blob = new Blob([bytes], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;

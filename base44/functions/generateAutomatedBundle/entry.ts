@@ -24,13 +24,11 @@ Deno.serve(async (req) => {
     } = body;
 
     // Fetch case details
-    const legalCase = await base44.entities.LegalCase.list({
-      id: case_id,
-    });
-    if (!legalCase || legalCase.length === 0) {
+    const cases = await base44.entities.LegalCase.filter({ id: case_id });
+    if (!cases || cases.length === 0) {
       return Response.json({ error: 'Case not found' }, { status: 404 });
     }
-    const caseData = legalCase[0];
+    const caseData = cases[0];
 
     // Fetch evidence items
     let evidenceData = [];
@@ -388,15 +386,13 @@ Deno.serve(async (req) => {
     yPos += 8;
     doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`, margin, yPos);
 
-    // Generate PDF
-    const pdfBytes = doc.output('arraybuffer');
+    // Generate PDF as base64
+    const pdfBase64 = doc.output('dataurlstring').split(',')[1];
 
-    return new Response(pdfBytes, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="Bundle_${caseData.case_ref}_${new Date().toISOString().split('T')[0]}.pdf"`,
-      },
+    return Response.json({
+      success: true,
+      pdfBase64: pdfBase64,
+      fileName: `Bundle_${caseData.case_ref}_${new Date().toISOString().split('T')[0]}.pdf`,
     });
   } catch (error) {
     console.error('Bundle generation error:', error);
