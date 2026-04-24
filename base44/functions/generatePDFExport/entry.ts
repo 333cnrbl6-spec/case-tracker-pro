@@ -28,7 +28,16 @@ Deno.serve(async (req) => {
         return Response.json({ error: 'No narrative generated yet. Generate one from the Case Narrative Builder first.' }, { status: 400 });
       }
       
-      const narrative = JSON.parse(legalCase.ai_narrative);
+      // Parse narrative JSON string
+      let narrative;
+      try {
+        const parsed = JSON.parse(legalCase.ai_narrative);
+        // Handle case where schema wrapper is included
+        narrative = parsed.properties ? parsed.properties : parsed;
+      } catch (e) {
+        return Response.json({ error: 'Failed to parse narrative: ' + e.message }, { status: 500 });
+      }
+      
       htmlContent = `
         <h1>Legal Case Narrative — ${legalCase.case_ref}</h1>
         <p><strong>Client:</strong> ${legalCase.client_name} | <strong>Generated:</strong> ${now}</p>

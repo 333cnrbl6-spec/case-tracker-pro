@@ -27,8 +27,15 @@ export default function CaseNarrativeBuilder() {
 
   // Load saved narrative on mount
   useEffect(() => {
-    if (legalCase?.ai_narrative) {
-      try { setNarrative(JSON.parse(legalCase.ai_narrative)); } catch {}
+    if (!legalCase?.ai_narrative) return;
+    
+    try {
+      const parsed = JSON.parse(legalCase.ai_narrative);
+      // Handle case where schema wrapper is included
+      const narrativeData = parsed.properties ? parsed.properties : parsed;
+      setNarrative(narrativeData);
+    } catch (e) {
+      console.error('Failed to parse narrative:', e);
     }
   }, [legalCase]);
 
