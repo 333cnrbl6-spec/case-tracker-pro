@@ -26,11 +26,17 @@ export default function BreachDiscoveryTool() {
   const [breaches, setBreaches] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
   const [convertingId, setConvertingId] = useState(null);
+  const [selectedCaseId, setSelectedCaseId] = useState(null);
   const queryClient = useQueryClient();
+
+  const { data: cases = [] } = useQuery({
+    queryKey: ['legal-cases'],
+    queryFn: () => base44.entities.LegalCase.list(),
+  });
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
-      const response = await base44.functions.invoke('analyzeCommuncationsForBreaches', {});
+      const response = await base44.functions.invoke('analyzeCommuncationsForBreaches', { case_id: selectedCaseId });
       return response;
     },
     onSuccess: (data) => {
@@ -75,29 +81,47 @@ export default function BreachDiscoveryTool() {
           <p className="text-slate-600">AI-powered scanner to detect non-compliant language and RICS rule violations in communications</p>
         </div>
 
-        {/* Scan Button */}
+        {/* Case Selection & Scan */}
         {breaches.length === 0 && !analyzeMutation.isPending && (
-          <Card className="mb-8 text-center py-16 border-dashed">
-            <Sparkles className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-slate-800 mb-2">Scan Communications for Breaches</h2>
-            <p className="text-slate-600 mb-6 max-w-md mx-auto">
-              Analyzes all communications using Claude AI against RICS Professional Standards to identify non-compliant language and rule violations.
-            </p>
-            <Button
-              onClick={() => analyzeMutation.mutate()}
-              disabled={analyzeMutation.isPending}
-              className="bg-indigo-600 hover:bg-indigo-700 gap-2"
-            >
-              {analyzeMutation.isPending ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Scanning...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" /> Start Scan
-                </>
-              )}
-            </Button>
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-indigo-600" /> Scan Communications for Breaches
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium block mb-2">Select Case (Optional)</label>
+                <select
+                  value={selectedCaseId || ''}
+                  onChange={(e) => setSelectedCaseId(e.target.value || null)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm"
+                >
+                  <option value="">All Communications</option>
+                  {cases.map(c => (
+                    <option key={c.id} value={c.id}>{c.case_ref} — {c.client_name}</option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-sm text-slate-600">
+                Analyzes communications using Claude AI against RICS Professional Standards to identify non-compliant language and rule violations.
+              </p>
+              <Button
+                onClick={() => analyzeMutation.mutate()}
+                disabled={analyzeMutation.isPending}
+                className="bg-indigo-600 hover:bg-indigo-700 gap-2 w-full"
+              >
+                {analyzeMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" /> Scanning...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" /> Start Scan
+                  </>
+                )}
+              </Button>
+            </CardContent>
           </Card>
         )}
 
