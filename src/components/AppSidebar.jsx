@@ -14,6 +14,7 @@ const NAV_GROUPS = [
     label: 'Overview',
     items: [
       { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+      { path: '/event-timeline', icon: Clock, label: 'Interactive Timeline' },
       { path: '/timeline', icon: Clock, label: 'Event Timeline' },
       { path: '/network-map', icon: Network, label: 'Network Map' },
     ],

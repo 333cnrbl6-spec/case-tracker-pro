@@ -58,6 +58,7 @@ import BatchExportBuilder from '@/pages/BatchExportBuilder';
 import CaseRiskDashboard from '@/pages/CaseRiskDashboard';
 import ProfessionalEntityDatabase from '@/pages/ProfessionalEntityDatabase';
 import BreachDiscoveryTool from '@/pages/BreachDiscoveryTool';
+import InteractiveEventTimeline from '@/pages/InteractiveEventTimeline';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -139,6 +140,7 @@ const AuthenticatedApp = () => {
       <Route path="/case-risk-dashboard" element={<CaseRiskDashboard />} />
       <Route path="/entity-database" element={<ProfessionalEntityDatabase />} />
       <Route path="/breach-discovery" element={<BreachDiscoveryTool />} />
+      <Route path="/event-timeline" element={<InteractiveEventTimeline />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
