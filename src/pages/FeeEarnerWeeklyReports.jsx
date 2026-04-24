@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, Mail, Loader2, CheckCircle, Clock, AlertTriangle, CheckCheck } from 'lucide-react';
+import { AlertCircle, Mail, Loader2, CheckCircle, Clock, AlertTriangle, CheckCheck, Calendar, Zap } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function FeeEarnerWeeklyReports() {
   const queryClient = useQueryClient();
   const [lastReport, setLastReport] = useState(null);
+  const [automationDay, setAutomationDay] = useState('monday');
+  const [automationTime, setAutomationTime] = useState('09:00');
+  const [automationEnabled, setAutomationEnabled] = useState(false);
+  const [automationId, setAutomationId] = useState(null);
 
   // Fetch all tasks to show preview
   const { data: tasks = [] } = useQuery({
@@ -24,6 +35,50 @@ export default function FeeEarnerWeeklyReports() {
       setLastReport(response.data);
       toast.success(`Weekly reports sent to ${response.data.reports_sent} fee earner${response.data.reports_sent !== 1 ? 's' : ''}`);
       queryClient.invalidateQueries({ queryKey: ['incident-tasks-preview'] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  // Set up automation
+  const setupAutomationMutation = useMutation({
+    mutationFn: async () => {
+      const dayMap = {
+        monday: 1,
+        tuesday: 2,
+        wednesday: 3,
+        thursday: 4,
+        friday: 5,
+        saturday: 6,
+        sunday: 0,
+      };
+
+      // Create the automation
+      const result = await base44.functions.invoke('createWeeklyReportAutomation', {
+        day_of_week: dayMap[automationDay],
+        time: automationTime,
+      });
+      return result.data;
+    },
+    onSuccess: (data) => {
+      setAutomationId(data.automation_id);
+      setAutomationEnabled(true);
+      toast.success(`Weekly reports scheduled for every ${automationDay} at ${automationTime}`);
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  // Disable automation
+  const disableAutomationMutation = useMutation({
+    mutationFn: async () => {
+      if (!automationId) return;
+      await base44.functions.invoke('disableWeeklyReportAutomation', {
+        automation_id: automationId,
+      });
+    },
+    onSuccess: () => {
+      setAutomationEnabled(false);
+      setAutomationId(null);
+      toast.success('Weekly report automation disabled');
     },
     onError: (err) => toast.error(err.message),
   });
@@ -96,6 +151,34 @@ export default function FeeEarnerWeeklyReports() {
           </Button>
         </div>
 
+        {/* Automation Status */}
+        {automationEnabled && (
+          <Card className="mb-6 bg-blue-50 border-blue-200">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-3 justify-between">
+                <div className="flex items-start gap-3 flex-1">
+                  <Zap className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold text-blue-900">Automation Active</p>
+                    <p className="text-sm text-blue-800 mt-1">
+                      Reports scheduled every {automationDay} at {automationTime}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => disableAutomationMutation.mutate()}
+                  disabled={disableAutomationMutation.isPending}
+                  variant="outline"
+                  size="sm"
+                  className="ml-2"
+                >
+                  Disable
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Last Report Summary */}
         {lastReport && (
           <Card className="mb-6 bg-green-50 border-green-200">
@@ -108,6 +191,63 @@ export default function FeeEarnerWeeklyReports() {
                     {lastReport.reports_sent} report{lastReport.reports_sent !== 1 ? 's' : ''} generated and emailed at {new Date().toLocaleTimeString('en-GB')}
                   </p>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Automation Scheduler */}
+        {!automationEnabled && (
+          <Card className="mb-6 bg-amber-50 border-amber-200">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Schedule Weekly Reports
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4 items-end">
+                <div className="flex-1">
+                  <label className="text-xs font-semibold text-slate-600 mb-1 block">Day of Week</label>
+                  <Select value={automationDay} onValueChange={setAutomationDay}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="monday">Monday</SelectItem>
+                      <SelectItem value="tuesday">Tuesday</SelectItem>
+                      <SelectItem value="wednesday">Wednesday</SelectItem>
+                      <SelectItem value="thursday">Thursday</SelectItem>
+                      <SelectItem value="friday">Friday</SelectItem>
+                      <SelectItem value="saturday">Saturday</SelectItem>
+                      <SelectItem value="sunday">Sunday</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex-1">
+                  <label className="text-xs font-semibold text-slate-600 mb-1 block">Time (24h)</label>
+                  <input
+                    type="time"
+                    value={automationTime}
+                    onChange={(e) => setAutomationTime(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm"
+                  />
+                </div>
+                <Button
+                  onClick={() => setupAutomationMutation.mutate()}
+                  disabled={setupAutomationMutation.isPending || totalFeeEarners === 0}
+                  className="bg-amber-600 hover:bg-amber-700 gap-2"
+                >
+                  {setupAutomationMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Setting up...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4" /> Enable Automation
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
