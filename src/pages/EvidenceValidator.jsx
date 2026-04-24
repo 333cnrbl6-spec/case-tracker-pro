@@ -270,7 +270,7 @@ Validation report data:
 - High issues: ${issues.filter(i => i.severity === 'high').length}
 - Timeline integrity: ${validationReport.timelineIntegrity ? 'Verified' : 'Issues found'}
 - Communication alignment: ${validationReport.communicationAlignment ? 'Aligned' : 'Discrepancies found'}
-- Issues: ${JSON.stringify(validationReport.issues.map(i => ({ title: i.title, severity: i.severity, type: i.type, description: i.description, recommendation: i.recommendation })))}`}
+- Issues: ${JSON.stringify(issues.map(i => ({ title: i.title, severity: i.severity, type: i.type, description: i.description, recommendation: i.recommendation })))}`}
           />
 
           {/* Summary Cards */}
