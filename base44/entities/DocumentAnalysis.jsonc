@@ -1,0 +1,141 @@
+{
+  "name": "DocumentAnalysis",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related legal case ID"
+    },
+    "document_name": {
+      "type": "string",
+      "description": "Original document filename"
+    },
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "contract",
+        "brief",
+        "agreement",
+        "statement",
+        "report",
+        "other"
+      ],
+      "description": "Type of document analyzed"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of the uploaded document"
+    },
+    "extracted_text": {
+      "type": "string",
+      "description": "Full extracted text from document"
+    },
+    "key_clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "clause_type": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "page_reference": {
+            "type": "number"
+          },
+          "relevance_score": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Extracted key clauses with metadata"
+    },
+    "key_dates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "description": {
+            "type": "string"
+          },
+          "obligation_type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Important dates and deadlines extracted"
+    },
+    "obligations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "party": {
+            "type": "string"
+          },
+          "obligation": {
+            "type": "string"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in_progress",
+              "completed",
+              "breached"
+            ]
+          }
+        }
+      },
+      "description": "Extracted obligations and their status"
+    },
+    "parties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Parties identified in the document"
+    },
+    "summary": {
+      "type": "string",
+      "description": "AI-generated executive summary"
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Identified risks or concerning clauses"
+    },
+    "analysis_confidence": {
+      "type": "number",
+      "description": "Confidence score of extraction (0-100)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Searchable tags for categorization"
+    },
+    "analyzed_by": {
+      "type": "string",
+      "description": "Email of user who uploaded document"
+    }
+  },
+  "required": [
+    "case_id",
+    "document_name",
+    "document_type",
+    "file_url"
+  ]
+}
