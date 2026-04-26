@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, AlertTriangle } from 'lucide-react';
+import { Search, AlertTriangle, Shield } from 'lucide-react';
 import { format, differenceInDays, parseISO } from 'date-fns';
 
 export default function SmartCaseSearch({ onCaseSelect }) {
@@ -58,7 +58,11 @@ export default function SmartCaseSearch({ onCaseSelect }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Smart Case Search</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Search className="w-5 h-5" />
+          Smart Case Search
+        </CardTitle>
+        <p className="text-xs text-slate-600 mt-2">Filter by limitation dates to identify cases requiring immediate action and prevent negligence claims</p>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Search Filters */}
@@ -97,12 +101,12 @@ export default function SmartCaseSearch({ onCaseSelect }) {
           <select
             value={filters.limitation_filter}
             onChange={(e) => setFilters({ ...filters, limitation_filter: e.target.value })}
-            className="border rounded-md p-2 text-sm col-span-2 md:col-span-1"
+            className="border rounded-md p-2 text-sm col-span-2 md:col-span-1 font-semibold"
           >
             <option value="">All limitation dates</option>
-            <option value="30">Within 30 days</option>
-            <option value="60">Within 60 days</option>
-            <option value="90">Within 90 days</option>
+            <option value="30">🚨 CRITICAL: Within 30 days</option>
+            <option value="60">⚠️ HIGH: Within 60 days</option>
+            <option value="90">📋 MEDIUM: Within 90 days</option>
           </select>
         </div>
 
@@ -140,18 +144,34 @@ export default function SmartCaseSearch({ onCaseSelect }) {
           )}
         </div>
 
-        {filtered.some(c => {
-          const days = differenceInDays(parseISO(c.limitation_date), new Date());
-          return days < 30;
-        }) && (
-          <div className="flex gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-700">
-            <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            {filtered.filter(c => {
-              const days = differenceInDays(parseISO(c.limitation_date), new Date());
-              return days < 30;
-            }).length} case(s) with limitation date within 30 days
-          </div>
-        )}
+        {/* Compliance Alerts */}
+        {(() => {
+          const critical = filtered.filter(c => c.limitation_date && differenceInDays(parseISO(c.limitation_date), new Date()) < 30);
+          const high = filtered.filter(c => c.limitation_date && differenceInDays(parseISO(c.limitation_date), new Date()) >= 30 && differenceInDays(parseISO(c.limitation_date), new Date()) < 60);
+          
+          return (
+            <div className="space-y-2">
+              {critical.length > 0 && (
+                <div className="flex gap-2 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span className="font-semibold">{critical.length} case(s) - CRITICAL: Limitation date within 30 days</span>
+                </div>
+              )}
+              {high.length > 0 && (
+                <div className="flex gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-700">
+                  <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span className="font-semibold">{high.length} case(s) - HIGH: Limitation date within 60 days</span>
+                </div>
+              )}
+              {critical.length === 0 && high.length === 0 && filtered.length > 0 && (
+                <div className="flex gap-2 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+                  <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span className="font-semibold">All cases compliant - No urgent limitation deadlines</span>
+                </div>
+              )}
+            </div>
+          );
+        })()}
       </CardContent>
     </Card>
   );
