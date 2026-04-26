@@ -11,6 +11,7 @@ import { Send, User, Calendar, AlertCircle, MessageCircle, Loader2, Upload, File
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
 import { Input } from '@/components/ui/input';
+import TaskDependencyManager from '@/components/TaskDependencyManager';
 
 const PRIORITY_COLORS = {
   low: 'bg-green-100 text-green-800',
@@ -19,7 +20,7 @@ const PRIORITY_COLORS = {
   critical: 'bg-red-100 text-red-800',
 };
 
-export default function TaskDetailModal({ task, incident, isOpen, onClose }) {
+export default function TaskDetailModal({ task, incident, isOpen, onClose, allTasks = [] }) {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -188,6 +189,16 @@ export default function TaskDetailModal({ task, incident, isOpen, onClose }) {
               )}
             </CardContent>
           </Card>
+
+          {/* Dependencies Section */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-slate-900">Task Dependencies</h3>
+            <TaskDependencyManager 
+              task={task} 
+              incidentId={incident?.id} 
+              allTasks={allTasks}
+            />
+          </div>
 
           {/* Attachments Section */}
           {(task?.attachments?.length > 0 || true) && (

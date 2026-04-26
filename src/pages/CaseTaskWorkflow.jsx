@@ -9,6 +9,7 @@ import { AlertCircle, Bell, RefreshCw, Loader2, Calendar, User, Zap, MessageCirc
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
 import TaskDetailModal from '@/components/TaskDetailModal';
+import CriticalPathViewer from '@/components/CriticalPathViewer';
 
 const COLUMNS = {
   not_started: { title: 'To Do', color: 'bg-slate-50', borderColor: 'border-slate-300' },
@@ -281,11 +282,17 @@ export default function CaseTaskWorkflow() {
           ))}
         </div>
 
+        {/* Critical Path Analysis */}
+        <div className="mt-8">
+          <CriticalPathViewer tasks={tasks} />
+        </div>
+
         {/* Task Detail Modal */}
         {selectedTask && (
           <TaskDetailModal
             task={selectedTask}
             incident={incidents[selectedTask.incident_id]}
+            allTasks={tasks}
             isOpen={modalOpen}
             onClose={() => {
               setModalOpen(false);

@@ -84,6 +84,25 @@
         }
       },
       "description": "Array of attached documents and evidence files"
+    },
+    "blocked_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of tasks that are blocking this task"
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of tasks that this task is blocking"
+    },
+    "is_on_critical_path": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this task is on the critical path to completion"
     }
   },
   "required": [
