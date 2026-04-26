@@ -75,6 +75,7 @@ import FeeEarnerWeeklyReports from '@/pages/FeeEarnerWeeklyReports';
 import TaskAnalyticsDashboard from '@/pages/TaskAnalyticsDashboard';
 import CaseNarrativeOnboarding from '@/pages/CaseNarrativeOnboarding';
 import LegalKPIDashboard from '@/pages/LegalKPIDashboard';
+import CaseTrackerPro from '@/pages/CaseTrackerPro';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -174,6 +175,7 @@ const AuthenticatedApp = () => {
       <Route path="/task-analytics" element={<TaskAnalyticsDashboard />} />
       <Route path="/onboarding-case-narrative" element={<CaseNarrativeOnboarding />} />
       <Route path="/legal-kpi-dashboard" element={<LegalKPIDashboard />} />
+      <Route path="/case-tracker-pro" element={<CaseTrackerPro />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
