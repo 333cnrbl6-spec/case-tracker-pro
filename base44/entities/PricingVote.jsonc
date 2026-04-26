@@ -1,0 +1,106 @@
+{
+  "name": "PricingVote",
+  "type": "object",
+  "properties": {
+    "voting_round_id": {
+      "type": "string",
+      "description": "Unique voting round identifier"
+    },
+    "tier_name": {
+      "type": "string",
+      "enum": [
+        "Starter",
+        "Professional",
+        "Premium",
+        "Enterprise"
+      ],
+      "description": "Tier being voted on"
+    },
+    "proposed_monthly_price": {
+      "type": "number",
+      "description": "Proposed monthly price"
+    },
+    "proposed_annual_price": {
+      "type": "number",
+      "description": "Proposed annual price"
+    },
+    "proposed_features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Proposed features"
+    },
+    "voter_email": {
+      "type": "string",
+      "description": "Email of team member voting"
+    },
+    "vote": {
+      "type": "string",
+      "enum": [
+        "approve",
+        "reject",
+        "modify"
+      ],
+      "description": "Vote decision"
+    },
+    "comment": {
+      "type": "string",
+      "description": "Voter's reasoning or suggestions"
+    },
+    "round_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "closed",
+        "implemented"
+      ],
+      "default": "active",
+      "description": "Status of voting round"
+    },
+    "total_votes": {
+      "type": "number",
+      "default": 0,
+      "description": "Total votes cast in this round"
+    },
+    "approve_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Count of approve votes"
+    },
+    "reject_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Count of reject votes"
+    },
+    "modify_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Count of modify votes"
+    },
+    "pass_threshold": {
+      "type": "number",
+      "default": 0.5,
+      "description": "Percentage threshold for passage (0.5 = 50%+1)"
+    },
+    "initiated_by": {
+      "type": "string",
+      "description": "Admin who started voting round"
+    },
+    "implemented_by": {
+      "type": "string",
+      "description": "Admin who implemented the decision"
+    },
+    "implemented_at": {
+      "type": "string",
+      "description": "ISO timestamp when implemented"
+    }
+  },
+  "required": [
+    "voting_round_id",
+    "tier_name",
+    "voter_email",
+    "vote",
+    "round_status"
+  ]
+}

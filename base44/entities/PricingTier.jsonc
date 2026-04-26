@@ -1,0 +1,69 @@
+{
+  "name": "PricingTier",
+  "type": "object",
+  "properties": {
+    "tier_name": {
+      "type": "string",
+      "enum": [
+        "Starter",
+        "Professional",
+        "Premium",
+        "Enterprise"
+      ],
+      "description": "Tier level"
+    },
+    "monthly_price": {
+      "type": "number",
+      "description": "Monthly price in GBP"
+    },
+    "annual_price": {
+      "type": "number",
+      "description": "Annual price in GBP"
+    },
+    "description": {
+      "type": "string",
+      "description": "Tier description"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of included features"
+    },
+    "max_cases": {
+      "type": "number",
+      "description": "Maximum cases allowed"
+    },
+    "max_users": {
+      "type": "number",
+      "description": "Maximum team members"
+    },
+    "support_level": {
+      "type": "string",
+      "enum": [
+        "email",
+        "priority",
+        "phone",
+        "dedicated"
+      ],
+      "description": "Support level"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this tier is currently active"
+    },
+    "display_order": {
+      "type": "number",
+      "description": "Order for display (1-4)"
+    }
+  },
+  "required": [
+    "tier_name",
+    "monthly_price",
+    "annual_price",
+    "description",
+    "features"
+  ]
+}
