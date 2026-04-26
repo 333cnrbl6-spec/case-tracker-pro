@@ -5,9 +5,10 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, Bell, RefreshCw, Loader2, Calendar, User, Zap } from 'lucide-react';
+import { AlertCircle, Bell, RefreshCw, Loader2, Calendar, User, Zap, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
+import TaskDetailModal from '@/components/TaskDetailModal';
 
 const COLUMNS = {
   not_started: { title: 'To Do', color: 'bg-slate-50', borderColor: 'border-slate-300' },
@@ -28,6 +29,8 @@ export default function CaseTaskWorkflow() {
   const queryClient = useQueryClient();
   const [tasks, setTasks] = useState([]);
   const [incidents, setIncidents] = useState({});
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Fetch tasks and incidents
   const { data: tasksData = [], isLoading: tasksLoading } = useQuery({
@@ -237,7 +240,21 @@ export default function CaseTaskWorkflow() {
                                       <span className="truncate">{task.assigned_to}</span>
                                     </div>
                                   )}
-                                </div>
+
+                                  {/* View Details Button */}
+                                  <Button
+                                    onClick={() => {
+                                      setSelectedTask(task);
+                                      setModalOpen(true);
+                                    }}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="w-full mt-2 text-xs h-7 gap-1"
+                                  >
+                                    <MessageCircle className="w-3 h-3" />
+                                    View & Comment
+                                  </Button>
+                                  </div>
                               )}
                             </Draggable>
                           );
@@ -263,6 +280,19 @@ export default function CaseTaskWorkflow() {
             </Card>
           ))}
         </div>
+
+        {/* Task Detail Modal */}
+        {selectedTask && (
+          <TaskDetailModal
+            task={selectedTask}
+            incident={incidents[selectedTask.incident_id]}
+            isOpen={modalOpen}
+            onClose={() => {
+              setModalOpen(false);
+              setSelectedTask(null);
+            }}
+          />
+        )}
       </div>
     </div>
   );
