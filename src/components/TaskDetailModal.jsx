@@ -7,9 +7,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, User, Calendar, AlertCircle, MessageCircle, Loader2 } from 'lucide-react';
+import { Send, User, Calendar, AlertCircle, MessageCircle, Loader2, Upload, FileIcon, Trash2, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
+import { Input } from '@/components/ui/input';
 
 const PRIORITY_COLORS = {
   low: 'bg-green-100 text-green-800',
@@ -21,6 +22,7 @@ const PRIORITY_COLORS = {
 export default function TaskDetailModal({ task, incident, isOpen, onClose }) {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
+  const [uploading, setUploading] = useState(false);
   const currentUser = base44.auth.me().catch(() => null);
 
   // Fetch task comments
@@ -52,6 +54,55 @@ export default function TaskDetailModal({ task, incident, isOpen, onClose }) {
     },
     onError: (err) => toast.error(err.message),
   });
+
+  // Handle file upload
+  const handleFileUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const user = await currentUser;
+      const file = files[0];
+      const response = await base44.integrations.Core.UploadFile({ file });
+
+      if (response.file_url) {
+        const currentAttachments = task.attachments || [];
+        const newAttachment = {
+          file_name: file.name,
+          file_url: response.file_url,
+          file_type: file.type,
+          uploaded_by: user?.email || 'unknown@example.com',
+          uploaded_at: new Date().toISOString(),
+        };
+
+        await base44.entities.IncidentTask.update(task.id, {
+          attachments: [...currentAttachments, newAttachment],
+        });
+
+        queryClient.invalidateQueries({ queryKey: ['incident-tasks'] });
+        toast.success('File uploaded successfully');
+        e.target.value = '';
+      }
+    } catch (error) {
+      toast.error('Failed to upload file');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Handle file delete
+  const handleDeleteAttachment = async (index) => {
+    try {
+      const currentAttachments = task.attachments || [];
+      const updated = currentAttachments.filter((_, i) => i !== index);
+      await base44.entities.IncidentTask.update(task.id, { attachments: updated });
+      queryClient.invalidateQueries({ queryKey: ['incident-tasks'] });
+      toast.success('Attachment removed');
+    } catch (error) {
+      toast.error('Failed to delete attachment');
+    }
+  };
 
   const handleAddComment = () => {
     if (!commentText.trim()) {
@@ -137,6 +188,62 @@ export default function TaskDetailModal({ task, incident, isOpen, onClose }) {
               )}
             </CardContent>
           </Card>
+
+          {/* Attachments Section */}
+          {(task?.attachments?.length > 0 || true) && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Upload className="w-5 h-5 text-slate-700" />
+                <h3 className="font-semibold text-slate-900">Attachments</h3>
+                <span className="text-xs text-slate-600 ml-auto">({task?.attachments?.length || 0})</span>
+              </div>
+
+              {/* Attachment List */}
+              {task?.attachments && task.attachments.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {task.attachments.map((attachment, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 bg-white border rounded-lg">
+                      <a
+                        href={attachment.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 flex-1 hover:text-indigo-600"
+                      >
+                        <FileIcon className="w-4 h-4 text-slate-500" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-slate-900 truncate">{attachment.file_name}</p>
+                          <p className="text-xs text-slate-500">
+                            by {attachment.uploaded_by?.split('@')[0]}
+                          </p>
+                        </div>
+                      </a>
+                      <button
+                        onClick={() => handleDeleteAttachment(index)}
+                        className="p-1 hover:bg-red-50 rounded"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Upload Input */}
+              <div className="relative">
+                <Input
+                  type="file"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                  className="text-sm"
+                />
+                {uploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/50 rounded">
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-600" />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Comments Section */}
           <div className="space-y-3">

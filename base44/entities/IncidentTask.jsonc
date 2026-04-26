@@ -60,6 +60,30 @@
       "type": "boolean",
       "default": false,
       "description": "Whether deadline reminder has been sent"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "uploaded_by": {
+            "type": "string"
+          },
+          "uploaded_at": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Array of attached documents and evidence files"
     }
   },
   "required": [
