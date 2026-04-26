@@ -82,75 +82,119 @@ ${evidence
   .join('\n') || 'No evidence'}
     `;
 
-    // Generate structured narrative using LLM
-    const narrativePrompt = `You are an expert legal counsel. Based on the following case information, generate a comprehensive, structured legal narrative for a case brief/summary report for partner review.
+    // Generate structured narrative using LLM with strict schema
+     const narrativePrompt = `You are a senior UK solicitor. Based on this case data, generate a structured legal narrative with detailed CHRONOLOGY, LIABILITY ANALYSIS, and QUANTUM ASSESSMENT sections.
 
-${caseContext}
+    ${caseContext}
 
-Please generate a JSON response with this exact structure:
-{
-  "executive_summary": "A 2-3 sentence summary of the case",
-  "case_overview": {
+    Generate JSON with this strict structure:
+    {
+    "executive_summary": "2-3 sentence case summary",
+    "case_overview": {
     "title": "Case title",
-    "type": "Type of case",
+    "type": "Case type",
     "client": "Client name",
     "opponent": "Opponent name",
-    "value": "Estimated/settled value",
-    "status": "Current status"
-  },
-  "background_and_facts": "Detailed chronological narrative of facts leading to the claim",
-  "key_parties": [
-    {
-      "name": "Party name",
-      "role": "Their role in the case",
-      "significance": "Why they are significant"
-    }
-  ],
-  "liability_analysis": "Analysis of liability issues, breaches, and responsibilities",
-  "key_evidence": [
-    {
-      "description": "What the evidence shows",
-      "type": "Type of evidence",
-      "strength": "How compelling it is",
-      "impact": "Its impact on the case"
-    }
-  ],
-  "communication_pattern": "Analysis of communications between parties, tone, and implications",
-  "damages_assessment": "Assessment of quantum/damages claim",
-  "legal_issues": [
-    {
-      "issue": "The legal issue",
-      "analysis": "How it applies to this case",
-      "risk": "Risk level (low/medium/high)"
-    }
-  ],
-  "strengths": ["Key case strengths"],
-  "weaknesses": ["Key vulnerabilities"],
-  "risks": ["Identified risks"],
-  "next_steps": ["Recommended actions"],
-  "partner_review_notes": "Any special notes for partner review"
-}`;
+    "estimated_value": "£X",
+    "status": "Status",
+    "limitation_date": "Date",
+    "urgency": "high/medium/low"
+    },
+    "background": {
+    "parties": [{"name": "Name", "role": "Role", "significance": "Why significant"}],
+    "relationship_summary": "How parties are connected",
+    "contractual_context": "Any relevant contracts"
+    },
+    "chronology": {
+    "timeline": [{"date": "YYYY-MM-DD", "event": "What happened", "significance": "Why it matters"}],
+    "key_milestones": ["Critical dates and events"],
+    "critical_dates": [{"date": "YYYY-MM-DD", "description": "What occurred", "legal_consequence": "Impact"}]
+    },
+    "liability_analysis": {
+    "legal_framework": "Applicable law/principles",
+    "breach_identified": "What was breached and how",
+    "causation": "How breach caused loss",
+    "defendant_defences": ["Potential defences"],
+    "assessment": "Liability strength assessment"
+    },
+    "quantum_assessment": {
+    "heads_of_loss": [{"category": "Loss type", "description": "Details", "estimated_value": "£X"}],
+    "calculation_methodology": "How damages calculated",
+    "total_claimed": "£X",
+    "mitigation": "Claimant mitigation obligations and actions"
+    },
+    "legal_framework": {
+    "applicable_law": ["Relevant legal areas"],
+    "key_statutes": [{"statute": "Name", "section": "Section", "relevance": "Why relevant"}],
+    "precedent_cases": ["Relevant case law"]
+    },
+    "evidence_analysis": {
+    "key_evidence": [{"description": "What it shows", "type": "evidence_type", "strength": "strong/moderate/weak", "impact": "On liability/quantum"}],
+    "evidence_gaps": ["Missing evidence"]
+    },
+    "strengths_weaknesses": {
+    "strengths": ["Case strengths"],
+    "weaknesses": ["Vulnerabilities"],
+    "risks": ["Key risks"],
+    "assessment": "Overall case assessment"
+    },
+    "next_steps": [{"action": "Action needed", "priority": "high/medium/low", "timeline": "When"}]
+    }`;
 
     const narrativeResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: narrativePrompt,
+      model: 'claude_sonnet_4_6',
       response_json_schema: {
         type: 'object',
         properties: {
           executive_summary: { type: 'string' },
-          case_overview: { type: 'object' },
-          background_and_facts: { type: 'string' },
-          key_parties: { type: 'array' },
-          liability_analysis: { type: 'string' },
-          key_evidence: { type: 'array' },
-          communication_pattern: { type: 'string' },
-          damages_assessment: { type: 'string' },
-          legal_issues: { type: 'array' },
-          strengths: { type: 'array' },
-          weaknesses: { type: 'array' },
-          risks: { type: 'array' },
-          next_steps: { type: 'array' },
-          partner_review_notes: { type: 'string' },
+          case_overview: {
+            type: 'object',
+            properties: {
+              title: { type: 'string' },
+              type: { type: 'string' },
+              client: { type: 'string' },
+              opponent: { type: 'string' },
+              estimated_value: { type: 'string' },
+              status: { type: 'string' },
+              limitation_date: { type: 'string' },
+              urgency: { type: 'string' }
+            }
+          },
+          background: { type: 'object' },
+          chronology: {
+            type: 'object',
+            properties: {
+              timeline: { type: 'array', items: { type: 'object' } },
+              key_milestones: { type: 'array', items: { type: 'string' } },
+              critical_dates: { type: 'array', items: { type: 'object' } }
+            }
+          },
+          liability_analysis: {
+            type: 'object',
+            properties: {
+              legal_framework: { type: 'string' },
+              breach_identified: { type: 'string' },
+              causation: { type: 'string' },
+              defendant_defences: { type: 'array', items: { type: 'string' } },
+              assessment: { type: 'string' }
+            }
+          },
+          quantum_assessment: {
+            type: 'object',
+            properties: {
+              heads_of_loss: { type: 'array', items: { type: 'object' } },
+              calculation_methodology: { type: 'string' },
+              total_claimed: { type: 'string' },
+              mitigation: { type: 'string' }
+            }
+          },
+          legal_framework: { type: 'object' },
+          evidence_analysis: { type: 'object' },
+          strengths_weaknesses: { type: 'object' },
+          next_steps: { type: 'array', items: { type: 'object' } }
         },
+        required: ['chronology', 'liability_analysis', 'quantum_assessment']
       },
     });
 

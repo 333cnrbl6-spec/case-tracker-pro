@@ -14,26 +14,25 @@ export default function EnhancedAILegalNarrative({ legalCase, onNarrativeGenerat
       setGenerating(true);
       setError(null);
 
-      const prompt = `You are a senior UK solicitor specialising in ${legalCase.case_type}. Build a structured legal case narrative:
-Case Ref: ${legalCase.case_ref}
-Client: ${legalCase.client_name}
-Opponent: ${legalCase.opponent_name}
-Incident Date: ${legalCase.incident_date}
-Facts: ${legalCase.facts}
-Evidence: ${legalCase.ai_narrative ? 'Multiple documents' : 'To be gathered'}
-Instructions: ${legalCase.instructions}
+      const prompt = `You are a senior UK solicitor specialising in ${legalCase.case_type}. Generate a comprehensive, structured legal case narrative.
+
+CASE DETAILS:
+- Reference: ${legalCase.case_ref}
+- Type: ${legalCase.case_type}
+- Client: ${legalCase.client_name}
+- Opponent: ${legalCase.opponent_name}
+- Incident Date: ${legalCase.incident_date}
+- Limitation Date: ${legalCase.limitation_date}
+- Estimated Value: £${legalCase.estimated_value || '0'}
+- Facts: ${legalCase.facts}
+- Instructions: ${legalCase.instructions}
 
 Jurisdiction: England & Wales
 
-Produce a comprehensive legal narrative with these sections:
-1. Background & Parties - identify all parties, their roles, relationships
-2. Chronology - timeline of key events
-3. Liability Analysis - legal basis for claim
-4. Quantum Assessment - damages calculation approach
-5. Legal Framework & Statutes - applicable law
-6. Recommended Actions - next steps
-7. Risk Assessment - strengths/weaknesses
-8. Applicable Statutes - relevant UK legislation`;
+Generate a JSON narrative with strict structure including:
+1. CHRONOLOGY - detailed timeline of events with dates
+2. LIABILITY ANALYSIS - legal basis, breach analysis, causation
+3. QUANTUM ASSESSMENT - damages calculation, heads of loss, valuation methodology`;
 
       const response = await base44.integrations.Core.InvokeLLM({
         prompt,
@@ -41,15 +40,61 @@ Produce a comprehensive legal narrative with these sections:
         response_json_schema: {
           type: 'object',
           properties: {
-            background_parties: { type: 'string' },
-            chronology: { type: 'string' },
-            liability_analysis: { type: 'string' },
-            quantum_assessment: { type: 'string' },
-            legal_framework: { type: 'string' },
-            recommended_actions: { type: 'array', items: { type: 'string' } },
-            risk_assessment: { type: 'string' },
-            applicable_statutes: { type: 'array', items: { type: 'string' } }
-          }
+            background: {
+              type: 'object',
+              properties: {
+                parties: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, role: { type: 'string' }, significance: { type: 'string' } } } },
+                relationship: { type: 'string' },
+                contractual_basis: { type: 'string' }
+              }
+            },
+            chronology: {
+              type: 'object',
+              properties: {
+                timeline: { type: 'array', items: { type: 'object', properties: { date: { type: 'string' }, event: { type: 'string' }, significance: { type: 'string' } } } },
+                key_milestones: { type: 'array', items: { type: 'string' } },
+                critical_dates: { type: 'array', items: { type: 'object', properties: { date: { type: 'string' }, description: { type: 'string' }, legal_consequence: { type: 'string' } } } }
+              }
+            },
+            liability_analysis: {
+              type: 'object',
+              properties: {
+                legal_framework: { type: 'string' },
+                breach_identified: { type: 'string' },
+                causation: { type: 'string' },
+                defences: { type: 'array', items: { type: 'string' } },
+                assessment: { type: 'string' }
+              }
+            },
+            quantum_assessment: {
+              type: 'object',
+              properties: {
+                heads_of_loss: { type: 'array', items: { type: 'object', properties: { category: { type: 'string' }, description: { type: 'string' }, estimated_value: { type: 'string' } } } },
+                calculation_methodology: { type: 'string' },
+                total_quantum: { type: 'string' },
+                mitigation_assessment: { type: 'string' }
+              }
+            },
+            legal_framework: {
+              type: 'object',
+              properties: {
+                applicable_law: { type: 'array', items: { type: 'string' } },
+                key_statutes: { type: 'array', items: { type: 'object', properties: { statute: { type: 'string' }, section: { type: 'string' }, relevance: { type: 'string' } } } },
+                case_law: { type: 'array', items: { type: 'string' } }
+              }
+            },
+            strengths_weaknesses: {
+              type: 'object',
+              properties: {
+                strengths: { type: 'array', items: { type: 'string' } },
+                weaknesses: { type: 'array', items: { type: 'string' } },
+                risks: { type: 'array', items: { type: 'string' } },
+                overall_assessment: { type: 'string' }
+              }
+            },
+            next_steps: { type: 'array', items: { type: 'object', properties: { action: { type: 'string' }, priority: { type: 'string' }, timeline: { type: 'string' } } } }
+          },
+          required: ['chronology', 'liability_analysis', 'quantum_assessment']
         }
       });
 
