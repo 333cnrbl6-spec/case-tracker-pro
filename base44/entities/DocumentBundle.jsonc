@@ -1,0 +1,74 @@
+{
+  "name": "DocumentBundle",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related legal case ID"
+    },
+    "bundle_name": {
+      "type": "string",
+      "description": "Name of the compiled bundle"
+    },
+    "description": {
+      "type": "string",
+      "description": "Bundle description"
+    },
+    "document_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of included DocumentAnalysis records"
+    },
+    "document_count": {
+      "type": "number",
+      "description": "Total number of documents in bundle"
+    },
+    "sort_order": {
+      "type": "string",
+      "enum": [
+        "chronological",
+        "reverse_chronological",
+        "type"
+      ],
+      "description": "How documents are ordered"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "URL to download the compiled PDF"
+    },
+    "pdf_size_mb": {
+      "type": "number",
+      "description": "Size of PDF in megabytes"
+    },
+    "page_count": {
+      "type": "number",
+      "description": "Total pages in compiled PDF"
+    },
+    "includes_index": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether bundle includes page index"
+    },
+    "court_formatted": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether formatted for court submission"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "Email of user who created bundle"
+    },
+    "created_at": {
+      "type": "string",
+      "description": "ISO timestamp of creation"
+    }
+  },
+  "required": [
+    "case_id",
+    "bundle_name",
+    "document_ids",
+    "document_count"
+  ]
+}
