@@ -73,6 +73,7 @@ import MilestoneTimeline from '@/pages/MilestoneTimeline';
 import CaseTaskWorkflow from '@/pages/CaseTaskWorkflow';
 import FeeEarnerWeeklyReports from '@/pages/FeeEarnerWeeklyReports';
 import TaskAnalyticsDashboard from '@/pages/TaskAnalyticsDashboard';
+import CaseNarrativeOnboarding from '@/pages/CaseNarrativeOnboarding';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -170,6 +171,7 @@ const AuthenticatedApp = () => {
       <Route path="/case-task-workflow" element={<CaseTaskWorkflow />} />
       <Route path="/fee-earner-reports" element={<FeeEarnerWeeklyReports />} />
       <Route path="/task-analytics" element={<TaskAnalyticsDashboard />} />
+      <Route path="/onboarding-case-narrative" element={<CaseNarrativeOnboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
