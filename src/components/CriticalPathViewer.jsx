@@ -8,15 +8,25 @@ export default function CriticalPathViewer({ tasks = [] }) {
   const criticalPath = useMemo(() => {
     if (!tasks || tasks.length === 0) return [];
 
-    // Find root tasks (not blocked by anything)
-    const rootTasks = tasks.filter(t => !t.blocked_by || t.blocked_by.length === 0);
-    
-    // Build dependency graph and calculate longest path
-    const buildPath = (task, visited = new Set()) => {
-      if (visited.has(task.id)) return [task];
-      visited.add(task.id);
+    // Validate tasks array
+    const validTasks = tasks.filter(t => t && t.id);
+    if (validTasks.length === 0) return [];
 
-      const dependentTasks = tasks.filter(t => task.blocks?.includes(t.id));
+    // Find root tasks (not blocked by anything)
+    const rootTasks = validTasks.filter(t => !Array.isArray(t?.blocked_by) || t.blocked_by.length === 0);
+    
+    // Build dependency graph with cycle detection
+    const buildPath = (task, visited = new Set(), depth = 0) => {
+      // Prevent infinite recursion
+      if (depth > validTasks.length) return [task];
+      if (!task?.id || visited.has(task.id)) return [task];
+      
+      const newVisited = new Set(visited);
+      newVisited.add(task.id);
+
+      const dependentTasks = validTasks.filter(t => 
+        Array.isArray(task?.blocks) && task.blocks.includes(t?.id)
+      );
       
       if (dependentTasks.length === 0) {
         return [task];
@@ -25,9 +35,11 @@ export default function CriticalPathViewer({ tasks = [] }) {
       // Find the path with the most tasks
       let longestPath = [task];
       for (const dependent of dependentTasks) {
-        const subPath = buildPath(dependent, new Set(visited));
-        if (subPath.length + 1 > longestPath.length) {
-          longestPath = [task, ...subPath];
+        if (dependent?.id && !newVisited.has(dependent.id)) {
+          const subPath = buildPath(dependent, newVisited, depth + 1);
+          if (subPath.length + 1 > longestPath.length) {
+            longestPath = [task, ...subPath];
+          }
         }
       }
       return longestPath;

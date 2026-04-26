@@ -4,6 +4,7 @@ import AppSidebar from './AppSidebar';
 import GlobalSearch from './GlobalSearch';
 import SaaSAdminHeader from './SaaSAdminHeader';
 import MobileNavBar from './MobileNavBar';
+import ErrorBoundary from './ErrorBoundary';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,7 +24,9 @@ export default function AppLayout({ children }) {
             </div>
           </header>
           <main className="flex-1">
-            {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
           </main>
         </div>
       </div>
@@ -32,7 +35,9 @@ export default function AppLayout({ children }) {
       <div className="flex flex-col lg:hidden min-h-screen bg-slate-50">
         <SaaSAdminHeader />
         <main className="flex-1 overflow-y-auto pb-16">
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
         </main>
         <MobileNavBar />
       </div>

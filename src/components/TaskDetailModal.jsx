@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -24,7 +24,21 @@ export default function TaskDetailModal({ task, incident, isOpen, onClose, allTa
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
   const [uploading, setUploading] = useState(false);
-  const currentUser = base44.auth.me().catch(() => null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchUser = async () => {
+      try {
+        const user = await base44.auth.me();
+        if (isMounted) setCurrentUser(user ?? null);
+      } catch {
+        if (isMounted) setCurrentUser(null);
+      }
+    };
+    fetchUser();
+    return () => { isMounted = false; };
+  }, []);
 
   // Fetch task comments
   const { data: comments = [], isLoading: commentsLoading } = useQuery({
@@ -63,7 +77,13 @@ export default function TaskDetailModal({ task, incident, isOpen, onClose, allTa
 
     setUploading(true);
     try {
-      const user = await currentUser;
+      if (!currentUser) {
+        toast.error('User not authenticated');
+        setUploading(false);
+        return;
+      }
+
+      const user = currentUser;
       const file = files[0];
       const response = await base44.integrations.Core.UploadFile({ file });
 

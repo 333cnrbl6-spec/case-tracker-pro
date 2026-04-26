@@ -39,31 +39,59 @@ export default function GlobalSearch() {
 
   const results = q.length < 2 ? [] : [
     ...incidents.filter(i =>
-      i.title?.toLowerCase().includes(q) ||
-      i.description?.toLowerCase().includes(q) ||
-      i.rics_violations?.some(v => v.toLowerCase().includes(q)) ||
-      i.incident_type?.toLowerCase().includes(q)
-    ).map(i => ({ type: 'incident', id: i.id, title: i.title, snippet: highlight(i.description, q), meta: i.severity, meta2: i.date, violations: i.rics_violations })),
+      i?.title?.toLowerCase().includes(q) ||
+      i?.description?.toLowerCase().includes(q) ||
+      Array.isArray(i?.rics_violations) && i.rics_violations.some(v => v?.toLowerCase?.().includes(q)) ||
+      i?.incident_type?.toLowerCase().includes(q)
+    ).map(i => ({ 
+      type: 'incident', 
+      id: i?.id, 
+      title: i?.title ?? 'Untitled', 
+      snippet: highlight(i?.description, q), 
+      meta: i?.severity, 
+      meta2: i?.date, 
+      violations: Array.isArray(i?.rics_violations) ? i.rics_violations : [] 
+    })),
 
     ...evidence.filter(e =>
-      e.title?.toLowerCase().includes(q) ||
-      e.description?.toLowerCase().includes(q) ||
-      e.notes?.toLowerCase().includes(q) ||
-      e.evidence_type?.toLowerCase().includes(q)
-    ).map(e => ({ type: 'evidence', id: e.id, title: e.title, snippet: highlight(e.description, q), meta: e.strength, meta2: e.date_collected })),
+      e?.title?.toLowerCase().includes(q) ||
+      e?.description?.toLowerCase().includes(q) ||
+      e?.notes?.toLowerCase().includes(q) ||
+      e?.evidence_type?.toLowerCase().includes(q)
+    ).map(e => ({ 
+      type: 'evidence', 
+      id: e?.id, 
+      title: e?.title ?? 'Untitled', 
+      snippet: highlight(e?.description, q), 
+      meta: e?.strength, 
+      meta2: e?.date_collected 
+    })),
 
     ...communications.filter(c =>
-      c.subject?.toLowerCase().includes(q) ||
-      c.content?.toLowerCase().includes(q) ||
-      c.from?.toLowerCase().includes(q) ||
-      c.to?.toLowerCase().includes(q)
-    ).map(c => ({ type: 'communication', id: c.id, title: c.subject, snippet: `${c.from} → ${c.to}`, meta: c.tone, meta2: c.date })),
+      c?.subject?.toLowerCase().includes(q) ||
+      c?.content?.toLowerCase().includes(q) ||
+      c?.from?.toLowerCase().includes(q) ||
+      c?.to?.toLowerCase().includes(q)
+    ).map(c => ({ 
+      type: 'communication', 
+      id: c?.id, 
+      title: c?.subject ?? 'No Subject', 
+      snippet: `${c?.from ?? 'Unknown'} → ${c?.to ?? 'Unknown'}`, 
+      meta: c?.tone, 
+      meta2: c?.date 
+    })),
 
     ...parties.filter(p =>
-      p.name?.toLowerCase().includes(q) ||
-      p.role_in_case?.toLowerCase().includes(q) ||
-      p.notes?.toLowerCase().includes(q)
-    ).map(p => ({ type: 'party', id: p.id, title: p.name, snippet: p.role_in_case, meta: p.party_type })),
+      p?.name?.toLowerCase().includes(q) ||
+      p?.role_in_case?.toLowerCase().includes(q) ||
+      p?.notes?.toLowerCase().includes(q)
+    ).map(p => ({ 
+      type: 'party', 
+      id: p?.id, 
+      title: p?.name ?? 'Unknown Party', 
+      snippet: p?.role_in_case ?? '', 
+      meta: p?.party_type 
+    })),
   ].slice(0, 12);
 
   useEffect(() => {

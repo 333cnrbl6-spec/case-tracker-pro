@@ -187,7 +187,7 @@ export default function AutomatedBundleGenerator() {
         setPreviewOpen(true);
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to generate bundle');
+      toast.error(error?.message || 'Failed to generate bundle');
     } finally {
       setGenerating(false);
     }
