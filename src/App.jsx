@@ -74,6 +74,7 @@ import CaseTaskWorkflow from '@/pages/CaseTaskWorkflow';
 import FeeEarnerWeeklyReports from '@/pages/FeeEarnerWeeklyReports';
 import TaskAnalyticsDashboard from '@/pages/TaskAnalyticsDashboard';
 import CaseNarrativeOnboarding from '@/pages/CaseNarrativeOnboarding';
+import LegalKPIDashboard from '@/pages/LegalKPIDashboard';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -172,6 +173,7 @@ const AuthenticatedApp = () => {
       <Route path="/fee-earner-reports" element={<FeeEarnerWeeklyReports />} />
       <Route path="/task-analytics" element={<TaskAnalyticsDashboard />} />
       <Route path="/onboarding-case-narrative" element={<CaseNarrativeOnboarding />} />
+      <Route path="/legal-kpi-dashboard" element={<LegalKPIDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
