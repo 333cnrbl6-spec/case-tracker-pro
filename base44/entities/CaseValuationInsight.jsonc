@@ -1,0 +1,125 @@
+{
+  "name": "CaseValuationInsight",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related legal case ID"
+    },
+    "case_ref": {
+      "type": "string",
+      "description": "Case reference for quick display"
+    },
+    "analysis_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date analysis was performed"
+    },
+    "valuation_estimate": {
+      "type": "number",
+      "description": "Estimated settlement value in GBP"
+    },
+    "valuation_range_low": {
+      "type": "number",
+      "description": "Lower bound of valuation range (25th percentile)"
+    },
+    "valuation_range_high": {
+      "type": "number",
+      "description": "Upper bound of valuation range (75th percentile)"
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Model confidence 0-100 based on data quality"
+    },
+    "settlement_probability": {
+      "type": "number",
+      "description": "Probability of settlement vs litigation (0-100)"
+    },
+    "case_type_factors": {
+      "type": "object",
+      "properties": {
+        "case_type": {
+          "type": "string"
+        },
+        "historical_avg_settlement": {
+          "type": "number"
+        },
+        "settlement_rate": {
+          "type": "number"
+        },
+        "avg_litigation_duration_days": {
+          "type": "number"
+        }
+      },
+      "description": "Benchmarks from similar historical cases"
+    },
+    "comparable_cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_ref": {
+            "type": "string"
+          },
+          "settlement_value": {
+            "type": "number"
+          },
+          "similarity_score": {
+            "type": "number"
+          },
+          "case_type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Similar historical cases used for estimation"
+    },
+    "risk_factors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "factor": {
+            "type": "string"
+          },
+          "impact_percent": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Factors affecting valuation with impact %"
+    },
+    "key_indicators": {
+      "type": "object",
+      "properties": {
+        "estimated_value": {
+          "type": "number"
+        },
+        "limitation_days_remaining": {
+          "type": "number"
+        },
+        "case_complexity": {
+          "type": "string"
+        },
+        "evidence_strength": {
+          "type": "string"
+        }
+      },
+      "description": "Key case indicators affecting valuation"
+    },
+    "analysis_summary": {
+      "type": "string",
+      "description": "AI-generated narrative explaining valuation"
+    },
+    "analyzed_by": {
+      "type": "string",
+      "description": "Email of user who triggered analysis"
+    }
+  },
+  "required": [
+    "case_id",
+    "case_ref",
+    "analysis_date",
+    "valuation_estimate"
+  ]
+}

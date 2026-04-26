@@ -78,6 +78,7 @@ import LegalKPIDashboard from '@/pages/LegalKPIDashboard';
 import CaseTrackerPro from '@/pages/CaseTrackerPro';
 import CaseDocumentAnalyzer from '@/pages/CaseDocumentAnalyzer';
 import DocumentBundleCompiler from '@/pages/DocumentBundleCompiler';
+import CaseValuationInsights from '@/pages/CaseValuationInsights';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -180,6 +181,7 @@ const AuthenticatedApp = () => {
       <Route path="/case-tracker-pro" element={<CaseTrackerPro />} />
       <Route path="/document-analyzer" element={<CaseDocumentAnalyzer />} />
       <Route path="/document-bundle-compiler" element={<DocumentBundleCompiler />} />
+      <Route path="/case-valuation-insights" element={<CaseValuationInsights />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
