@@ -79,9 +79,16 @@ const NAV_GROUPS = [
     ],
   },
   {
-    label: 'System',
+    label: 'Compliance & Audit',
     items: [
       { path: '/compliance-alerts', icon: Bell, label: 'Compliance Alerts' },
+      { path: '/compliance-audit', icon: ShieldCheck, label: 'Compliance Audit' },
+      { path: '/practice-analytics', icon: Activity, label: 'Practice Analytics' },
+    ],
+  },
+  {
+    label: 'System',
+    items: [
       { path: '/entity-database', icon: Users, label: 'Entity Database' },
       { path: '/permissions', icon: Settings, label: 'Permissions' },
       { path: '/onboarding', icon: CheckSquare, label: 'Setup & Onboarding' },

@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import PDFLegalDocumentExport from '@/components/PDFLegalDocumentExport';
 import {
   FileText,
   Loader2,
@@ -19,13 +20,16 @@ import {
   AlertCircle,
   Zap,
   Copy,
+  Sparkles,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import AILegalNarrativeModes from '@/components/AILegalNarrativeModes';
 
 export default function CaseNarrativeBuilder() {
   const queryClient = useQueryClient();
   const [selectedCaseId, setSelectedCaseId] = useState('');
   const [activeSection, setActiveSection] = useState('executive_summary');
+  const [builderTab, setBuilderTab] = useState('standard'); // 'standard' | 'ai_modes'
 
   // Fetch cases
   const { data: cases = [], isLoading: casesLoading } = useQuery({
@@ -188,6 +192,34 @@ export default function CaseNarrativeBuilder() {
             AI-powered legal brief generation from case facts, communications, and evidence
           </p>
         </div>
+
+        {/* Tab switcher */}
+        <div className="flex gap-2 mb-6">
+          <button onClick={() => setBuilderTab('standard')} className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${builderTab === 'standard' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
+            <Zap className="w-4 h-4 inline mr-1" /> Standard Narrative
+          </button>
+          <button onClick={() => setBuilderTab('ai_modes')} className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${builderTab === 'ai_modes' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:border-indigo-300'}`}>
+            <Sparkles className="w-4 h-4 inline mr-1" /> Advanced AI Modes
+          </button>
+        </div>
+
+        {/* Advanced AI Modes tab */}
+        {builderTab === 'ai_modes' && selectedCaseId && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Sparkles className="w-5 h-5 text-indigo-500" /> Advanced AI Legal Modes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AILegalNarrativeModes legalCase={cases.find(c => c.id === selectedCaseId) || {}} />
+            </CardContent>
+          </Card>
+        )}
+
+        {builderTab === 'ai_modes' && !selectedCaseId && (
+          <Card className="mb-6 text-center py-8">
+            <p className="text-slate-500 text-sm">Select a case above first, then choose an AI mode below.</p>
+          </Card>
+        )}
 
         {/* Case Selection & Generation */}
         <Card className="mb-6">
@@ -508,6 +540,13 @@ export default function CaseNarrativeBuilder() {
                   : 'Select a case to begin'}
             </p>
           </Card>
+        )}
+
+        {/* PDF Export — always available when a case is selected */}
+        {selectedCaseId && (
+          <div className="mt-6">
+            <PDFLegalDocumentExport legalCase={selectedCase || null} narrative={narrative} />
+          </div>
         )}
       </div>
     </div>

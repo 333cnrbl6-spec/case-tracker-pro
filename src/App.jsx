@@ -79,6 +79,7 @@ import CaseTrackerPro from '@/pages/CaseTrackerPro';
 import CaseDocumentAnalyzer from '@/pages/CaseDocumentAnalyzer';
 import DocumentBundleCompiler from '@/pages/DocumentBundleCompiler';
 import CaseValuationInsights from '@/pages/CaseValuationInsights';
+import ComplianceAuditDashboard from '@/pages/ComplianceAuditDashboard';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -182,6 +183,7 @@ const AuthenticatedApp = () => {
       <Route path="/document-analyzer" element={<CaseDocumentAnalyzer />} />
       <Route path="/document-bundle-compiler" element={<DocumentBundleCompiler />} />
       <Route path="/case-valuation-insights" element={<CaseValuationInsights />} />
+      <Route path="/compliance-audit" element={<ComplianceAuditDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

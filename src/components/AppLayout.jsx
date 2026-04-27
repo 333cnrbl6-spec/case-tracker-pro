@@ -5,6 +5,8 @@ import GlobalSearch from './GlobalSearch';
 import SaaSAdminHeader from './SaaSAdminHeader';
 import MobileNavBar from './MobileNavBar';
 import ErrorBoundary from './ErrorBoundary';
+import NavBellAlerts from './NavBellAlerts';
+import CriticalLimitationBanner from './CriticalLimitationBanner';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +24,9 @@ export default function AppLayout({ children }) {
             <div className="flex-1 flex justify-center">
               <GlobalSearch />
             </div>
+            <NavBellAlerts />
           </header>
+          <CriticalLimitationBanner />
           <main className="flex-1">
             <ErrorBoundary>
               {children}
