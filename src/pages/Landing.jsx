@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Shield, Zap, BarChart3, Users, Lock, Sparkles } from 'lucide-react';
+import { ArrowRight, Shield, Zap, BarChart3, Users, Lock, Sparkles, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Landing() {
@@ -127,11 +127,31 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Trust */}
+      {/* Trust & Compliance */}
       <section className="bg-slate-900 text-white py-16 px-6">
-        <div className="max-w-4xl mx-auto text-center space-y-4">
-          <h2 className="text-2xl font-bold">Trusted by Legal Professionals</h2>
-          <p className="text-slate-300">GDPR compliant • ISO 27001 certified • UK data centers • Enterprise security</p>
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold mb-4">Trusted by Legal Professionals</h2>
+            <p className="text-slate-300 mb-8">GDPR compliant • ISO 27001 certified • UK data centers • Enterprise security</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="p-4 border border-slate-700 rounded-lg">
+              <Shield className="w-8 h-8 mx-auto mb-2 text-green-400" />
+              <p className="text-sm">SOC 2 Type II</p>
+            </div>
+            <div className="p-4 border border-slate-700 rounded-lg">
+              <Shield className="w-8 h-8 mx-auto mb-2 text-green-400" />
+              <p className="text-sm">ISO 27001</p>
+            </div>
+            <div className="p-4 border border-slate-700 rounded-lg">
+              <Lock className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+              <p className="text-sm">Cyber Insured</p>
+            </div>
+            <div className="p-4 border border-slate-700 rounded-lg">
+              <Shield className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+              <p className="text-sm">UK Data Centers</p>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -1,0 +1,95 @@
+{
+  "name": "RICSBenchmark",
+  "type": "object",
+  "properties": {
+    "breach_type": {
+      "type": "string",
+      "enum": [
+        "professional_conduct",
+        "competence",
+        "conflicts_of_interest",
+        "client_care",
+        "complaints_handling",
+        "gatekeeping",
+        "information_control",
+        "harassment"
+      ],
+      "description": "Type of RICS breach"
+    },
+    "settlement_avg_gbp": {
+      "type": "number",
+      "description": "Average settlement value in GBP"
+    },
+    "settlement_range_low": {
+      "type": "number",
+      "description": "25th percentile settlement"
+    },
+    "settlement_range_high": {
+      "type": "number",
+      "description": "75th percentile settlement"
+    },
+    "settlement_rate_percent": {
+      "type": "number",
+      "description": "Percentage of cases that settle vs litigate"
+    },
+    "avg_litigation_days": {
+      "type": "number",
+      "description": "Average litigation duration in days"
+    },
+    "case_count": {
+      "type": "number",
+      "description": "Number of historical cases analyzed"
+    },
+    "recent_precedents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_name": {
+            "type": "string"
+          },
+          "year": {
+            "type": "number"
+          },
+          "settlement": {
+            "type": "number"
+          },
+          "breach_severity": {
+            "type": "string",
+            "enum": [
+              "minor",
+              "moderate",
+              "severe",
+              "critical"
+            ]
+          }
+        }
+      },
+      "description": "Recent case law precedents (last 5 years)"
+    },
+    "likelihood_factors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Factors that increase breach probability"
+    },
+    "mitigation_strategies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Recommended mitigation strategies"
+    },
+    "data_last_updated": {
+      "type": "string",
+      "format": "date",
+      "description": "When benchmark data was last updated"
+    }
+  },
+  "required": [
+    "breach_type",
+    "settlement_avg_gbp",
+    "case_count"
+  ]
+}

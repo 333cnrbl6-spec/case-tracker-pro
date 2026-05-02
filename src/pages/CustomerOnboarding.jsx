@@ -14,6 +14,26 @@ export default function CustomerOnboarding() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const [templateSelected, setTemplateSelected] = useState(null);
+
+  const caseTemplates = [
+    {
+      id: 'empty',
+      name: 'Blank Case',
+      description: 'Start from scratch'
+    },
+    {
+      id: 'professional_negligence',
+      name: 'Professional Negligence (Example)',
+      description: 'Pre-filled example case from Bradley v Belcher'
+    },
+    {
+      id: 'surveyor_breach',
+      name: 'Surveyor RICS Breach (Example)',
+      description: 'Example case with RICS violations'
+    }
+  ];
+
   const steps = [
     {
       number: 1,
@@ -27,6 +47,11 @@ export default function CustomerOnboarding() {
     },
     {
       number: 3,
+      title: 'Pick First Case',
+      description: 'Start with a template or blank'
+    },
+    {
+      number: 4,
       title: 'Start Free Trial',
       description: 'Your trial is ready to use'
     }
@@ -57,6 +82,14 @@ export default function CustomerOnboarding() {
         firm_email: user.email,
         trial_days: 14
       });
+
+      // Pre-populate with example case if selected
+      if (templateSelected !== 'empty') {
+        await base44.functions.invoke('generateBradleyBelcherTestData', {
+          firm_email: user.email,
+          case_type: templateSelected
+        }).catch(err => console.error('Template pre-fill failed:', err));
+      }
 
       // Send onboarding email
       await base44.functions.invoke('sendCustomerEmail', {
@@ -150,17 +183,54 @@ export default function CustomerOnboarding() {
       return (
         <div className="space-y-6 py-8">
           <div className="text-center space-y-4">
+            <h2 className="text-xl font-bold">Start Your First Case</h2>
+            <p className="text-sm text-slate-600">Choose a template or start blank</p>
+          </div>
+
+          <div className="space-y-3">
+            {caseTemplates.map(template => (
+              <div
+                key={template.id}
+                onClick={() => setTemplateSelected(template.id)}
+                className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                  templateSelected === template.id
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <p className="font-semibold text-sm">{template.name}</p>
+                <p className="text-xs text-slate-600">{template.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+              Back
+            </Button>
+            <Button onClick={() => setStep(4)} className="flex-1 bg-blue-600 hover:bg-blue-700">
+              Continue
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 4) {
+      return (
+        <div className="space-y-6 py-8">
+          <div className="text-center space-y-4">
             <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto" />
             <h2 className="text-2xl font-bold">Trial Ready!</h2>
             <p className="text-slate-600">Your 14-day free trial is all set up</p>
           </div>
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-3">
-            <h3 className="font-semibold text-green-900">Next Steps:</h3>
+            <h3 className="font-semibold text-green-900">What's Next:</h3>
             <ol className="space-y-2 text-sm text-green-800">
               <li>1. Confirm your email address</li>
-              <li>2. Create your first legal case</li>
-              <li>3. Upload your evidence documents</li>
+              <li>2. {templateSelected !== 'empty' ? 'Explore your example case' : 'Create your first legal case'}</li>
+              <li>3. Upload evidence documents</li>
               <li>4. Generate your first AI case narrative</li>
             </ol>
           </div>

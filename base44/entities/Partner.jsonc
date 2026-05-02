@@ -1,0 +1,71 @@
+{
+  "name": "Partner",
+  "type": "object",
+  "properties": {
+    "partner_name": {
+      "type": "string",
+      "description": "Name of partner organization"
+    },
+    "partner_type": {
+      "type": "string",
+      "enum": [
+        "practice_management",
+        "document_automation",
+        "case_valuation",
+        "evidence_analysis",
+        "other"
+      ],
+      "description": "Type of partnership"
+    },
+    "api_key": {
+      "type": "string",
+      "description": "API key for white-label access"
+    },
+    "api_key_hash": {
+      "type": "string",
+      "description": "Hashed API key for security"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact person email"
+    },
+    "integration_endpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Enabled API endpoints for this partner"
+    },
+    "monthly_api_calls": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of API calls made this month"
+    },
+    "api_call_limit": {
+      "type": "number",
+      "default": 10000,
+      "description": "Monthly API call limit"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "inactive"
+      ],
+      "default": "active",
+      "description": "Partnership status"
+    },
+    "onboarded_at": {
+      "type": "string",
+      "format": "date",
+      "description": "When partner was added"
+    }
+  },
+  "required": [
+    "partner_name",
+    "partner_type",
+    "api_key_hash",
+    "contact_email"
+  ]
+}

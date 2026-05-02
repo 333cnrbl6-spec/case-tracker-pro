@@ -1,0 +1,75 @@
+{
+  "name": "RICSBreachBulletin",
+  "type": "object",
+  "properties": {
+    "bulletin_month": {
+      "type": "string",
+      "format": "date",
+      "description": "Month of the bulletin (e.g., 2026-05-01)"
+    },
+    "top_breaches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "number"
+          },
+          "breach_type": {
+            "type": "string"
+          },
+          "case_count": {
+            "type": "number"
+          },
+          "avg_settlement": {
+            "type": "number"
+          },
+          "key_insight": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Top 10 RICS violations detected this month"
+    },
+    "case_law_updates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "case_name": {
+            "type": "string"
+          },
+          "ruling_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "implication": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Recent case law precedents affecting RICS members"
+    },
+    "trend_analysis": {
+      "type": "string",
+      "description": "Month-over-month trend analysis"
+    },
+    "subscriber_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of subscribers who received this bulletin"
+    },
+    "open_rate": {
+      "type": "number",
+      "description": "Email open rate (0-100)"
+    },
+    "generated_at": {
+      "type": "string",
+      "description": "ISO timestamp when bulletin was generated"
+    }
+  },
+  "required": [
+    "bulletin_month",
+    "top_breaches"
+  ]
+}
