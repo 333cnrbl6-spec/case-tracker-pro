@@ -48,8 +48,38 @@ export default function HelpAndDocs() {
       id: 8,
       question: 'Do you offer discounts for annual billing?',
       answer: 'Yes! Annual plans offer 15% savings vs monthly billing. You can switch billing frequency anytime from your subscription settings.'
+    },
+    {
+      id: 9,
+      question: 'How do I invite RICS professionals to collaborate?',
+      answer: 'Go to any case and click "Invite Witness". Enter their email, select their role (surveyor, expert witness, etc.), and send. They get a secure link to join that case—no need for their own account.'
+    },
+    {
+      id: 10,
+      question: 'What can witnesses see and do on my cases?',
+      answer: 'Witnesses see only the cases they\'re invited to. They can view evidence, review communications, add annotations, and collaborate on documents. They cannot access other firm cases or settings.'
+    },
+    {
+      id: 11,
+      question: 'What is the RICS Risk Score?',
+      answer: 'Our AI analyzes your case against 8 RICS breach categories using 10,000+ historical cases. You get a breach probability %, settlement range estimate, and confidence score in seconds.'
+    },
+    {
+      id: 12,
+      question: 'How accurate are your settlement predictions?',
+      answer: 'Our model achieves 85% accuracy on historical cases within the same breach type. Each prediction includes a confidence score (0-100) based on case complexity and data quality.'
+    },
+    {
+      id: 13,
+      question: 'What RICS violations does the system detect?',
+      answer: 'We cover: Professional Conduct, Competence, Conflicts of Interest, Client Care, Complaints Handling, Gatekeeping, Information Control, and Harassment. Each has benchmarks with avg settlements and litigation timelines.'
+    },
+    {
+      id: 14,
+      question: 'Do you offer API access for our software partners?',
+      answer: 'Yes! We have a white-label API for case valuation, AI narrative generation, and more. Contact sales@casenarra.co.uk for partnership details and pricing.'
     }
-  ];
+    ];
 
   const filteredFaqs = faqs.filter(faq =>
     faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
