@@ -42,6 +42,15 @@ export default function CustomerOnboarding() {
     try {
       const user = await base44.auth.me();
       
+      // Check if email is verified
+      if (!user.email_verified) {
+        // Send verification email
+        await base44.functions.invoke('sendEmailVerification', {});
+        toast.success('Verification email sent. Check your inbox!');
+        setTimeout(() => navigate('/verify-email'), 2000);
+        return;
+      }
+
       // Create trial
       await base44.functions.invoke('handleTrialManagement', {
         action: 'create_trial',
@@ -54,10 +63,10 @@ export default function CustomerOnboarding() {
         recipient_email: user.email,
         email_type: 'onboarding_welcome',
         subject: 'Welcome to CaseNarrative - Your 14-Day Free Trial Starts Now',
-        body: `Hi ${user.full_name},\n\nWelcome to CaseNarrative! Your 14-day free trial is now active.\n\nWhat you can do during your trial:\n- Create up to 3 legal cases\n- Invite 2 team members\n- Generate 5 AI narratives\n- Access basic compliance features\n\nYour trial expires in 14 days. To continue using CaseNarrative, upgrade to a paid plan.\n\nQuestions? Our support team is here to help.`
+        body: `Hi ${user.full_name},\n\nWelcome to CaseNarrative! Your 14-day free trial is now active.\n\nWhat you can do during your trial:\n- Create up to 3 legal cases\n- Invite 2 team members\n- Generate 5 AI narratives\n- Access basic compliance features\n\nYour trial expires in 14 days. To continue using CaseNarrative, upgrade to a paid plan.\n\nQuestions? Contact support@casenarra.co.uk`
       });
 
-      toast.success('Trial started! Check your email.');
+      toast.success('Trial started! Redirecting...');
       setTimeout(() => navigate('/'), 2000);
     } catch (error) {
       toast.error('Failed to start trial: ' + error.message);

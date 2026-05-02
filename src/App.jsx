@@ -84,6 +84,7 @@ import SaaSAdminDashboard from '@/pages/SaaSAdminDashboard';
 import CustomerBillingPortal from '@/pages/CustomerBillingPortal';
 import CustomerUsagePortal from '@/pages/CustomerUsagePortal';
 import CustomerOnboarding from '@/pages/CustomerOnboarding';
+import VerifyEmail from '@/pages/VerifyEmail';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -192,6 +193,8 @@ const AuthenticatedApp = () => {
       <Route path="/customer-billing" element={<CustomerBillingPortal />} />
       <Route path="/customer-usage" element={<CustomerUsagePortal />} />
       <Route path="/onboarding-trial" element={<CustomerOnboarding />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/help" element={<HelpAndDocs />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

@@ -1,176 +1,148 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, MessageCircle, Play, FileText, Search } from 'lucide-react';
-
-const DOCS = [
-  {
-    category: 'Getting Started',
-    items: [
-      { title: 'Introduction to RICS Monitor', url: '#' },
-      { title: 'Setting up your firm profile', url: '#' },
-      { title: 'Inviting team members', url: '#' },
-      { title: 'First case setup', url: '#' },
-    ],
-  },
-  {
-    category: 'Case Management',
-    items: [
-      { title: 'Creating a new case', url: '#' },
-      { title: 'Managing incidents', url: '#' },
-      { title: 'Uploading evidence', url: '#' },
-      { title: 'Case narrative builder', url: '#' },
-    ],
-  },
-  {
-    category: 'RICS Compliance',
-    items: [
-      { title: 'RICS rules library', url: '#' },
-      { title: 'Compliance assessment', url: '#' },
-      { title: 'Breach reporting', url: '#' },
-    ],
-  },
-];
-
-const VIDEOS = [
-  { title: 'Dashboard Overview', duration: '3:45' },
-  { title: 'Creating Your First Case', duration: '8:20' },
-  { title: 'Evidence Management Deep Dive', duration: '6:15' },
-  { title: 'RICS Compliance Guide', duration: '12:30' },
-];
+import { Button } from '@/components/ui/button';
+import { Search, ChevronDown, Mail, MessageSquare, BookOpen } from 'lucide-react';
 
 export default function HelpAndDocs() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [expandedFaq, setExpandedFaq] = useState(null);
+
+  const faqs = [
+    {
+      id: 1,
+      question: 'How do I start my 14-day free trial?',
+      answer: 'Go to the Pricing page and click "Start Free Trial". Complete the onboarding wizard with your company details and email verification. Your trial activates immediately.'
+    },
+    {
+      id: 2,
+      question: 'What happens when my trial expires?',
+      answer: 'You\'ll receive email reminders 3 days before expiration. After expiration, you must upgrade to a paid plan to continue using CaseNarrative. You can pause or cancel anytime.'
+    },
+    {
+      id: 3,
+      question: 'Can I invite team members during my trial?',
+      answer: 'Yes, the free trial includes 2 team member slots. Use Settings > Team to send invitations. Paid plans include more team members depending on your tier.'
+    },
+    {
+      id: 4,
+      question: 'How many AI narratives can I generate?',
+      answer: 'Free trial: 5 per month. Starter: 25/month. Professional: 100/month. Enterprise: unlimited. Usage resets on your billing cycle date.'
+    },
+    {
+      id: 5,
+      question: 'Is my data secure?',
+      answer: 'Yes. All data is encrypted in transit and at rest. We comply with GDPR, ISO 27001, and UK data protection laws. See our Privacy Policy for details.'
+    },
+    {
+      id: 6,
+      question: 'How do I export my cases?',
+      answer: 'Use the Document Bundle Compiler to create PDF exports. Your tier determines export limits per month. Exports can be downloaded immediately.'
+    },
+    {
+      id: 7,
+      question: 'Can I cancel my subscription anytime?',
+      answer: 'Yes, you can cancel anytime from your Billing Portal. Your access continues until the end of your current billing period.'
+    },
+    {
+      id: 8,
+      question: 'Do you offer discounts for annual billing?',
+      answer: 'Yes! Annual plans offer 15% savings vs monthly billing. You can switch billing frequency anytime from your subscription settings.'
+    }
+  ];
+
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-950 dark:to-blue-950 p-6">
+    <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-4xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Help & Documentation</h1>
-          <p className="text-slate-600 dark:text-slate-400">Everything you need to get the most from RICS Monitor</p>
+          <h1 className="text-4xl font-bold flex items-center gap-2 mb-2">
+            <BookOpen className="w-8 h-8" />
+            Help & Documentation
+          </h1>
+          <p className="text-slate-600">Find answers to common questions and learn how to use CaseNarrative.</p>
         </div>
 
         {/* Search */}
-        <div className="mb-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
-            <Input
-              placeholder="Search docs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 w-5 h-5 text-slate-400" />
+              <Input
+                placeholder="Search FAQs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* FAQs */}
+        <div className="space-y-3 mb-8">
+          {filteredFaqs.map((faq) => (
+            <Card key={faq.id} className="cursor-pointer hover:border-blue-300 transition-colors">
+              <button
+                onClick={() => setExpandedFaq(expandedFaq === faq.id ? null : faq.id)}
+                className="w-full text-left p-6 flex items-center justify-between"
+              >
+                <span className="font-semibold text-slate-900">{faq.question}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-slate-400 transition-transform ${
+                    expandedFaq === faq.id ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {expandedFaq === faq.id && (
+                <CardContent className="border-t pt-4 pb-6">
+                  <p className="text-slate-700 leading-relaxed">{faq.answer}</p>
+                </CardContent>
+              )}
+            </Card>
+          ))}
         </div>
 
-        <Tabs defaultValue="docs" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="docs" className="gap-2">
-              <FileText className="w-4 h-4" /> Documentation
-            </TabsTrigger>
-            <TabsTrigger value="videos" className="gap-2">
-              <Play className="w-4 h-4" /> Video Tutorials
-            </TabsTrigger>
-            <TabsTrigger value="support" className="gap-2">
-              <MessageCircle className="w-4 h-4" /> Support
-            </TabsTrigger>
-          </TabsList>
+        {filteredFaqs.length === 0 && (
+          <Card className="text-center py-8">
+            <p className="text-slate-500">No results found. Try a different search.</p>
+          </Card>
+        )}
 
-          {/* Documentation */}
-          <TabsContent value="docs">
-            <div className="space-y-6">
-              {DOCS.map((section) => (
-                <Card key={section.category}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{section.category}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {section.items.map((item) => (
-                        <li key={item.title}>
-                          <a
-                            href={item.url}
-                            className="flex items-center gap-2 p-2 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                          >
-                            <BookOpen className="w-4 h-4 text-primary shrink-0" />
-                            <span className="text-sm hover:underline">{item.title}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
+        {/* Contact Support */}
+        <Card className="bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-blue-900">Need More Help?</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <Mail className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-slate-900">Email Support</p>
+                  <p className="text-sm text-slate-600">support@casenarra.co.uk</p>
+                  <p className="text-xs text-slate-500 mt-1">Response time: within 2 hours (business hours)</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <MessageSquare className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-slate-900">Live Chat</p>
+                  <p className="text-sm text-slate-600">Chat with our team (bottom right corner)</p>
+                  <p className="text-xs text-slate-500 mt-1">Available 9am-6pm GMT Monday-Friday</p>
+                </div>
+              </div>
             </div>
-          </TabsContent>
-
-          {/* Video Tutorials */}
-          <TabsContent value="videos">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {VIDEOS.map((video) => (
-                <Card key={video.title} className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardContent className="pt-6">
-                    <div className="bg-slate-200 dark:bg-slate-800 aspect-video rounded-lg mb-4 flex items-center justify-center">
-                      <Play className="w-12 h-12 text-slate-400" />
-                    </div>
-                    <p className="font-medium text-sm mb-1">{video.title}</p>
-                    <p className="text-xs text-slate-500">{video.duration}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Support */}
-          <TabsContent value="support">
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Support</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
-                    Our support team is available Monday–Friday, 9am–5pm GMT.
-                  </p>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Email</p>
-                    <a href="mailto:support@ricsmonitor.com" className="text-primary hover:underline text-sm">
-                      support@ricsmonitor.com
-                    </a>
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium">Phone</p>
-                    <a href="tel:+441234567890" className="text-primary hover:underline text-sm">
-                      +44 123 456 7890
-                    </a>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>FAQ</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div>
-                    <p className="font-medium text-sm mb-1">How do I export a case bundle?</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Navigate to Evidence &gt; Batch Export and select your evidence files.
-                    </p>
-                  </div>
-                  <hr className="dark:border-slate-700" />
-                  <div>
-                    <p className="font-medium text-sm mb-1">Can I manage multiple firms?</p>
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      Yes, Enterprise users can manage multiple firm organizations.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 gap-2">
+              <Mail className="w-4 h-4" />
+              Contact Support
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
