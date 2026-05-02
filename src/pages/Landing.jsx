@@ -10,40 +10,40 @@ export default function Landing() {
   const features = [
     {
       icon: Sparkles,
-      title: 'AI-Powered Legal Briefs',
-      description: 'Generate comprehensive case narratives in seconds using advanced AI analysis'
+      title: 'Settlement Predictions',
+      description: 'Know what your case is worth. 85% accuracy. Results in seconds, not weeks.'
     },
     {
       icon: Shield,
       title: 'RICS Compliance',
-      description: 'Automated breach detection and compliance monitoring for surveyor conduct'
+      description: 'Never miss a breach. AI monitors every case for competence, conduct & conflicts violations.'
     },
     {
       icon: BarChart3,
-      title: 'Evidence Analytics',
-      description: 'Visual mapping, contradiction detection, and risk scoring for all documents'
+      title: 'AI Legal Briefs',
+      description: 'Court-ready case narratives from your evidence in minutes. Not hours.'
     },
     {
       icon: Users,
-      title: 'Team Collaboration',
-      description: 'Invite team members, share cases, and work together securely'
+      title: 'Witness Coordination',
+      description: 'Invite witnesses securely. Track responses. Audit trail included. No accounts needed.'
     },
     {
       icon: Lock,
-      title: 'Enterprise Security',
-      description: 'GDPR compliant, encrypted data, ISO 27001 certified infrastructure'
+      title: 'Document Intelligence',
+      description: 'Auto-extract obligations, key dates, risk clauses. No manual review.'
     },
     {
       icon: Zap,
-      title: 'Fast & Intuitive',
-      description: 'Streamlined workflows designed specifically for legal professionals'
+      title: 'Firm Analytics',
+      description: 'See settlement trends, fee earner productivity, compliance gaps at a glance.'
     }
   ];
 
   const tiers = [
     { name: 'Free Trial', price: '£0', duration: '14 days', cta: 'Start Free' },
-    { name: 'Starter', price: '£99', duration: '/month', cta: 'Upgrade' },
-    { name: 'Professional', price: '£199', duration: '/month', cta: 'Upgrade' }
+    { name: 'Starter', price: '£49', duration: '/month', cta: 'Upgrade' },
+    { name: 'Professional', price: '£149', duration: '/month', cta: 'Upgrade' }
   ];
 
   return (
@@ -66,10 +66,10 @@ export default function Landing() {
       <section className="bg-gradient-to-b from-blue-50 to-white py-20 px-6">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900">
-            AI-Powered Legal Case Management
+            Know Your Case Value. Instantly.
           </h1>
           <p className="text-xl text-slate-600">
-            Generate AI-driven case narratives, analyze evidence, detect RICS breaches, and manage legal cases faster than ever.
+            Settlement predictions (85% accuracy), RICS compliance monitoring, AI legal briefs, and witness coordination. All in one platform.
           </p>
           <div className="flex gap-4 justify-center pt-4">
             <Button size="lg" onClick={() => navigate('/onboarding-trial')} className="bg-blue-600 hover:bg-blue-700 gap-2">

@@ -89,6 +89,7 @@ import CustomerOnboarding from '@/pages/CustomerOnboarding';
 import VerifyEmail from '@/pages/VerifyEmail';
 import Landing from '@/pages/Landing';
 import EnterpriseSalesPage from '@/pages/EnterpriseSalesPage';
+import GettingStartedGuide from '@/pages/GettingStartedGuide';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -208,6 +209,7 @@ const AuthenticatedApp = () => {
       <Route path="/onboarding-trial" element={<CustomerOnboarding />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/enterprise" element={<EnterpriseSalesPage />} />
+      <Route path="/getting-started" element={<GettingStartedGuide />} />
       <Route path="/help" element={<HelpAndDocs />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
