@@ -81,6 +81,9 @@ import DocumentBundleCompiler from '@/pages/DocumentBundleCompiler';
 import CaseValuationInsights from '@/pages/CaseValuationInsights';
 import ComplianceAuditDashboard from '@/pages/ComplianceAuditDashboard';
 import SaaSAdminDashboard from '@/pages/SaaSAdminDashboard';
+import CustomerBillingPortal from '@/pages/CustomerBillingPortal';
+import CustomerUsagePortal from '@/pages/CustomerUsagePortal';
+import CustomerOnboarding from '@/pages/CustomerOnboarding';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -186,6 +189,9 @@ const AuthenticatedApp = () => {
       <Route path="/case-valuation-insights" element={<CaseValuationInsights />} />
       <Route path="/compliance-audit" element={<ComplianceAuditDashboard />} />
       <Route path="/saas-admin" element={<SaaSAdminDashboard />} />
+      <Route path="/customer-billing" element={<CustomerBillingPortal />} />
+      <Route path="/customer-usage" element={<CustomerUsagePortal />} />
+      <Route path="/onboarding-trial" element={<CustomerOnboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

@@ -1,0 +1,66 @@
+{
+  "name": "EmailLog",
+  "type": "object",
+  "properties": {
+    "recipient_email": {
+      "type": "string",
+      "description": "Email recipient"
+    },
+    "firm_email": {
+      "type": "string",
+      "description": "Associated firm email"
+    },
+    "email_type": {
+      "type": "string",
+      "enum": [
+        "payment_confirmation",
+        "upgrade_reminder",
+        "expiration_warning",
+        "onboarding_welcome",
+        "trial_expiring_soon",
+        "win_back_offer",
+        "billing_notice"
+      ],
+      "description": "Type of email sent"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject line"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "bounced",
+        "failed",
+        "opened",
+        "clicked"
+      ],
+      "default": "sent",
+      "description": "Delivery status"
+    },
+    "sent_date": {
+      "type": "string",
+      "description": "ISO timestamp when sent"
+    },
+    "opened_at": {
+      "type": "string",
+      "description": "ISO timestamp if opened"
+    },
+    "click_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Times recipient clicked"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error details if failed"
+    }
+  },
+  "required": [
+    "recipient_email",
+    "email_type",
+    "subject",
+    "sent_date"
+  ]
+}

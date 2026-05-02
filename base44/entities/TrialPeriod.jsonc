@@ -1,0 +1,66 @@
+{
+  "name": "TrialPeriod",
+  "type": "object",
+  "properties": {
+    "firm_email": {
+      "type": "string",
+      "description": "Firm's primary contact email"
+    },
+    "trial_start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the trial began"
+    },
+    "trial_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the trial expires"
+    },
+    "days_remaining": {
+      "type": "number",
+      "description": "Days left in trial (calculated)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "converted",
+        "expired",
+        "cancelled"
+      ],
+      "default": "active",
+      "description": "Trial status"
+    },
+    "converted_to_tier": {
+      "type": "string",
+      "enum": [
+        "Starter",
+        "Professional",
+        "Premium",
+        "Enterprise"
+      ],
+      "description": "Tier customer upgraded to (if converted)"
+    },
+    "conversion_date": {
+      "type": "string",
+      "description": "When customer converted to paid"
+    },
+    "features_allowed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Features available during trial"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether expiration reminder was sent"
+    }
+  },
+  "required": [
+    "firm_email",
+    "trial_start_date",
+    "trial_end_date"
+  ]
+}

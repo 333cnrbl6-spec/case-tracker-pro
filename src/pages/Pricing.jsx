@@ -32,9 +32,23 @@ export default function Pricing() {
     }
   };
 
-  const handleTierSelect = (tier) => {
-    console.log('Selected tier:', tier);
-    // TODO: Redirect to signup or payment flow
+  const handleTierSelect = async (tier) => {
+    try {
+      if (tier === 'Free') {
+        // Redirect to free trial onboarding
+        window.location.href = '/onboarding-trial';
+      } else {
+        // Initiate Stripe checkout
+        const response = await base44.functions.invoke('createStripeCheckout', {
+          tier_name: tier
+        });
+        if (response.data?.checkout_url) {
+          window.location.href = response.data.checkout_url;
+        }
+      }
+    } catch (error) {
+      console.error('Error selecting tier:', error);
+    }
   };
 
   return (
@@ -53,6 +67,22 @@ export default function Pricing() {
           <h2 className="text-3xl font-bold mb-6 text-slate-900">Team Pricing Vote</h2>
           <PricingVotingBoard />
         </div>
+
+        {/* Free Trial CTA */}
+        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+          <CardHeader>
+            <CardTitle className="text-2xl text-blue-900">Start Free</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-slate-700">Try CaseNarrative free for 14 days. No credit card required.</p>
+            <Button 
+              onClick={() => handleTierSelect('Free')}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Start Your Free Trial
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Unified Pricing Grid */}
         <div>
