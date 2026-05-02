@@ -1,11 +1,13 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 // Add page imports here
+import { base44 } from '@/api/base44Client';
 import Dashboard from '@/pages/Dashboard';
 import Incidents from '@/pages/Incidents';
 import Communications from '@/pages/Communications';
@@ -85,10 +87,20 @@ import CustomerBillingPortal from '@/pages/CustomerBillingPortal';
 import CustomerUsagePortal from '@/pages/CustomerUsagePortal';
 import CustomerOnboarding from '@/pages/CustomerOnboarding';
 import VerifyEmail from '@/pages/VerifyEmail';
+import Landing from '@/pages/Landing';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const location = useLocation();
+
+  // Analytics tracking
+  useEffect(() => {
+    base44.functions.invoke('trackAnalyticsEvent', {
+      event_name: 'page_view',
+      properties: { page: location.pathname }
+    }).catch(err => console.log('Analytics error:', err));
+  }, [location.pathname]);
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -208,7 +220,10 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <AuthenticatedApp />
+          <Routes>
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<AuthenticatedApp />} />
+          </Routes>
         </Router>
         <Toaster />
       </QueryClientProvider>

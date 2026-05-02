@@ -32,6 +32,17 @@ export default function AppLayout({ children }) {
               {children}
             </ErrorBoundary>
           </main>
+          <footer className="border-t bg-slate-900 text-slate-300 py-8 px-4 text-xs">
+            <div className="max-w-7xl mx-auto flex justify-between items-center">
+              <p>&copy; 2026 CaseNarrative. All rights reserved.</p>
+              <div className="flex gap-6">
+                <a href="#" className="hover:text-white">Terms</a>
+                <a href="#" className="hover:text-white">Privacy</a>
+                <a href="#" className="hover:text-white">GDPR</a>
+                <a href="mailto:support@casenarra.co.uk" className="hover:text-white">support@casenarra.co.uk</a>
+              </div>
+            </div>
+          </footer>
         </div>
       </div>
 
@@ -43,6 +54,9 @@ export default function AppLayout({ children }) {
             {children}
           </ErrorBoundary>
         </main>
+        <footer className="border-t bg-slate-900 text-slate-300 py-4 px-4 text-xs text-center">
+          <p>&copy; 2026 CaseNarrative | <a href="mailto:support@casenarra.co.uk" className="hover:text-white">support@casenarra.co.uk</a></p>
+        </footer>
         <MobileNavBar />
       </div>
     </>
