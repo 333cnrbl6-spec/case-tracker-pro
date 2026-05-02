@@ -1,0 +1,58 @@
+{
+  "name": "SubscriptionTier",
+  "type": "object",
+  "properties": {
+    "tier_name": {
+      "type": "string",
+      "enum": [
+        "Starter",
+        "Professional",
+        "Premium",
+        "Enterprise"
+      ],
+      "description": "Subscription tier level"
+    },
+    "monthly_price": {
+      "type": "number",
+      "description": "Monthly price in GBP"
+    },
+    "annual_price": {
+      "type": "number",
+      "description": "Annual price in GBP"
+    },
+    "max_cases": {
+      "type": "number",
+      "description": "Maximum cases allowed"
+    },
+    "max_users": {
+      "type": "number",
+      "description": "Maximum team members"
+    },
+    "max_ai_generations": {
+      "type": "number",
+      "description": "Maximum AI narrative generations per month"
+    },
+    "max_document_exports": {
+      "type": "number",
+      "description": "Maximum document exports per month"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of included features"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether tier is currently available"
+    }
+  },
+  "required": [
+    "tier_name",
+    "monthly_price",
+    "max_cases",
+    "max_users"
+  ]
+}

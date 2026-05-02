@@ -1,0 +1,68 @@
+{
+  "name": "SubscriptionMeters",
+  "type": "object",
+  "properties": {
+    "firm_email": {
+      "type": "string",
+      "description": "Primary contact email for the firm/subscription"
+    },
+    "subscription_tier": {
+      "type": "string",
+      "enum": [
+        "Starter",
+        "Professional",
+        "Premium",
+        "Enterprise"
+      ],
+      "description": "Current subscription tier"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID for tracking"
+    },
+    "subscription_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether subscription is currently active"
+    },
+    "current_case_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Current number of cases"
+    },
+    "current_user_count": {
+      "type": "number",
+      "default": 1,
+      "description": "Current number of team members"
+    },
+    "ai_generations_this_month": {
+      "type": "number",
+      "default": 0,
+      "description": "AI narrative generations used this month"
+    },
+    "document_exports_this_month": {
+      "type": "number",
+      "default": 0,
+      "description": "Document exports used this month"
+    },
+    "billing_cycle_start": {
+      "type": "string",
+      "format": "date",
+      "description": "Start date of current billing cycle"
+    },
+    "billing_cycle_end": {
+      "type": "string",
+      "format": "date",
+      "description": "End date of current billing cycle"
+    },
+    "upgrade_available": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether higher tier is recommended"
+    }
+  },
+  "required": [
+    "firm_email",
+    "subscription_tier"
+  ]
+}
