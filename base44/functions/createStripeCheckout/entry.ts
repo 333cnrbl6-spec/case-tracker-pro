@@ -12,38 +12,43 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { tier_name, billing_period } = await req.json();
+    const { tier_name, billing_period = 'monthly' } = await req.json();
 
-    // Get tier pricing
-    const tiers = await base44.entities.SubscriptionTier.filter({
-      tier_name: tier_name
+    // Get Stripe prices for this tier
+    const products = await stripeClient.products.list({
+      expand: ['data.default_price'],
+      limit: 100
     });
 
-    if (!tiers || tiers.length === 0) {
-      return Response.json({ error: 'Tier not found' }, { status: 404 });
+    const tierProduct = products.data.find(p => p.metadata?.tier_name === tier_name);
+    if (!tierProduct) {
+      return Response.json({ error: `Tier '${tier_name}' not found in Stripe` }, { status: 404 });
     }
 
-    const tier = tiers[0];
-    const amount = billing_period === 'annual' ? tier.annual_price : tier.monthly_price;
-    const currency = 'gbp';
+    // Get the correct price (monthly or annual)
+    const prices = await stripeClient.prices.list({
+      product: tierProduct.id,
+      limit: 10
+    });
+
+    const selectedPrice = prices.data.find(p => 
+      p.metadata?.billing_type === billing_period
+    );
+
+    if (!selectedPrice) {
+      return Response.json({ error: `${billing_period} pricing not found` }, { status: 404 });
+    }
 
     // Create Stripe checkout session
     const session = await stripeClient.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: currency,
-            product_data: {
-              name: `${tier_name} Tier - ${billing_period === 'annual' ? 'Annual' : 'Monthly'}`,
-              description: tier.features?.join(', ') || 'Legal case management'
-            },
-            unit_amount: Math.round(amount * 100)
-          },
+          price: selectedPrice.id,
           quantity: 1
         }
       ],
-      mode: 'payment',
+      mode: 'subscription',
       success_url: `${Deno.env.get('APP_URL')}/pricing?session_id={CHECKOUT_SESSION_ID}&success=true`,
       cancel_url: `${Deno.env.get('APP_URL')}/pricing?cancelled=true`,
       customer_email: user.email,
