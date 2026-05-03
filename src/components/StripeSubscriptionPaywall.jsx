@@ -185,7 +185,9 @@ export default function StripeSubscriptionPaywall({ children, feature, requiredT
   const [showModal, setShowModal] = useState(false);
 
   const tierOrder = { starter: 0, professional: 1, enterprise: 2 };
-  const hasAccess = tierOrder[userTier] >= tierOrder[requiredTier];
+  const normalizedUserTier = (userTier || '').toLowerCase();
+  const normalizedRequiredTier = (requiredTier || '').toLowerCase();
+  const hasAccess = (tierOrder[normalizedUserTier] || 0) >= (tierOrder[normalizedRequiredTier] || 1);
 
   if (hasAccess) return children;
 

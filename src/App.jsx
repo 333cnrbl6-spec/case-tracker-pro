@@ -226,7 +226,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/landing" element={<Landing />} />
-            <Route path="/" element={<AuthenticatedApp />} />
+            <Route path="/*" element={<AuthenticatedApp />} />
           </Routes>
         </Router>
         <Toaster />

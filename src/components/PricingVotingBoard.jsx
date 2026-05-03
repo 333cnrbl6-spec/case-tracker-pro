@@ -32,7 +32,11 @@ export default function PricingVotingBoard() {
   const [currentUser, setCurrentUser] = React.useState(null);
 
   React.useEffect(() => {
-    base44.auth.me?.().then(u => setCurrentUser(u)).catch(() => setCurrentUser(null));
+    if (base44.auth && typeof base44.auth.me === 'function') {
+      base44.auth.me()
+        .then(u => setCurrentUser(u))
+        .catch(() => setCurrentUser(null));
+    }
   }, []);
 
   // Check if user already voted
@@ -143,7 +147,7 @@ export default function PricingVotingBoard() {
               <div className="grid grid-cols-3 gap-3">
                 <Button
                   onClick={() => submitVote('approve')}
-                  disabled={submitting}
+                  disabled={submitting || userHasVoted}
                   variant={userVote === 'approve' ? 'default' : 'outline'}
                   className="gap-2"
                 >
@@ -151,7 +155,7 @@ export default function PricingVotingBoard() {
                 </Button>
                 <Button
                   onClick={() => submitVote('modify')}
-                  disabled={submitting}
+                  disabled={submitting || userHasVoted}
                   variant={userVote === 'modify' ? 'default' : 'outline'}
                   className="gap-2"
                 >
@@ -159,7 +163,7 @@ export default function PricingVotingBoard() {
                 </Button>
                 <Button
                   onClick={() => submitVote('reject')}
-                  disabled={submitting}
+                  disabled={submitting || userHasVoted}
                   variant={userVote === 'reject' ? 'default' : 'outline'}
                   className="gap-2"
                 >

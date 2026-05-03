@@ -10,7 +10,7 @@ export default function UnifiedPricingGrid({ onSelect }) {
   const [isAnnual, setIsAnnual] = useState(false);
 
   // Fetch active pricing tiers
-  const { data: tiers = [], isLoading } = useQuery({
+  const { data: tiers = [], isLoading, isError } = useQuery({
     queryKey: ['pricing-tiers-active'],
     queryFn: async () => {
       const result = await base44.entities.PricingTier.filter({ is_active: true });
@@ -19,7 +19,17 @@ export default function UnifiedPricingGrid({ onSelect }) {
   });
 
   if (isLoading) {
-    return <div className="text-center py-12">Loading pricing...</div>;
+    return <div className="text-center py-12 text-slate-600">Loading pricing...</div>;
+  }
+
+  if (isError) {
+    return (
+      <Card className="bg-red-50 border-red-200">
+        <CardContent className="pt-6 text-center">
+          <p className="text-red-600">Failed to load pricing. Please refresh the page.</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (tiers.length === 0) {
