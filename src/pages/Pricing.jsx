@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Loader } from 'lucide-react';
+import { Download } from 'lucide-react';
+import ProcessingFeedback from '@/components/ui/ProcessingFeedback';
 import UnifiedPricingGrid from '@/components/UnifiedPricingGrid';
 import PricingVotingBoard from '@/components/PricingVotingBoard';
 
@@ -95,25 +96,28 @@ export default function Pricing() {
           <CardHeader>
             <CardTitle className="text-2xl">Download Our Pricing Sheet</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-slate-700 mb-6">Get a comprehensive overview of SynergyFlow pricing and features across all tiers.</p>
-            <Button 
-              onClick={handleDownloadPDF}
-              disabled={downloadingPDF}
-              className="bg-blue-600 hover:bg-blue-700 gap-2"
-            >
-              {downloadingPDF ? (
-                <>
-                  <Loader className="w-4 h-4 animate-spin" />
-                  Generating PDF...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  Download Pricing Overview
-                </>
-              )}
-            </Button>
+          <CardContent className="space-y-4">
+            <p className="text-slate-700">Get a comprehensive overview of SynergyFlow pricing and features across all tiers.</p>
+            
+            {downloadingPDF ? (
+              <ProcessingFeedback
+                label="Generating pricing sheet…"
+                detail="Creating PDF with all tier details and features."
+                tips={[
+                  'This PDF includes all pricing tiers, features, and support levels.',
+                  'You can save it for team review and share with partners.',
+                  'Typical generation time is 10-30 seconds.'
+                ]}
+              />
+            ) : (
+              <Button 
+                onClick={handleDownloadPDF}
+                className="bg-blue-600 hover:bg-blue-700 gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download Pricing Overview
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>

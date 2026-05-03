@@ -11,10 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import ProcessingFeedback from '@/components/ui/ProcessingFeedback';
 import PDFLegalDocumentExport from '@/components/PDFLegalDocumentExport';
 import {
   FileText,
-  Loader2,
   Download,
   CheckCircle2,
   AlertCircle,
@@ -252,17 +252,13 @@ export default function CaseNarrativeBuilder() {
                   disabled={generateNarrative.isPending || !selectedCaseId}
                   className="gap-2"
                 >
-                  {generateNarrative.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
+                  {!generateNarrative.isPending && (
                     <>
                       <Zap className="w-4 h-4" />
                       Generate Narrative
                     </>
                   )}
+                  {generateNarrative.isPending && 'Generating...'}
                 </Button>
 
                 {narrative && (
@@ -277,6 +273,22 @@ export default function CaseNarrativeBuilder() {
                 )}
               </div>
             </div>
+
+            {generateNarrative.isPending && (
+              <div className="mt-6">
+                <ProcessingFeedback
+                  label="Generating legal narrative…"
+                  detail="Analyzing case facts, evidence, and communications with AI."
+                  step={1}
+                  totalSteps={3}
+                  tips={[
+                    'This AI reads all your case documents to find key facts and evidence.',
+                    'It analyzes legal issues and identifies case strengths and weaknesses.',
+                    'The brief will be ready in 30-60 seconds once analysis completes.'
+                  ]}
+                />
+              </div>
+            )}
 
             {selectedCase?.narrative_generated_at && (
               <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">

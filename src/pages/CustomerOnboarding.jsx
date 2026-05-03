@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import ProcessingFeedback from '@/components/ui/ProcessingFeedback';
 import { CheckCircle2, ArrowRight, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -217,6 +218,24 @@ export default function CustomerOnboarding() {
     }
 
     if (step === 4) {
+      if (loading) {
+        return (
+          <div className="py-8">
+            <ProcessingFeedback
+              label="Setting up your free trial…"
+              detail="Creating account, initializing database, sending welcome email."
+              step={1}
+              totalSteps={2}
+              tips={[
+                'Your account is being created and linked to your email address.',
+                'We\'re preparing your trial database and team settings.',
+                'You\'ll receive a welcome email with your first steps in about 10 seconds.'
+              ]}
+            />
+          </div>
+        );
+      }
+
       return (
         <div className="space-y-6 py-8">
           <div className="text-center space-y-4">
@@ -240,7 +259,7 @@ export default function CustomerOnboarding() {
             disabled={loading || !companyName}
             className="w-full bg-green-600 hover:bg-green-700"
           >
-            {loading ? 'Starting Trial...' : 'Activate Trial'}
+            Activate Trial
           </Button>
         </div>
       );
