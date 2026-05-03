@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import { useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { PermissionProvider } from '@/lib/PermissionContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 // Add page imports here
 import { base44 } from '@/api/base44Client';
@@ -90,6 +91,7 @@ import VerifyEmail from '@/pages/VerifyEmail';
 import Landing from '@/pages/Landing';
 import EnterpriseSalesPage from '@/pages/EnterpriseSalesPage';
 import GettingStartedGuide from '@/pages/GettingStartedGuide';
+import DeveloperPortal from '@/pages/DeveloperPortal';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -211,6 +213,7 @@ const AuthenticatedApp = () => {
       <Route path="/enterprise" element={<EnterpriseSalesPage />} />
       <Route path="/getting-started" element={<GettingStartedGuide />} />
       <Route path="/help" element={<HelpAndDocs />} />
+      <Route path="/developer-portal" element={<DeveloperPortal />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>
@@ -222,15 +225,17 @@ function App() {
 
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <Routes>
-            <Route path="/landing" element={<Landing />} />
-            <Route path="/*" element={<AuthenticatedApp />} />
-          </Routes>
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
+      <PermissionProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <Routes>
+              <Route path="/landing" element={<Landing />} />
+              <Route path="/*" element={<AuthenticatedApp />} />
+            </Routes>
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </PermissionProvider>
     </AuthProvider>
   )
 }

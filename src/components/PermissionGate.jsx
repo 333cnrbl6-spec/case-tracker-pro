@@ -1,36 +1,49 @@
 import React from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { usePermissions } from '@/lib/PermissionContext';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lock } from 'lucide-react';
-import { hasPermission } from '@/lib/permissions';
 
-/**
- * Permission Gate Component
- * Conditionally renders content based on user role and required permission
- */
-export default function PermissionGate({
-  userRole,
-  resource,
-  action,
-  children,
-  fallback = null,
-  showAlert = true,
+export default function PermissionGate({ 
+  children, 
+  requiredRole = null,
+  requiredTier = null,
+  requiredModule = null,
+  fallback = null
 }) {
-  const hasAccess = hasPermission(userRole, resource, action);
+  const permissions = usePermissions();
 
-  if (hasAccess) {
-    return children;
+  if (permissions.loading) {
+    return <div className="flex items-center justify-center p-8">Loading access...</div>;
   }
 
-  if (!showAlert) {
-    return fallback;
+  if (requiredRole && permissions.role !== requiredRole && permissions.role !== 'developer') {
+    return fallback || <LockedFeature reason={`Requires ${requiredRole} access`} />;
   }
 
-  return fallback || (
-    <Alert className="bg-amber-50 border-amber-200">
-      <Lock className="w-4 h-4 text-amber-600" />
-      <AlertDescription className="text-amber-800">
-        You don't have permission to access this content. Required role: {action}
-      </AlertDescription>
-    </Alert>
+  const tierHierarchy = { 'free': 0, 'starter': 1, 'professional': 2, 'premium': 3, 'enterprise': 4 };
+  if (requiredTier && tierHierarchy[permissions.tier] < tierHierarchy[requiredTier]) {
+    return fallback || <LockedFeature reason={`Requires ${requiredTier} subscription`} />;
+  }
+
+  if (requiredModule && !permissions.modules.includes(requiredModule)) {
+    return fallback || <LockedFeature reason={`Module not available in your plan`} />;
+  }
+
+  return children;
+}
+
+function LockedFeature({ reason }) {
+  return (
+    <Card className="border-amber-200 bg-amber-50">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-amber-900">
+          <Lock className="w-5 h-5" />
+          Feature Unavailable
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-amber-800">{reason}</p>
+      </CardContent>
+    </Card>
   );
 }
