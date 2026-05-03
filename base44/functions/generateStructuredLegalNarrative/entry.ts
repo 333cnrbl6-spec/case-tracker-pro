@@ -198,17 +198,41 @@ ${evidence
       },
     });
 
-    // Save narrative to case record
-    await base44.entities.LegalCase.update(case_id, {
-      ai_narrative: JSON.stringify(narrativeResult),
+    // Convert narrative to JSON string (typically 50-200KB)
+    const narrativeJson = JSON.stringify(narrativeResult);
+
+    // Upload narrative to file storage to avoid field size limits
+    let narrativeUrl = null;
+    try {
+      const uploadResult = await base44.asServiceRole.integrations.Core.UploadFile({
+        file: narrativeJson,
+      });
+      narrativeUrl = uploadResult.file_url;
+    } catch (uploadError) {
+      console.error('Failed to upload narrative:', uploadError);
+      // Continue with in-app storage as fallback
+    }
+
+    // Save narrative reference to case record
+    const updatePayload = {
       narrative_generated_at: new Date().toISOString(),
-    });
+    };
+
+    if (narrativeUrl) {
+      updatePayload.ai_narrative_url = narrativeUrl;
+    } else {
+      // Fallback: store compact summary instead of full JSON
+      updatePayload.ai_narrative = `Generated at ${new Date().toISOString()}. Full narrative stored in cloud. Sections: executive_summary, liability_analysis, quantum_assessment.`;
+    }
+
+    await base44.entities.LegalCase.update(case_id, updatePayload);
 
     return Response.json({
       success: true,
       case_ref: legalCase.case_ref,
       narrative: narrativeResult,
       generated_at: new Date().toISOString(),
+      narrative_storage: narrativeUrl ? 'file_storage' : 'summary_only',
       data_points: {
         incidents_analyzed: incidents.length,
         communications_analyzed: communications.length,

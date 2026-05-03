@@ -107,7 +107,11 @@
     },
     "ai_narrative": {
       "type": "string",
-      "description": "AI-generated structured legal narrative (JSON)"
+      "description": "AI-generated structured legal narrative (JSON) or summary"
+    },
+    "ai_narrative_url": {
+      "type": "string",
+      "description": "URL to full AI narrative stored in file storage (for large narratives >50KB)"
     },
     "narrative_generated_at": {
       "type": "string",
