@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CaseNarrative - Law Firm Flyer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #1e293b;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            display: flex;
+            flex-direction: column;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page {
+                page-break-after: always;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* ========== FRONT SIDE ========== */
+        .front {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .front-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .front-header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .tagline {
+            font-size: 18px;
+            color: #dbeafe;
+            font-weight: 500;
+        }
+
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+            margin: 20px auto;
+            width: 80px;
+        }
+
+        .front-content {
+            flex: 1;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #60a5fa;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .feature h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            font-size: 13px;
+            color: #dbeafe;
+        }
+
+        .highlight-box {
+            background: rgba(34, 197, 94, 0.2);
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .highlight-box h2 {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: #86efac;
+        }
+
+        .highlight-box p {
+            font-size: 14px;
+            color: #dbeafe;
+        }
+
+        .front-footer {
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            padding-top: 20px;
+            font-size: 12px;
+            color: #bfdbfe;
+        }
+
+        /* ========== BACK SIDE ========== */
+        .back {
+            background: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .back-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .back-header h2 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .back-header p {
+            font-size: 15px;
+            color: #64748b;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .benefits-section {
+            margin-bottom: 30px;
+        }
+
+        .benefits-section h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .benefits-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .benefit-item {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+            color: #334155;
+        }
+
+        .benefit-item:before {
+            content: "✓";
+            color: #22c55e;
+            font-weight: 900;
+            flex-shrink: 0;
+            font-size: 16px;
+        }
+
+        .cta-section {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .cta-section h3 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #dbeafe;
+        }
+
+        .signup-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .signup-method {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .signup-method strong {
+            display: block;
+            color: #86efac;
+            margin-bottom: 4px;
+        }
+
+        .contact-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .contact-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .contact-item strong {
+            display: block;
+            color: #1e40af;
+            margin-bottom: 5px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .back-footer {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .back-footer p {
+            margin: 3px 0;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <!-- FRONT SIDE -->
+    <div class="page front">
+        <div class="front-header">
+            <h1>CaseNarrative</h1>
+            <p class="tagline">AI-Powered Legal Case Management</p>
+            <div class="divider"></div>
+        </div>
+
+        <div class="front-content">
+            <div class="highlight-box">
+                <h2>6 MONTHS FREE TRIAL</h2>
+                <p>No credit card required • Full feature access</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Case Narratives</h3>
+                    <p>Generate structured legal briefs in seconds</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">⚖️</div>
+                    <h3>RICS Compliance</h3>
+                    <p>Automated breach detection & risk analysis</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <h3>Settlement Intelligence</h3>
+                    <p>Predictive valuation based on case precedents</p>
+                </div>
+
+                <div class="feature">
+                    <div class="feature-icon">🔗</div>
+                    <h3>Evidence Mapping</h3>
+                    <p>Visualize connections across your case data</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="front-footer">
+            <p>Trusted by leading UK law firms • Fast implementation • Expert support</p>
+        </div>
+    </div>
+
+    <!-- BACK SIDE -->
+    <div class="page back">
+        <div class="back-header">
+            <h2>Transform Your Legal Practice</h2>
+            <p>Automate case management, reduce admin time, and unlock AI-driven legal insights with CaseNarrative</p>
+        </div>
+
+        <div class="benefits-section">
+            <h3>⏱️ What You'll Gain</h3>
+            <div class="benefits-list">
+                <div class="benefit-item">Save 10+ hours per case on documentation</div>
+                <div class="benefit-item">Identify RICS breaches instantly</div>
+                <div class="benefit-item">AI-powered settlement predictions</div>
+                <div class="benefit-item">Real-time compliance alerts</div>
+                <div class="benefit-item">Secure client portal included</div>
+                <div class="benefit-item">Multi-user team collaboration</div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h3>Start Your Free Trial Today</h3>
+            <p><strong>6 months</strong> of full platform access • No credit card • Cancel anytime</p>
+            
+            <div class="signup-methods">
+                <div class="signup-method">
+                    <strong>Online</strong>
+                    casenarrative.io/trial
+                </div>
+                <div class="signup-method">
+                    <strong>Phone</strong>
+                    +44 (0) 20 XXXX XXXX
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-info">
+            <div class="contact-item">
+                <strong>📧 Email</strong>
+                hello@casenarrative.io
+            </div>
+            <div class="contact-item">
+                <strong>🎥 Book a Demo</strong>
+                calendly.com/casenarrative
+            </div>
+        </div>
+
+        <div class="back-footer">
+            <p><strong>Why CaseNarrative?</strong> Purpose-built for UK legal practices • Compliant with SRA standards</p>
+            <p>Join 50+ law firms already transforming their practice with AI.</p>
+        </div>
+    </div>
+</body>
+</html>
