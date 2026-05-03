@@ -1,0 +1,173 @@
+{
+  "name": "AudioTranscription",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "Related case ID"
+    },
+    "evidence_id": {
+      "type": "string",
+      "description": "Original evidence record ID"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of original audio/video file"
+    },
+    "file_type": {
+      "type": "string",
+      "enum": [
+        "audio",
+        "video"
+      ],
+      "description": "Type of media file"
+    },
+    "duration_seconds": {
+      "type": "number",
+      "description": "Length of audio/video in seconds"
+    },
+    "transcription_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Transcription job status"
+    },
+    "transcription_text": {
+      "type": "string",
+      "description": "Full transcribed text"
+    },
+    "transcription_url": {
+      "type": "string",
+      "description": "URL to stored transcription file (for large transcriptions)"
+    },
+    "key_phrases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phrase": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "relevance": {
+            "type": "string",
+            "enum": [
+              "rics_violation",
+              "legal_issue",
+              "credibility",
+              "timeline",
+              "other"
+            ]
+          },
+          "context": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Important phrases extracted with timestamps"
+    },
+    "detected_speakers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Names of detected speakers (if available)"
+    },
+    "sentiment_analysis": {
+      "type": "object",
+      "properties": {
+        "overall_sentiment": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "neutral",
+            "negative"
+          ]
+        },
+        "segments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "type": "number"
+              },
+              "text": {
+                "type": "string"
+              },
+              "sentiment": {
+                "type": "string"
+              },
+              "confidence": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "description": "Sentiment analysis of recording"
+    },
+    "linked_incidents": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Incident IDs this transcription links to"
+    },
+    "rics_breach_indicators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "breach_type": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "evidence_text": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Detected RICS breach indicators with evidence"
+    },
+    "language": {
+      "type": "string",
+      "default": "en-GB",
+      "description": "Language of recording (ISO 639-1 code)"
+    },
+    "quality_score": {
+      "type": "number",
+      "description": "Transcription quality confidence (0-100)"
+    },
+    "processing_started_at": {
+      "type": "string",
+      "description": "ISO timestamp when transcription started"
+    },
+    "processing_completed_at": {
+      "type": "string",
+      "description": "ISO timestamp when transcription completed"
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error details if transcription failed"
+    }
+  },
+  "required": [
+    "case_id",
+    "evidence_id",
+    "file_url",
+    "file_type"
+  ]
+}
