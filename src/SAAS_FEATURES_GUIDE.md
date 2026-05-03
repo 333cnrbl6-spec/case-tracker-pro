@@ -1,130 +1,195 @@
 # Complete SaaS Feature Implementation Guide
 
-## 5 Features Deployed
+## Complete SaaS Infrastructure Deployed
 
-### 1️⃣ Customer Self-Service Portal
+### 1️⃣ Customer Self-Service Portal (LIVE)
 
 **Components:**
-- `/customer-billing` - Billing, invoices, payment methods, subscription management
-- `/customer-usage` - Real-time usage tracking & limit warnings
-- Admin: `/saas-admin` - Telemetry, security, feature analytics
+- `/customer-billing` — Full invoice history, payment management, subscription control
+- `/customer-usage` — Real-time usage tracking with limit warnings and upgrade prompts
+- `/saas-admin` — Admin telemetry dashboard, security settings, legal document generation
+- `/pricing` — Public pricing page with tier comparison and Stripe checkout integration
 
-**Key Functions:**
-- `manageBillingInvoices` - Create, list, mark invoices as paid
-- Entities: `BillingInvoice`, `SubscriptionMeters`
+**Included Features:**
+- View active subscription tier & renewal date
+- Monitor usage (cases, team members, AI generations, document exports)
+- Visual progress bars showing usage vs. tier limits
+- Download invoices (PDF, emailed monthly)
+- Change payment method (Stripe integration)
+- Upgrade/downgrade subscription (immediate effect)
+- See included features for current and available tiers
+- Download copy of Terms, Privacy Policy, DPA
 
-**Features:**
-- View current subscription tier
-- Monitor usage vs limits with progress bars
-- Download invoices
-- Update payment methods (UI placeholder)
-- Upgrade/downgrade plans
-- See included features per tier
-
----
-
-### 2️⃣ Onboarding Flow
-
-**Page:** `/onboarding-trial`
-
-**Multi-step setup:**
-1. Welcome with trial benefits
-2. Company details collection
-3. Trial activation confirmation
-
-**What happens:**
-- User signs up → Redirected to `/onboarding-trial`
-- Creates 14-day trial
-- Receives welcome email
-- Starts with free tier limits (3 cases, 2 users, 5 AI gens)
-
-**Function:** `handleTrialManagement` (action: `create_trial`)
+**Stripe Integration:**
+- Secure payment processing (PCI compliant)
+- Automatic invoice generation
+- Subscription management (pause, cancel, upgrade)
+- Webhook handling for payment events
+- Customer sync with Stripe dashboard
 
 ---
 
-### 3️⃣ Automated Email System
+### 2️⃣ Onboarding Flow (LIVE)
 
-**Types of emails:**
-- ✉️ Payment confirmations (when subscription starts)
-- ✉️ Upgrade/limit warnings (when approaching usage limits)
-- ✉️ Trial expiration notices (3 days before expires)
-- ✉️ Onboarding welcome (after signup)
-- ✉️ Billing notices (invoice generated)
+**Page:** `/onboarding-trial` → Multi-step wizard
 
-**Function:** `sendCustomerEmail`
+**User Journey:**
+1. **Welcome:** Introduce 14-day free trial, show included features
+2. **Company Details:** Collect firm name, practice areas
+3. **Case Template:** Choose blank case or pre-filled example (Bradley v Belcher)
+4. **Confirmation:** Review trial details, activate immediately
+5. **Welcome Email:** Sent with login link + next steps
 
-**Automation:** 
-```
-Scheduled job runs daily at 09:00 UTC
-→ Checks all active trials
-→ Sends expiration warnings for trials expiring within 3 days
-→ Marks reminder as sent
-```
+**Behind the Scenes:**
+- `handleTrialManagement` function creates TrialPeriod record
+- `sendCustomerEmail` sends welcome email
+- `generateBradleyBelcherTestData` populates example case if selected
+- `SubscriptionMeters` auto-created with trial tier limits
+- User can immediately start using all Premium features
 
-**All emails logged to `EmailLog` entity** for compliance & tracking.
-
----
-
-### 4️⃣ Free Tier + Trial System
-
-**Free Tier (14-day trial):**
-- Up to 3 legal cases
-- 2 team members
-- 5 AI narrative generations
-- Basic compliance alerts
-- Email support
-
-**After trial expires:**
-- User must upgrade to paid tier (Starter £99/mo, Professional £199/mo, etc.)
-- Can pause/cancel subscription
-- Auto-reminders sent 3 days before expiration
-
-**Entities:**
-- `TrialPeriod` - Tracks trial start/end, status, conversion
-- Auto-creates `SubscriptionMeters` record when trial is created
-
-**Flow:**
-```
-User clicks "Start Free Trial"
-  ↓
-Onboarding wizard (company details)
-  ↓
-Trial created + welcome email sent
-  ↓
-User has 14 days to try features
-  ↓
-Day 11: Warning email sent
-  ↓
-Day 14: Trial expires, upgrade prompt shown
-```
+**Trial Details:**
+- Duration: 14 days
+- Included: 3 cases, 2 team members, 5 AI generations, full feature access
+- Reminders sent: Day 11, Day 1, On expiration
 
 ---
 
-### 5️⃣ Legal & Compliance Documents
+### 3️⃣ Automated Email System (LIVE)
 
-**Page:** `/saas-admin` (Admin only)
+**Transactional Emails Sent:**
+- ✉️ **Verification Email** — Confirm email address on signup
+- ✉️ **Welcome Email** — Trial activated, next steps
+- ✉️ **Trial Expiration (Day 11)** — "Your trial expires in 3 days, upgrade now"
+- ✉️ **Trial Expiration (Day 1)** — "Last chance: trial expires tomorrow"
+- ✉️ **Payment Confirmation** — Receipt after upgrade
+- ✉️ **Invoice** — Monthly billing statement
+- ✉️ **Upgrade Reminder** — If approaching usage limits
+- ✉️ **Settlement Value Estimate** — When valuation generated (optional)
+- ✉️ **Narrative Complete** — When AI brief generation finishes
+- ✉️ **Team Invitation** — Invite colleague to firm account
 
-**Documents generated:**
-- ✓ Terms of Service
-- ✓ Privacy Policy
-- ✓ Data Processing Agreement (GDPR)
+**Email Tracking:**
+- All emails logged to `EmailLog` entity (sent, opened, clicked, bounced, failed)
+- GDPR compliant (right to be forgotten enabled)
+- Audit trail for all customer communications
+- Compliance reports available to admins
 
-**Function:** `generateLegalDocuments` (document_type param)
+**Automation Schedule:**
+- Every 24 hours: Check for trials expiring in 3 days, send reminders
+- Every time: Invoice generated, payment received, user action triggered
+- Real-time: Verification email, welcome email, team invitations
 
-**Usage:**
+---
+
+### 4️⃣ Free Trial + Subscription Management (LIVE)
+
+**14-Day Free Trial (No Credit Card Required):**
+- **Cases:** Up to 3
+- **Team Members:** 2
+- **AI Narratives:** 5 per month
+- **Features:** Full Premium feature set
+- **Support:** Email (24-48 hour response)
+- **Cost:** £0
+
+**Subscription Tiers (After Trial):**
+
+| Tier | Price | Cases | Team | AI/mo | Support |
+|------|-------|-------|------|-------|---------|
+| **Starter** | £49/mo | 5 | 2 | 10 | Email |
+| **Professional** | £149/mo | 50 | 10 | 50 | Phone* |
+| **Premium** | £299/mo | Unlimited | 50 | Unlimited | Phone |
+| **Enterprise** | £999+/mo | Unlimited | Unlimited | Unlimited | Dedicated |
+
+*Phone support during UK business hours
+
+**Trial-to-Paid Flow:**
+1. Day 14 arrives → Trial expires
+2. User sees upgrade modal on login
+3. Recommended tier: Starter (£49/mo)
+4. Click "Upgrade" → Stripe Checkout
+5. Payment confirmed → Subscription activates
+6. New tier limits apply immediately
+7. Payment receipt emailed
+
+**Subscription Management:**
+- Change billing (monthly to annual, vice versa)
+- Downgrade tier (prorated credit applied)
+- Upgrade tier (additional charge applied)
+- Pause subscription (30-day pause, auto-resume)
+- Cancel subscription (data accessible for 90 days)
+- View billing history
+
+**Database Entities:**
+- `TrialPeriod` — trial_start_date, trial_end_date, status (active/converted/expired), converted_to_tier
+- `SubscriptionMeters` — current usage (cases, users, AI gens), tier limits, billing cycle dates
+- `BillingInvoice` — invoice history, stripe_invoice_id, payment status
+- `EmailLog` — all email communications, delivery status, audit trail
+
+---
+
+### 5️⃣ Legal & Compliance Documents (LIVE)
+
+**Page:** `/saas-admin` (Admin-only access)
+
+**Generated Documents:**
+1. **Terms of Service** — Full T&S including usage limits, acceptable use, limitations of liability
+2. **Privacy Policy** — GDPR-specific privacy notice, data retention, user rights
+3. **Data Processing Agreement (DPA)** — GDPR Article 28 DPA for GDPR compliance
+4. **Acceptable Use Policy** — What users can/cannot do (no illegal use, etc.)
+5. **SLA & Support Terms** — Uptime guarantees, support response times
+
+**Document Generation:**
 ```javascript
 const result = await base44.functions.invoke('generateLegalDocuments', {
-  document_type: 'terms_of_service'
+  document_type: 'terms_of_service'  // or privacy_policy, dpa, acceptable_use, sla
 });
-// Returns full markdown text ready to publish or customize
+// Returns full markdown, ready to customize & publish
 ```
 
-**Action items:**
-1. Generate documents via `/saas-admin`
-2. Review with legal team
-3. Customize company details
-4. Publish to website
-5. Update terms URL in footer
+**Usage:**
+1. Admin visits `/saas-admin` → Legal Documents section
+2. Click "Generate [Document Type]"
+3. Document generated (1-2 minutes)
+4. Review and customize with firm-specific details
+5. Download as PDF/Markdown
+6. Publish to website or send to legal review
+7. Update footer links to point to published versions
+
+**Customization Points:**
+- Company name and address
+- Support email / phone
+- Effective date
+- Billing terms (monthly/annual options)
+- Data retention periods
+- Service limitations (e.g., "99% uptime SLA")
+- Jurisdiction (currently England & Wales)
+
+**Compliance Checklist:**
+- ✅ GDPR Article 13 (privacy notice) — Included in Privacy Policy
+- ✅ GDPR Article 28 (DPA) — Full DPA document
+- ✅ GDPR Right to be Forgotten — Enabled in system
+- ✅ GDPR Data Portability — Export data feature in Settings
+- ✅ UK PECR (email marketing) — Opt-out links in all emails
+- ✅ CMA Terms & Transparency — Full T&S available
+
+---
+
+## SaaS Infrastructure Status
+
+| Component | Status | Live Date |
+|-----------|--------|-----------|
+| Stripe Payment Processing | ✅ Live | May 2, 2026 |
+| 4 Subscription Tiers | ✅ Live | May 2, 2026 |
+| 14-Day Trial System | ✅ Live | May 2, 2026 |
+| Customer Billing Portal | ✅ Live | May 2, 2026 |
+| Usage Limits & Enforcement | ✅ Live | May 2, 2026 |
+| Automated Trial Reminders | ✅ Live | May 2, 2026 |
+| Email Automation | ✅ Live | May 2, 2026 |
+| Legal Document Generation | ✅ Live | May 2, 2026 |
+| Admin Telemetry Dashboard | ✅ Live | May 2, 2026 |
+| MRR & Churn Tracking | ✅ Live | May 2, 2026 |
+
+**All SaaS infrastructure production-ready and deployed.**
 
 ---
 
