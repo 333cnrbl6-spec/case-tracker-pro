@@ -18,7 +18,7 @@ export function PermissionProvider({ children }) {
   });
 
   // CONFIGURE THIS FOR YOUR APP
-  const DEVELOPER_EMAIL = 'developer@casenarrative.io';
+  const DEVELOPER_EMAIL = '333cnrbl6@gmail.com';
 
   useEffect(() => {
     loadPermissions();

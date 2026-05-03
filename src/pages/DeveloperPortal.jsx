@@ -5,7 +5,7 @@ import { AlertCircle, Settings, BarChart3, FileText } from 'lucide-react';
 
 export default function DeveloperPortal() {
   const permissions = usePermissions();
-  const DEVELOPER_EMAIL = 'developer@casenarrative.io';
+  const DEVELOPER_EMAIL = '333cnrbl6@gmail.com';
   const isDeveloper = permissions.email === DEVELOPER_EMAIL;
 
   if (!isDeveloper) {
