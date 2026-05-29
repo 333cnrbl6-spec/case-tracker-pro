@@ -4,6 +4,11 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['Poppins', 'Inter', 'Segoe UI', 'sans-serif'],
+  			poppins: ['Poppins', 'sans-serif'],
+  			inter: ['Inter', 'sans-serif'],
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
