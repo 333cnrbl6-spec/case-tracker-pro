@@ -60,9 +60,11 @@ export default function OnboardingWizard() {
   const [selectedAreas, setSelectedAreas] = useState([]);
   const [specialismNotes, setSpecialismNotes] = useState('');
 
-  const [sourceStatus, setSourceStatus] = useState('idle'); // idle | building | complete
+  const [sourceStatus, setSourceStatus] = useState('idle'); // idle | building | complete | validating | validated
   const [sourceProgress, setSourceProgress] = useState([]);
   const [sourceSummary, setSourceSummary] = useState('');
+  const [sourcesData, setSourcesData] = useState(null);
+  const [validationResults, setValidationResults] = useState([]);
 
   const [alertDays, setAlertDays] = useState([30, 14, 7, 3, 1]);
 
@@ -149,7 +151,7 @@ Format as a structured JSON with sections for each category.`,
       });
 
       setSourceSummary(result.summary || 'Legal knowledge base built successfully.');
-      setSourceStatus('complete');
+      setSourcesData(result);
 
       // Store the legal sources on the user profile
       await base44.auth.updateMe({
@@ -157,9 +159,64 @@ Format as a structured JSON with sections for each category.`,
         practice_areas: selectedAreas,
         specialism_notes: specialismNotes
       });
+
+      // Run specialism validation tests
+      await validateSpecialismData(result, areaLabels);
     } catch (e) {
       setSourceStatus('complete');
       setSourceSummary('Legal knowledge base index compiled from primary UK sources.');
+    }
+  };
+
+  const validateSpecialismData = async (sourcesResult, areaLabels) => {
+    setSourceStatus('validating');
+    setValidationResults([]);
+
+    try {
+      const validation = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are a UK legal data quality auditor. A legal professional has selected the following practice areas: ${areaLabels.join(', ')}.
+
+The following legal sources index was compiled for them:
+${JSON.stringify(sourcesResult, null, 2)}
+
+For EACH selected practice area, perform a data completeness test and verify that the necessary data was sourced. Check:
+1. Are the correct primary statutes present for that area?
+2. Is relevant case law included?
+3. Are the right regulatory bodies/codes covered?
+4. Are the correct courts/tribunals listed?
+5. Any critical gaps that could affect legal work?
+
+Return a test result for each practice area with a pass/fail status and specific findings.`,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            overall_pass: { type: 'boolean' },
+            overall_summary: { type: 'string' },
+            specialism_tests: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  specialism: { type: 'string' },
+                  status: { type: 'string', enum: ['pass', 'partial', 'fail'] },
+                  legislation_check: { type: 'boolean' },
+                  case_law_check: { type: 'boolean' },
+                  regulatory_check: { type: 'boolean' },
+                  courts_check: { type: 'boolean' },
+                  key_sources_found: { type: 'array', items: { type: 'string' } },
+                  gaps_identified: { type: 'array', items: { type: 'string' } },
+                  confidence_score: { type: 'number' }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      setValidationResults(validation.specialism_tests || []);
+      setSourceStatus('complete');
+    } catch (e) {
+      setSourceStatus('complete');
     }
   };
 
@@ -198,7 +255,7 @@ Format as a structured JSON with sections for each category.`,
     1: personal.full_name && personal.role && personal.email,
     2: practice.firm_name,
     3: selectedAreas.length > 0,
-    4: sourceStatus === 'complete',
+    4: sourceStatus === 'complete' || sourceStatus === 'validated',
     5: true,
   };
 
@@ -430,10 +487,11 @@ Format as a structured JSON with sections for each category.`,
                 </div>
               )}
 
-              {sourceStatus === 'building' && (
+              {(sourceStatus === 'building' || sourceStatus === 'validating') && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm text-primary font-medium">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Researching legal sources...
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    {sourceStatus === 'validating' ? 'Running specialism data validation tests...' : 'Researching legal sources...'}
                   </div>
                   <div className="space-y-2">
                     {sourceProgress.map((p, i) => (
@@ -442,17 +500,23 @@ Format as a structured JSON with sections for each category.`,
                         {p.text}
                       </div>
                     ))}
-                    {sourceProgress.length < 8 && (
+                    {sourceStatus === 'building' && sourceProgress.length < 8 && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
                         <span>Processing...</span>
+                      </div>
+                    )}
+                    {sourceStatus === 'validating' && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
+                        <span>Verifying data completeness for each specialism...</span>
                       </div>
                     )}
                   </div>
                   <div className="w-full bg-muted rounded-full h-2 mt-3">
                     <div
                       className="bg-primary h-2 rounded-full transition-all duration-500"
-                      style={{ width: `${(sourceProgress.length / 8) * 100}%` }}
+                      style={{ width: sourceStatus === 'validating' ? '90%' : `${(sourceProgress.length / 8) * 100}%` }}
                     />
                   </div>
                 </div>
@@ -466,14 +530,59 @@ Format as a structured JSON with sections for each category.`,
                     </div>
                     <p className="text-sm text-green-600">{sourceSummary}</p>
                   </div>
-                  <div className="space-y-1">
-                    {sourceProgress.map((p, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm text-slate-500">
-                        <CheckCircle className="w-3.5 h-3.5 text-green-500 flex-shrink-0" />
-                        {p.text}
-                      </div>
-                    ))}
-                  </div>
+
+                  {/* Specialism Validation Test Results */}
+                  {validationResults.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" /> Specialism Data Validation Tests
+                      </p>
+                      {validationResults.map((v, i) => {
+                        const statusColor = v.status === 'pass' ? 'bg-green-50 border-green-200' : v.status === 'partial' ? 'bg-amber-50 border-amber-200' : 'bg-red-50 border-red-200';
+                        const statusBadge = v.status === 'pass' ? 'bg-green-100 text-green-800' : v.status === 'partial' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800';
+                        const checks = [
+                          { label: 'Legislation', ok: v.legislation_check },
+                          { label: 'Case Law', ok: v.case_law_check },
+                          { label: 'Regulatory', ok: v.regulatory_check },
+                          { label: 'Courts', ok: v.courts_check },
+                        ];
+                        return (
+                          <div key={i} className={`rounded-lg border p-3 ${statusColor}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium text-sm">{v.specialism}</span>
+                              <div className="flex items-center gap-2">
+                                {v.confidence_score && (
+                                  <span className="text-xs text-slate-500">{Math.round(v.confidence_score)}% confidence</span>
+                                )}
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold uppercase ${statusBadge}`}>
+                                  {v.status}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5 mb-2">
+                              {checks.map(c => (
+                                <span key={c.label} className={`text-xs px-2 py-0.5 rounded flex items-center gap-1 ${c.ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                  {c.ok ? '✓' : '✗'} {c.label}
+                                </span>
+                              ))}
+                            </div>
+                            {v.key_sources_found?.length > 0 && (
+                              <p className="text-xs text-slate-600 mb-1">
+                                <strong>Found:</strong> {v.key_sources_found.slice(0, 3).join(', ')}
+                                {v.key_sources_found.length > 3 && ` +${v.key_sources_found.length - 3} more`}
+                              </p>
+                            )}
+                            {v.gaps_identified?.length > 0 && (
+                              <p className="text-xs text-amber-700">
+                                <strong>Gaps:</strong> {v.gaps_identified.join(', ')}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-sm text-primary">
                     <strong>Your AI is now loaded</strong> with practice-specific legislation, precedents, and regulatory standards. Every case you build will draw on this personalised legal library.
                   </div>
