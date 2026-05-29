@@ -92,6 +92,7 @@ import Landing from '@/pages/Landing';
 import EnterpriseSalesPage from '@/pages/EnterpriseSalesPage';
 import GettingStartedGuide from '@/pages/GettingStartedGuide';
 import DeveloperPortal from '@/pages/DeveloperPortal';
+import CuratedOnboarding from '@/pages/CuratedOnboarding';
 import AppLayout from '@/components/AppLayout';
 
 const AuthenticatedApp = () => {
@@ -214,6 +215,7 @@ const AuthenticatedApp = () => {
       <Route path="/getting-started" element={<GettingStartedGuide />} />
       <Route path="/help" element={<HelpAndDocs />} />
       <Route path="/developer-portal" element={<DeveloperPortal />} />
+      <Route path="/curated-onboarding" element={<CuratedOnboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </AppLayout>

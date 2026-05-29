@@ -168,6 +168,7 @@ const ALL_NAV_GROUPS = [
       { path: '/permissions', icon: Settings, label: 'Permissions' },
       { path: '/settings', icon: Settings, label: 'Firm Settings' },
       { path: '/onboarding', icon: CheckSquare, label: 'Setup & Onboarding' },
+      { path: '/curated-onboarding', icon: Sparkles, label: 'Curated Onboarding' },
     ],
   },
 ];
