@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { DEVELOPER_EMAIL } from '@/lib/dataPolicy';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -69,6 +70,15 @@ export default function OnboardingWizard() {
     queryKey: ['practice-profiles'],
     queryFn: () => base44.entities.PracticeProfile.list(),
   });
+
+  // Developer account skips onboarding entirely
+  useEffect(() => {
+    base44.auth.me().then(user => {
+      if (user?.email === DEVELOPER_EMAIL) {
+        navigate('/dashboard', { replace: true });
+      }
+    });
+  }, [navigate]);
 
   useEffect(() => {
     if (existingProfiles.length > 0 && existingProfiles[0].onboarding_complete) {

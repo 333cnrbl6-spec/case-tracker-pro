@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +12,7 @@ import { AlertTriangle, Plus, Search, Calendar, User, Briefcase, ChevronRight, G
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { daysUntil } from '@/lib/dateUtils';
+import { getDataFilter, isDeveloper } from '@/lib/dataPolicy';
 import CaseTimeline from '@/components/CaseTimeline';
 import DuplicateCaseMerger from '@/components/DuplicateCaseMerger';
 import EntityConflictAlert from '@/components/EntityConflictAlert';
@@ -71,10 +72,21 @@ export default function CaseManager() {
   const [editingId, setEditingId] = useState(null);
   const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
   const [duplicatePair, setDuplicatePair] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser);
+  }, []);
 
   const { data: cases = [], isLoading } = useQuery({
-    queryKey: ['legal-cases'],
-    queryFn: () => base44.entities.LegalCase.list('-created_date'),
+    queryKey: ['legal-cases', currentUser?.email],
+    queryFn: () => {
+      const filter = getDataFilter(currentUser);
+      return Object.keys(filter).length === 0
+        ? base44.entities.LegalCase.list('-created_date')
+        : base44.entities.LegalCase.filter(filter, '-created_date');
+    },
+    enabled: !!currentUser,
   });
 
   const saveMutation = useMutation({
