@@ -1,0 +1,37 @@
+{
+  "name": "Incident Breach Notification",
+  "description": "",
+  "trigger": {
+    "condition": "${ ((.trigger.data.severity == \"high\" or .trigger.data.severity == \"critical\") or (.trigger.data.rics_violations != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Incident"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "incident_breach_notification",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notifyIncidentBreach",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "notifyIncidentBreach"
+  }
+}

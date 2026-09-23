@@ -1,0 +1,43 @@
+{
+  "name": "Auto-transcribe audio/video evidence",
+  "description": "",
+  "trigger": {
+    "condition": "${ (.trigger.data.evidence_type == \"recording_transcript\" or .trigger.data.evidence_type == \"photograph\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Evidence"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_transcribe_audio_video_evidence",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "transcribeAudioEvidence",
+            "args": {
+              "evidence_id": "{{data.id}}",
+              "case_id": "{{data.case_id}}",
+              "file_url": "{{data.file_url}}",
+              "file_type": "audio",
+              "duration_seconds": 0
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  },
+  "x-base44-migrated-from-automation": {
+    "legacy_payload_function": "transcribeAudioEvidence"
+  }
+}
